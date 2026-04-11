@@ -14,6 +14,11 @@ namespace GHelper.Input
     {
         System.Timers.Timer timer = new System.Timers.Timer(AppConfig.Get("keyboard_timeout_refresh", 1000));
         public static bool backlightActivity = true;
+
+        // Callbacks for WPF integration (set by WPF app, null in WinForms)
+        public static Action<int>? OnCycleAura;
+        public static Action<int>? OnCycleVisual;
+        public static Action? OnToggleApp;
         public static bool lidClose = false;
         public static bool tentMode = false;
         private static bool? _fnLock = null;
@@ -548,6 +553,18 @@ namespace GHelper.Input
 
         public static void KeyProcess(string name = "m3")
         {
+            try
+            {
+                KeyProcessCore(name);
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteLine($"KeyProcess error ({name}): {ex.Message}");
+            }
+        }
+
+        private static void KeyProcessCore(string name)
+        {
             string action = AppConfig.GetString(name);
 
             if (action is null || action.Length <= 1)
@@ -593,10 +610,16 @@ namespace GHelper.Input
                     Program.toast.RunToast(miniledName, miniledName == Properties.Strings.OneZone ? ToastIcon.BrightnessDown : ToastIcon.BrightnessUp);
                     break;
                 case "aura":
-                    Program.settingsForm.BeginInvoke(Program.settingsForm.CycleAuraMode, Control.ModifierKeys == Keys.Shift ? -1 : 1);
+                    if (Program.settingsForm != null)
+                        Program.settingsForm.BeginInvoke(Program.settingsForm.CycleAuraMode, Control.ModifierKeys == Keys.Shift ? -1 : 1);
+                    else
+                        OnCycleAura?.Invoke(Control.ModifierKeys == Keys.Shift ? -1 : 1);
                     break;
                 case "visual":
-                    Program.settingsForm.BeginInvoke(Program.settingsForm.CycleVisualMode, Control.ModifierKeys == Keys.Shift ? -1 : 1);
+                    if (Program.settingsForm != null)
+                        Program.settingsForm.BeginInvoke(Program.settingsForm.CycleVisualMode, Control.ModifierKeys == Keys.Shift ? -1 : 1);
+                    else
+                        OnCycleVisual?.Invoke(Control.ModifierKeys == Keys.Shift ? -1 : 1);
                     break;
                 case "performance":
                     modeControl.CyclePerformanceMode(Control.ModifierKeys == Keys.Shift);
@@ -604,10 +627,17 @@ namespace GHelper.Input
                 case "ghelper":
                     try
                     {
-                        Program.settingsForm.BeginInvoke(delegate
+                        if (Program.settingsForm != null)
                         {
-                            Program.SettingsToggle();
-                        });
+                            Program.settingsForm.BeginInvoke(delegate
+                            {
+                                Program.SettingsToggle();
+                            });
+                        }
+                        else
+                        {
+                            OnToggleApp?.Invoke();
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -639,7 +669,8 @@ namespace GHelper.Input
                     LaunchProcess("calc");
                     break;
                 case "controller":
-                    Program.settingsForm.BeginInvoke(Program.settingsForm.allyControl.ToggleModeHotkey);
+                    if (Program.settingsForm != null)
+                        Program.settingsForm.BeginInvoke(Program.settingsForm.allyControl.ToggleModeHotkey);
                     break;
                 case "touchscreen":
                     ToggleTouchScreen();
@@ -721,8 +752,11 @@ namespace GHelper.Input
             int arLock = AppConfig.Is("arrow_lock") ? 0 : 1;
             AppConfig.Set("arrow_lock", arLock);
 
-            Program.settingsForm.BeginInvoke(Program.inputDispatcher.RegisterKeys);
-            Program.toast.RunToast("Arrow-Lock " + (arLock == 1 ? Properties.Strings.On : Properties.Strings.Off), ToastIcon.FnLock);
+            if (Program.settingsForm != null)
+                Program.settingsForm.BeginInvoke(Program.inputDispatcher.RegisterKeys);
+            else
+                Program.inputDispatcher?.RegisterKeys();
+            Program.toast?.RunToast("Arrow-Lock " + (arLock == 1 ? Properties.Strings.On : Properties.Strings.Off), ToastIcon.FnLock);
         }
 
         public static bool IsHardwareFnLock()
@@ -750,10 +784,13 @@ namespace GHelper.Input
 
             if (IsHardwareFnLock())
                 HardwareFnLock(fnLock);
-            else
+            else if (Program.settingsForm != null)
                 Program.settingsForm.BeginInvoke(Program.inputDispatcher.RegisterKeys);
+            else
+                Program.inputDispatcher?.RegisterKeys();
 
-            Program.settingsForm.BeginInvoke(Program.settingsForm.VisualiseFnLock);
+            if (Program.settingsForm != null)
+                Program.settingsForm.BeginInvoke(Program.settingsForm.VisualiseFnLock);
 
             Program.toast.RunToast(fnLock ? Properties.Strings.FnLockOn : Properties.Strings.FnLockOff, ToastIcon.FnLock);
         }
@@ -801,6 +838,18 @@ namespace GHelper.Input
         }
 
         static void HandleEvent(int EventID)
+        {
+            try
+            {
+                HandleEventCore(EventID);
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteLine($"HandleEvent error (event {EventID}): {ex.Message}");
+            }
+        }
+
+        static void HandleEventCore(int EventID)
         {
             // The ROG Ally uses different M-key codes.
             // We'll special-case the translation of those.
@@ -862,7 +911,10 @@ namespace GHelper.Input
                         modeControl.CyclePerformanceMode(Control.ModifierKeys == Keys.Shift);
                         return;
                     case 178:   // FN+LEFT ARROW / FN + F4
-                        Program.settingsForm.BeginInvoke(Program.settingsForm.CycleAuraMode, -1);
+                        if (Program.settingsForm != null)
+                            Program.settingsForm.BeginInvoke(Program.settingsForm.CycleAuraMode, -1);
+                        else
+                            KeyProcess("fnf4");
                         return;
                     case 179:   // FN+F4
                         KeyProcess("fnf4");

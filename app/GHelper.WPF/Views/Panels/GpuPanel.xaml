@@ -1,0 +1,50 @@
+<UserControl x:Class="GHelper.WPF.Views.Panels.GpuPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:GHelper.WPF.Controls"
+             Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibility}}">
+
+    <Border Style="{StaticResource CardStyle}">
+        <StackPanel>
+            <!-- Header -->
+            <Grid Margin="0,0,0,28">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="&#xE836;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="{Binding HeaderText}"
+                               Style="{StaticResource CardTitleStyle}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <TextBlock Grid.Column="1" Text="Requires Restart &#x26A0;"
+                           Foreground="{DynamicResource WarnOrangeBrush}"
+                           FontSize="11"
+                           FontStyle="Italic"
+                           VerticalAlignment="Center"
+                           Visibility="{Binding ShowRestart, Converter={StaticResource BoolToVisibility}}" />
+            </Grid>
+
+            <!-- GPU Schematic Diagram -->
+            <controls:GpuSchematic
+                Height="260"
+                ActiveMode="{Binding SchematicMode}"
+                ShowRestart="{Binding ShowRestart}"
+                AccentColor="{DynamicResource AccentColor}"
+                Margin="0,0,0,28" />
+
+            <!-- Mode Selector Pills with Icons -->
+            <controls:PillSelector
+                Height="34"
+                Items="{Binding ModeLabels}"
+                Icons="{Binding ModeIcons}"
+                ItemColors="{Binding ModeColors}"
+                SelectedIndex="{Binding SelectedModeIndex, Mode=TwoWay}" />
+        </StackPanel>
+    </Border>
+</UserControl>

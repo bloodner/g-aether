@@ -1,0 +1,122 @@
+<UserControl x:Class="GHelper.WPF.Views.Panels.MonitorPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:GHelper.WPF.Controls">
+
+    <Grid Margin="0,0,0,8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Row 0: CPU Temp + Power Draw (always visible) -->
+        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardStyle}">
+            <controls:SparklineChart Height="70"
+                Label="CPU Temp"
+                CurrentText="{Binding CpuTempText}"
+                Values="{Binding CpuTempValues}"
+                MaxValue="105"
+                ValueFontSize="16"
+                StrokeColor="#FF6B6B" />
+        </Border>
+        <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource CardStyle}">
+            <controls:SparklineChart Height="70"
+                Label="Power Draw"
+                CurrentText="{Binding BatteryRateText}"
+                Values="{Binding BatteryRateValues}"
+                MaxValue="100"
+                ValueFontSize="16"
+                StrokeColor="#6BCB77" />
+        </Border>
+
+        <!-- Row 1: GPU Temp + GPU Usage (when active) OR dGPU Idle banner (when Eco) -->
+        <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource CardStyle}"
+                Visibility="{Binding IsGpuActive, Converter={StaticResource BoolToVisibility}}">
+            <controls:SparklineChart Height="70"
+                Label="GPU Temp"
+                CurrentText="{Binding GpuTempText}"
+                Values="{Binding GpuTempValues}"
+                MaxValue="95"
+                ValueFontSize="16"
+                StrokeColor="#FFB347" />
+        </Border>
+        <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource CardStyle}"
+                Visibility="{Binding IsGpuActive, Converter={StaticResource BoolToVisibility}}">
+            <controls:SparklineChart Height="70"
+                Label="GPU Usage"
+                CurrentText="{Binding GpuUseText}"
+                Values="{Binding GpuUseValues}"
+                MaxValue="100"
+                ValueFontSize="16"
+                StrokeColor="#60CDFF" />
+        </Border>
+        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                Style="{StaticResource CardStyle}"
+                Visibility="{Binding IsGpuActive, Converter={StaticResource InverseBoolToVisibility}}"
+                Padding="14,8">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="&#xE7F4;" FontFamily="Segoe MDL2 Assets" FontSize="14"
+                           Foreground="{DynamicResource ForeDimBrush}"
+                           VerticalAlignment="Center" Margin="0,0,8,0" />
+                <TextBlock Text="dGPU Off — Eco Mode"
+                           Style="{StaticResource DimTextStyle}"
+                           FontSize="12"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
+
+        <!-- Row 2: CPU Fan / GPU Fan -->
+        <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource CardStyle}">
+            <controls:SparklineChart Height="70"
+                Label="CPU Fan"
+                CurrentText="{Binding CpuFanCurrentText}"
+                Values="{Binding CpuFanValues}"
+                MaxValue="7000"
+                ValueFontSize="13"
+                StrokeColor="#C084FC" />
+        </Border>
+        <Border Grid.Row="2" Grid.Column="2" Style="{StaticResource CardStyle}">
+            <controls:SparklineChart Height="70"
+                Label="GPU Fan"
+                CurrentText="{Binding GpuFanCurrentText}"
+                Values="{Binding GpuFanValues}"
+                MaxValue="7000"
+                ValueFontSize="13"
+                StrokeColor="#F472B6" />
+        </Border>
+
+        <!-- Row 3: Battery Status (full width) -->
+        <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Style="{StaticResource CardStyle}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                    <TextBlock Text="{Binding BatteryPercentText}"
+                               FontSize="22" FontWeight="SemiBold"
+                               Foreground="{Binding BatteryBrush}"
+                               HorizontalAlignment="Center" />
+                    <TextBlock Text="{Binding PowerStatusText}"
+                               Style="{StaticResource DimTextStyle}"
+                               FontSize="10"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Style="{StaticResource DimTextStyle}" Text="Battery" Margin="0,0,0,2" />
+                    <TextBlock Style="{StaticResource BodyTextStyle}"
+                               Text="{Binding BatteryRateText}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

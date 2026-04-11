@@ -22,11 +22,25 @@ namespace GHelper.UI
         public static Color chartMain;
         public static Color chartGrid;
 
+        public static Color cardBackground;
+        public static Color cardBackgroundSecondary;
+
         [DllImport("UXTheme.dll", SetLastError = true, EntryPoint = "#138")]
         public static extern bool CheckSystemDarkModeStatus();
 
-        [DllImport("DwmApi")] //System.Runtime.InteropServices
+        [DllImport("DwmApi")]
         private static extern int DwmSetWindowAttribute(nint hwnd, int attr, int[] attrValue, int attrSize);
+
+        [DllImport("DwmApi")]
+        private static extern int DwmExtendFrameIntoClientArea(nint hwnd, ref MARGINS margins);
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct MARGINS { public int Left, Right, Top, Bottom; }
+
+        private const int DWMWA_SYSTEMBACKDROP_TYPE = 38;
+
+        public static bool IsMicaSupported => Environment.OSVersion.Version.Build >= 22000;
+        public bool MicaEnabled { get; private set; } = false;
 
         public bool darkTheme = false;
         protected override CreateParams CreateParams
@@ -52,6 +66,9 @@ namespace GHelper.UI
 
                 chartMain = Color.FromArgb(255, 35, 35, 35);
                 chartGrid = Color.FromArgb(255, 70, 70, 70);
+
+                cardBackground = Color.FromArgb(255, 32, 32, 32);
+                cardBackgroundSecondary = Color.FromArgb(255, 30, 30, 30);
             }
             else
             {
@@ -64,6 +81,24 @@ namespace GHelper.UI
 
                 chartMain = SystemColors.ControlLightLight;
                 chartGrid = Color.LightGray;
+
+                cardBackground = Color.FromArgb(255, 251, 251, 251);
+                cardBackgroundSecondary = Color.FromArgb(255, 245, 245, 245);
+            }
+        }
+
+        protected void EnableMica()
+        {
+            if (!IsMicaSupported) return;
+            try
+            {
+                // Mica backdrop on the title bar
+                DwmSetWindowAttribute(Handle, DWMWA_SYSTEMBACKDROP_TYPE, new[] { 2 }, 4);
+                MicaEnabled = true;
+            }
+            catch
+            {
+                MicaEnabled = false;
             }
         }
 
@@ -102,11 +137,17 @@ namespace GHelper.UI
             InitColors(darkTheme);
 
             if (setDPI)
+            {
                 ControlHelper.Resize(this);
-
-            if (changed)
+                DwmSetWindowAttribute(Handle, 20, new[] { darkTheme ? 1 : 0 }, 4);
+                EnableMica();
+                ControlHelper.Adjust(this, true);
+                this.Invalidate();
+            }
+            else if (changed)
             {
                 DwmSetWindowAttribute(Handle, 20, new[] { darkTheme ? 1 : 0 }, 4);
+                EnableMica();
                 ControlHelper.Adjust(this, changed);
                 this.Invalidate();
             }

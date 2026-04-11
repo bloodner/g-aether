@@ -229,22 +229,25 @@ namespace GHelper.Display
             AppConfig.Set("frequency", frequency);
             AppConfig.Set("overdrive", overdrive);
 
-            Program.settingsForm.Invoke(delegate
+            if (Program.settingsForm != null)
             {
-                Program.settingsForm.VisualiseScreen(
-                    screenEnabled: screenEnabled,
-                    screenAuto: screenAuto,
-                    frequency: frequency,
-                    maxFrequency: maxFrequency,
-                    overdrive: overdrive,
-                    overdriveSetting: overdriveSetting,
-                    miniled1: miniled1,
-                    miniled2: miniled2,
-                    hdr: hdr,
-                    fhd: fhd,
-                    hdrControl: hdrControl
-                );
-            });
+                Program.settingsForm.Invoke(delegate
+                {
+                    Program.settingsForm.VisualiseScreen(
+                        screenEnabled: screenEnabled,
+                        screenAuto: screenAuto,
+                        frequency: frequency,
+                        maxFrequency: maxFrequency,
+                        overdrive: overdrive,
+                        overdriveSetting: overdriveSetting,
+                        miniled1: miniled1,
+                        miniled2: miniled2,
+                        hdr: hdr,
+                        fhd: fhd,
+                        hdrControl: hdrControl
+                    );
+                });
+            }
 
         }
     }

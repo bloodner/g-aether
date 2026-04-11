@@ -1,0 +1,185 @@
+<UserControl x:Class="GHelper.WPF.Views.Panels.PerformancePanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:GHelper.WPF.Controls">
+
+    <StackPanel>
+        <!-- Main Performance Card -->
+        <Border Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <!-- Title Row -->
+                <Grid Margin="0,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Grid.Column="1" Style="{StaticResource CardTitleStyle}" VerticalAlignment="Center">
+                        <Run Text="Mode: " />
+                        <Run Text="{Binding ModeSummaryLabel}" />
+                    </TextBlock>
+                </Grid>
+
+                <!-- Performance Mode Arc (Silent / Balanced / Turbo) -->
+                <controls:PerformanceModeArc
+                    Height="180"
+                    SelectedIndex="{Binding SelectedModeIndex, Mode=TwoWay}"
+                    Items="{Binding ModeLabels}" />
+
+                <!-- Apply Strategy Selector -->
+                <TextBlock Text="Fan &amp; Power Control"
+                           Style="{StaticResource DimTextStyle}"
+                           FontSize="10" Margin="0,4,0,6" />
+                <controls:PillSelector
+                    Items="{Binding ApplyStrategyLabels}"
+                    SelectedIndex="{Binding ApplyStrategyIndex, Mode=TwoWay}"
+                    Height="32" />
+
+                <!-- Sensor Cards: CPU + GPU side by side -->
+                <Grid Margin="0,14,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="8" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <controls:SensorCard
+                        Grid.Column="0"
+                        Label="CPU"
+                        IconGlyph="&#xE950;"
+                        Temperature="{Binding CpuTemperature}"
+                        FanSpeed="{Binding CpuFanSpeed}"
+                        TargetSpeed="{Binding CpuTargetSpeed}" />
+
+                    <controls:SensorCard
+                        Grid.Column="2"
+                        Label="GPU"
+                        IconGlyph="&#xE7F4;"
+                        Temperature="{Binding GpuTemperature}"
+                        FanSpeed="{Binding GpuFanSpeed}"
+                        TargetSpeed="{Binding GpuTargetSpeed}" />
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- Fan Curves Section (visible when Custom Fans or Both selected) -->
+        <Border Style="{StaticResource CardStyle}"
+                Visibility="{Binding DataContext.ShowFanCurves, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"
+                DataContext="{Binding FansPower}">
+            <StackPanel>
+                <Grid Margin="0,0,0,8">
+                    <TextBlock Style="{StaticResource CardTitleStyle}">
+                        <Run Text="&#xE9CA;" FontFamily="Segoe MDL2 Assets" FontSize="14" />
+                        <Run Text="  Fan Curves" />
+                    </TextBlock>
+                    <Button Content="Reset" HorizontalAlignment="Right"
+                            Style="{StaticResource LinkButtonStyle}"
+                            Command="{Binding ResetFanCurvesCommand}" />
+                </Grid>
+
+                <controls:FanCurveEditor x:Name="CpuCurveEditor"
+                    Height="150"
+                    Label="CPU Fan"
+                    Temps="{Binding CpuFanTemps, Mode=TwoWay}"
+                    Speeds="{Binding CpuFanSpeeds, Mode=TwoWay}"
+                    BaseAccentColor="{DynamicResource AccentColor}"
+                    AnimateColor="True"
+                    HueOffset="0" />
+
+                <controls:FanCurveEditor x:Name="GpuCurveEditor"
+                    Height="150" Margin="0,8,0,0"
+                    Label="GPU Fan"
+                    Temps="{Binding GpuFanTemps, Mode=TwoWay}"
+                    Speeds="{Binding GpuFanSpeeds, Mode=TwoWay}"
+                    BaseAccentColor="{DynamicResource AccentColor}"
+                    AnimateColor="True"
+                    HueOffset="3.14" />
+            </StackPanel>
+        </Border>
+
+        <!-- Power Limits Section (visible when Custom Power or Both selected) -->
+        <Border Style="{StaticResource CardStyle}"
+                Visibility="{Binding DataContext.ShowPowerLimits, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"
+                DataContext="{Binding FansPower}">
+            <StackPanel>
+                <Grid Margin="0,0,0,8">
+                    <TextBlock Style="{StaticResource CardTitleStyle}">
+                        <Run Text="&#xEA93;" FontFamily="Segoe MDL2 Assets" FontSize="14" />
+                        <Run Text="  Power Limits" />
+                    </TextBlock>
+                </Grid>
+
+                <!-- Total / SPL -->
+                <Grid Style="{StaticResource SettingsRowStyle}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="50" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Total (SPL)" Style="{StaticResource DimTextStyle}"
+                               VerticalAlignment="Center" />
+                    <Slider Grid.Column="1" Minimum="{Binding MinPower}" Maximum="{Binding MaxPower}"
+                            Value="{Binding TotalPowerLimit, Mode=TwoWay}"
+                            VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="{Binding TotalPowerText}"
+                               Style="{StaticResource BodyTextStyle}"
+                               HorizontalAlignment="Right" VerticalAlignment="Center" />
+                </Grid>
+
+                <!-- Slow Boost / sPPT -->
+                <Grid Style="{StaticResource SettingsRowStyle}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="50" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Slow (sPPT)" Style="{StaticResource DimTextStyle}"
+                               VerticalAlignment="Center" />
+                    <Slider Grid.Column="1" Minimum="{Binding MinPower}" Maximum="{Binding MaxPower}"
+                            Value="{Binding SlowBoostLimit, Mode=TwoWay}"
+                            VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="{Binding SlowBoostText}"
+                               Style="{StaticResource BodyTextStyle}"
+                               HorizontalAlignment="Right" VerticalAlignment="Center" />
+                </Grid>
+
+                <!-- Fast Boost / fPPT -->
+                <Grid Style="{StaticResource SettingsRowStyle}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="50" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Fast (fPPT)" Style="{StaticResource DimTextStyle}"
+                               VerticalAlignment="Center" />
+                    <Slider Grid.Column="1" Minimum="{Binding MinPower}" Maximum="{Binding MaxPower}"
+                            Value="{Binding FastBoostLimit, Mode=TwoWay}"
+                            VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="{Binding FastBoostText}"
+                               Style="{StaticResource BodyTextStyle}"
+                               HorizontalAlignment="Right" VerticalAlignment="Center" />
+                </Grid>
+
+                <!-- CPU Limit -->
+                <Grid Style="{StaticResource SettingsRowStyle}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="50" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="CPU" Style="{StaticResource DimTextStyle}"
+                               VerticalAlignment="Center" />
+                    <Slider Grid.Column="1" Minimum="{Binding MinPower}" Maximum="{Binding MaxPower}"
+                            Value="{Binding CpuPowerLimit, Mode=TwoWay}"
+                            VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="{Binding CpuPowerText}"
+                               Style="{StaticResource BodyTextStyle}"
+                               HorizontalAlignment="Right" VerticalAlignment="Center" />
+                </Grid>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

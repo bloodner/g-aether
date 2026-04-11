@@ -10,7 +10,7 @@ using System.Net;
 
 namespace Ryzen
 {
-    internal class RyzenControl
+    public class RyzenControl
     {
 
         public static int MinCPUUV => AppConfig.Get("min_uv", -40);

@@ -1,0 +1,54 @@
+<UserControl x:Class="GHelper.WPF.Views.Panels.KeyBindingsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Border Style="{StaticResource CardStyle}">
+        <StackPanel>
+            <!-- Header -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                <TextBlock Text="&#xE92E;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                           Foreground="{DynamicResource AccentBrush}"
+                           VerticalAlignment="Center" Margin="0,0,8,0" />
+                <TextBlock Text="Key Bindings"
+                           Style="{StaticResource CardTitleStyle}"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+
+            <TextBlock Text="Assign actions to your laptop's special keys."
+                       Style="{StaticResource DimTextStyle}" Margin="0,0,0,14" />
+
+            <!-- ROG / M4 Key -->
+            <TextBlock Text="ROG Key" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
+            <ComboBox ItemsSource="{Binding Actions}"
+                      SelectedIndex="{Binding RogKeyIndex, Mode=TwoWay}"
+                      Margin="0,0,0,12" />
+
+            <!-- M3 / Aura Key -->
+            <TextBlock Text="Aura Key (M3)" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
+            <ComboBox ItemsSource="{Binding Actions}"
+                      SelectedIndex="{Binding AuraKeyIndex, Mode=TwoWay}"
+                      Margin="0,0,0,12" />
+
+            <!-- Fn+F4 -->
+            <Border BorderBrush="#10FFFFFF" BorderThickness="0,1,0,0" Padding="0,12,0,0">
+                <StackPanel>
+                    <TextBlock Text="Fn + F4" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
+                    <ComboBox ItemsSource="{Binding Actions}"
+                              SelectedIndex="{Binding FnF4Index, Mode=TwoWay}"
+                              Margin="0,0,0,12" />
+
+                    <!-- Fn+V -->
+                    <TextBlock Text="Fn + V" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
+                    <ComboBox ItemsSource="{Binding Actions}"
+                              SelectedIndex="{Binding FnVIndex, Mode=TwoWay}"
+                              Margin="0,0,0,12" />
+
+                    <!-- Fn+Numpad Enter -->
+                    <TextBlock Text="Fn + Numpad Enter" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
+                    <ComboBox ItemsSource="{Binding Actions}"
+                              SelectedIndex="{Binding FnEnterIndex, Mode=TwoWay}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Border>
+</UserControl>

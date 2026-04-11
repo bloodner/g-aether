@@ -18,19 +18,19 @@ using static NativeMethods;
 namespace GHelper
 {
 
-    static class Program
+    public static class Program
     {
         public static NotifyIcon trayIcon;
         public static AsusACPI acpi;
 
-        public static SettingsForm settingsForm = new SettingsForm();
+        public static SettingsForm? settingsForm;
 
-        public static ModeControl modeControl = new ModeControl();
-        public static GPUModeControl gpuControl = new GPUModeControl(settingsForm);
-        public static AllyControl allyControl = new AllyControl(settingsForm);
-        public static ClamshellModeControl clamshellControl = new ClamshellModeControl();
+        public static ModeControl? modeControl;
+        public static GPUModeControl? gpuControl;
+        public static AllyControl? allyControl;
+        public static ClamshellModeControl? clamshellControl;
 
-        public static ToastForm toast = new ToastForm();
+        public static ToastForm? toast;
 
         public static IntPtr unRegPowerNotify, unRegPowerNotifyLid;
         public static int WM_TASKBARCREATED = 0;
@@ -85,6 +85,14 @@ namespace GHelper
 
             ProcessHelper.CheckAlreadyRunning();
             ProcessHelper.SetPriority();
+
+            // Initialize form and controllers (deferred from static init for WPF compatibility)
+            settingsForm = new SettingsForm();
+            modeControl = new ModeControl();
+            gpuControl = new GPUModeControl(settingsForm);
+            allyControl = new AllyControl(settingsForm);
+            clamshellControl = new ClamshellModeControl();
+            toast = new ToastForm();
 
             Logger.WriteLine("------------");
             Logger.WriteLine("App launched: " + AppConfig.GetModel() + " :" + Assembly.GetExecutingAssembly().GetName().Version.ToString() + CultureInfo.CurrentUICulture + (ProcessHelper.IsUserAdministrator() ? "." : ""));

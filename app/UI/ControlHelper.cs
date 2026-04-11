@@ -95,6 +95,12 @@ public static class ControlHelper
                 gb.ForeColor = RForm.foreMain;
             }
 
+            var cardPanel = control as CardPanel;
+            if (cardPanel != null)
+            {
+                cardPanel.BackColor = RForm.cardBackground;
+            }
+
             var pn = control as Panel;
             if (pn != null && pn.Name.Contains("Header"))
             {
@@ -105,6 +111,48 @@ public static class ControlHelper
             if (sl != null)
             {
                 sl.borderColor = RForm.buttonMain;
+            }
+
+            var bs = control as ButtonSelector;
+            if (bs != null)
+            {
+                bs.BackColor = RForm.cardBackground;
+                bs.Invalidate();
+            }
+
+            var cp = control as ColorPickerPanel;
+            if (cp != null)
+            {
+                cp.BackColor = RForm.cardBackground;
+                cp.Invalidate();
+            }
+
+            var gauge = control as CircularGauge;
+            if (gauge != null)
+            {
+                gauge.BackColor = RForm.cardBackground;
+                gauge.Invalidate();
+            }
+
+            var schematic = control as GpuSchematicPanel;
+            if (schematic != null)
+            {
+                schematic.BackColor = RForm.cardBackground;
+                schematic.Invalidate();
+            }
+
+            var toggle = control as ToggleSwitch;
+            if (toggle != null)
+            {
+                toggle.BackColor = RForm.cardBackground;
+                toggle.Invalidate();
+            }
+
+            var gradSlider = control as GradientModeSlider;
+            if (gradSlider != null)
+            {
+                gradSlider.BackColor = RForm.cardBackground;
+                gradSlider.Invalidate();
             }
 
             var chk = control as CheckBox;

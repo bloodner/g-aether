@@ -510,7 +510,7 @@ public static class AppConfig
 
     public static bool IsAdvancedRGB()
     {
-        return IsStrix() || ContainsModel("GX650");
+        return IsStrix() || ContainsModel("GX650") || Is("advanced_rgb");
     }
 
     public static bool IsBacklightZones()

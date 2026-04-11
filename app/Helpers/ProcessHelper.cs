@@ -7,6 +7,15 @@ namespace GHelper.Helpers
     {
         private static long lastAdmin;
 
+        /// <summary>
+        /// Exits the application regardless of UI framework (WinForms or WPF).
+        /// </summary>
+        public static void ExitApplication()
+        {
+            Application.Exit();
+            Environment.Exit(0);
+        }
+
         private static bool? _isSystem;
         public static bool IsRunningAsSystem()
         {
@@ -41,7 +50,7 @@ namespace GHelper.Helpers
                         {
                             Logger.WriteLine(ex.ToString());
                             MessageBox.Show(Properties.Strings.AppAlreadyRunningText, Properties.Strings.AppAlreadyRunning, MessageBoxButtons.OK);
-                            Application.Exit();
+                            ExitApplication();
                             return;
                         }
             }
@@ -72,7 +81,7 @@ namespace GHelper.Helpers
                 try
                 {
                     Process.Start(startInfo);
-                    Application.Exit();
+                    ExitApplication();
                 }
                 catch (Exception ex)
                 {

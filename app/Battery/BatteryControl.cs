@@ -29,14 +29,15 @@ namespace GHelper.Battery
         {
             chargeFull = true;
             Program.acpi.DeviceSet(AsusACPI.BatteryLimit, 100, "BatteryLimit");
-            Program.settingsForm.VisualiseBatteryFull();
+            Program.settingsForm?.VisualiseBatteryFull();
         }
 
         public static void UnSetBatteryLimitFull()
         {
             chargeFull = false;
             Logger.WriteLine("Battery fully charged");
-            Program.settingsForm.Invoke(Program.settingsForm.VisualiseBatteryFull);
+            if (Program.settingsForm != null)
+                Program.settingsForm.Invoke(Program.settingsForm.VisualiseBatteryFull);
         }
 
         public static void AutoBattery(bool init = false)
@@ -63,7 +64,7 @@ namespace GHelper.Battery
             AppConfig.Set("charge_limit", limit);
             chargeFull = false;
 
-            Program.settingsForm.VisualiseBattery(limit);
+            Program.settingsForm?.VisualiseBattery(limit);
         }
 
         public static void BatteryReport()

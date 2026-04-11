@@ -3,6 +3,14 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# G-Aether local artifacts
+/publish/
+/app/GHelper.WPF/publish/
+/app/GHelper.WPF/publish-single/
+/.claude/
+Context.txt
+ui.md
+
 # User-specific files
 *.rsuser
 *.suo

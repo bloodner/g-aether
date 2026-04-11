@@ -8,7 +8,7 @@ namespace GHelper.Mode
     public class ModeControl
     {
 
-        static SettingsForm settings = Program.settingsForm;
+        static SettingsForm? settings => Program.settingsForm;
 
         private static bool customFans = false;
         private static int customPower = 0;
@@ -72,7 +72,7 @@ namespace GHelper.Mode
 
             if (!Modes.Exists(mode)) mode = 0;
 
-            settings.ShowMode(mode);
+            settings?.ShowMode(mode);
 
             Modes.SetCurrent(mode);
 
@@ -133,7 +133,7 @@ namespace GHelper.Mode
             if (AppConfig.GetMode("auto_boost") != -1)
                     PowerNative.SetCPUBoost(AppConfig.GetMode("auto_boost"));
 
-            settings.FansInit();
+            settings?.FansInit();
         }
 
 
@@ -199,12 +199,12 @@ namespace GHelper.Mode
                     if (cpuResult != 1 || gpuResult != 1)
                     {
                         Program.acpi.DeviceSet(AsusACPI.PerformanceMode, Modes.GetCurrentBase(), "Reset Mode");
-                        settings.LabelFansResult("Model doesn't support custom fan curves");
+                        settings?.LabelFansResult("Model doesn't support custom fan curves");
                     }
                 }
                 else
                 {
-                    settings.LabelFansResult("");
+                    settings?.LabelFansResult("");
                     customFans = true;
                 }
 
@@ -249,7 +249,7 @@ namespace GHelper.Mode
 
         public void SetModeLabel()
         {
-            settings.SetModeLabel(Properties.Strings.PerformanceMode + ": " + Modes.GetCurrentName() + (customFans ? "+" : "") + ((customPower > 0) ? " " + customPower + "W" : ""));
+            settings?.SetModeLabel(Properties.Strings.PerformanceMode + ": " + Modes.GetCurrentName() + (customFans ? "+" : "") + ((customPower > 0) ? " " + customPower + "W" : ""));
         }
 
         public void SetRyzenPower(bool init = false)
@@ -368,7 +368,7 @@ namespace GHelper.Mode
                     Logger.WriteLine("Clocks Error:" + ex.ToString());
                 }
 
-                settings.GPUInit();
+                settings?.GPUInit();
             });
         }
 

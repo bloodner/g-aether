@@ -152,6 +152,8 @@ namespace GHelper.Helpers
 
             if (AppConfig.Is("disable_osd")) return;
 
+            if (Program.settingsForm == null) return;
+
             Program.settingsForm.Invoke(delegate
             {
                 //Hide();

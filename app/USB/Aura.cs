@@ -54,6 +54,7 @@ namespace GHelper.USB
         GPUMODE = 21,
         AMBIENT = 22,
         BATTERY = 23,
+        CONTRAST = 24,
     }
 
     public enum AuraSpeed : int
@@ -86,6 +87,13 @@ namespace GHelper.USB
 
         static bool isStrix4Zone = AppConfig.Is4ZoneRGB();
         static bool isStrixNumpad = AppConfig.IsStrixNumpad();
+
+        public static void RefreshRGBFlags()
+        {
+            isStrix = AppConfig.IsAdvancedRGB() && !AppConfig.IsNoDirectRGB();
+            isStrix4Zone = AppConfig.Is4ZoneRGB();
+            initDirect = true;
+        }
 
         static public bool isSingleColor = false;
 
@@ -146,6 +154,7 @@ namespace GHelper.USB
             { AuraMode.HEATMAP, "Heatmap"},
             { AuraMode.AMBIENT, "Ambient"},
             { AuraMode.BATTERY, "Battery"},
+            { AuraMode.CONTRAST, "Contrast"},
         };
 
         static Aura()
@@ -240,7 +249,7 @@ namespace GHelper.USB
 
         public static bool HasSecondColor()
         {
-            return mode == AuraMode.AuraBreathe && !isACPI;
+            return (mode == AuraMode.AuraBreathe && !isACPI) || mode == AuraMode.CONTRAST;
         }
 
         private static void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
@@ -531,6 +540,29 @@ namespace GHelper.USB
 
         };
 
+        // Contrast mode: 0 = Color A (action/modifier keys), 1 = Color B (content/typing keys)
+        static byte[] packetContrast = new byte[]
+        {
+                    /* VDN   VUP   MICM  HPFN  ARMC  */
+                         0,    0,    0,    0,    0,
+        /* ESC          F1    F2    F3    F4    F5    F6    F7    F8    F9   F10   F11   F12              DEL15 DEL17  PAUS  PRT   HOM   */
+             0,          0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,                0,   0,    0,    0,    0,
+        /* BKTK    1     2     3     4     5     6     7     8     9     0     -     =   BSPC  BSPC  BSPC PLY15  NMLK  NMDV  NMTM  NMMI  */
+             1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    0,    0,    0,    0,    0,    0,    0,    0,
+        /* TAB     Q     W     E     R     T     Y     U     I     O     P     [     ]     \              STP15  NM7   NM8   NM9   NMPL  */
+             0,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,                0,    1,    1,    1,    0,
+        /* CPLK    A     S     D     F     G     H     J     K     L     ;     "     #   ENTR  ENTR  ENTR PRV15  NM4   NM5   NM6   NMPL  */
+             0,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    0,    0,    0,    0,    1,    1,    1,    0,
+        /* LSFT  ISO\    Z     X     C     V     B     N     M     ,     .     /   RSFT  RSFT  RSFT  ARWU NXT15  NM1   NM2   NM3   NMER  */
+             0,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    0,    0,    0,    0,    0,    1,    1,    1,    0,
+        /* LCTL  LFNC  LWIN  LALT              SPC               RALT  RFNC  RCTL        ARWL  ARWD  ARWR PRT15        NM0   NMPD  NMER  */
+             0,    0,    0,    0,              1,                  0,    0,    0,          0,    0,    0,    0,          1,    1,    0,
+        /* LB1   LB2   LB3                                                               ARW?  ARWL? ARWD? ARWR?       LB4   LB5   LB6   */
+             0,    0,    0,                                                                0,    0,    0,    0,          0,    0,    0,
+        /* KSTN  LOGO  LIDL  LIDR  */
+             0,    0,    0,    0,
+        };
+
         static byte[] packet4Zone = new byte[]
         {
 /*01        Z1  Z2  Z3  Z4  NA  NA  KeyZone */
@@ -666,6 +698,64 @@ namespace GHelper.USB
 
         }
 
+        public static void ApplyDirectContrast(Color colorA, Color colorB, bool init = false)
+        {
+            const byte keySet = 167;
+            const byte ledCount = 178;
+            const ushort mapSize = 3 * ledCount;
+            const byte ledsPerPacket = 16;
+
+            byte[] buffer = new byte[64];
+            byte[] keyBuf = new byte[mapSize];
+
+            buffer[0] = AsusHid.AURA_ID;
+            buffer[1] = 0xbc;
+            buffer[2] = 0x01;
+            buffer[3] = 0x01;
+            buffer[4] = 0x01;
+            buffer[5] = 0x01;
+            buffer[6] = 0x00;
+            buffer[7] = 0x10;
+
+            if (init || initDirect)
+            {
+                initDirect = false;
+                AsusHid.WriteAura(new byte[] { AsusHid.AURA_ID, 0xBC });
+            }
+
+            Array.Clear(keyBuf, 0, keyBuf.Length);
+
+            for (int ledIndex = 0; ledIndex < packetMap.Count(); ledIndex++)
+            {
+                ushort offset = (ushort)(3 * packetMap[ledIndex]);
+                byte group = packetContrast[ledIndex]; // 0 = Color A, 1 = Color B
+                Color c = group == 0 ? colorA : colorB;
+
+                keyBuf[offset] = c.R;
+                keyBuf[offset + 1] = c.G;
+                keyBuf[offset + 2] = c.B;
+            }
+
+            for (int i = 0; i < keySet; i += ledsPerPacket)
+            {
+                byte ledsRemaining = (byte)(keySet - i);
+                if (ledsRemaining < ledsPerPacket)
+                    buffer[7] = ledsRemaining;
+
+                buffer[6] = (byte)i;
+                Buffer.BlockCopy(keyBuf, 3 * i, buffer, 9, 3 * buffer[7]);
+                AsusHid.WriteAura(buffer);
+            }
+
+            buffer[4] = 0x04;
+            buffer[5] = 0x00;
+            buffer[6] = 0x00;
+            buffer[7] = 0x00;
+
+            Buffer.BlockCopy(keyBuf, 3 * keySet, buffer, 9, 3 * (ledCount - keySet));
+            AsusHid.WriteAura(buffer);
+        }
+
         public static Color ColorDim(Color Color, double colorDim = 1)
         {
             switch (InputDispatcher.GetBacklight())
@@ -697,6 +787,12 @@ namespace GHelper.USB
             timer.Enabled = false;
 
             Logger.WriteLine($"AuraMode: {Mode}");
+
+            if (Mode == AuraMode.CONTRAST)
+            {
+                CustomRGB.ApplyContrast(true);
+                return;
+            }
 
             if (Mode == AuraMode.HEATMAP)
             {
@@ -798,6 +894,23 @@ namespace GHelper.USB
             static Color colorUltimate = ColorTranslator.FromHtml(AppConfig.GetString("color_ultimate", "#FF0000"));
             static Color colorStandard = ColorTranslator.FromHtml(AppConfig.GetString("color_standard", "#FFFF00"));
             static Color colorEco = ColorTranslator.FromHtml(AppConfig.GetString("color_eco", "#008000"));
+
+            public static void ApplyContrast(bool init = false)
+            {
+                if (!backlight) return;
+
+                Color colorA = Color1; // Action/modifier keys
+                Color colorB = Color2; // Content/typing keys
+
+                if (isStrix)
+                {
+                    ApplyDirectContrast(colorA, colorB, init);
+                    return;
+                }
+
+                // Non-Strix: fall back to static single color
+                ApplyDirect(colorA, init);
+            }
 
             public static void ApplyGPUColor(int gpuMode = -1)
             {

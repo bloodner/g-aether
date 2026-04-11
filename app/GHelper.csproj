@@ -38,6 +38,9 @@
     <Compile Remove="screenshots\**" />
     <EmbeddedResource Remove="screenshots\**" />
     <None Remove="screenshots\**" />
+    <Compile Remove="GHelper.WPF\**" />
+    <EmbeddedResource Remove="GHelper.WPF\**" />
+    <None Remove="GHelper.WPF\**" />
   </ItemGroup>
 
   <ItemGroup>

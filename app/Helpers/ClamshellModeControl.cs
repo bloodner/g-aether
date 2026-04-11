@@ -4,7 +4,7 @@ using Microsoft.Win32;
 
 namespace GHelper.Helpers
 {
-    internal class ClamshellModeControl
+    public class ClamshellModeControl
     {
 
         public ClamshellModeControl()
@@ -105,7 +105,7 @@ namespace GHelper.Helpers
             if (IsClamshellEnabled())
                 ToggleLidAction();
 
-            if (Program.settingsForm.Visible)
+            if (Program.settingsForm != null && Program.settingsForm.Visible)
                 ScreenControl.InitScreen();
 
             if (AppConfig.IsForceMiniled())

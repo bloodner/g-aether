@@ -1,0 +1,300 @@
+<UserControl x:Class="GHelper.WPF.Views.Panels.ExtraSettingsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:GHelper.WPF.Controls">
+
+    <Border Style="{StaticResource CardStyle}">
+        <StackPanel>
+            <!-- Header -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                           Foreground="{DynamicResource AccentBrush}"
+                           VerticalAlignment="Center" Margin="0,0,8,0" />
+                <TextBlock Text="Settings"
+                           Style="{StaticResource CardTitleStyle}"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+
+            <!-- Run on Startup -->
+            <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Run on Startup" Style="{StaticResource BodyTextStyle}" />
+                    <TextBlock Text="Launch automatically when you log in"
+                               Style="{StaticResource DimTextStyle}" FontSize="10" />
+                </StackPanel>
+                <controls:ToggleSwitch Grid.Column="1"
+                                       IsChecked="{Binding RunOnStartup, Mode=TwoWay}"
+                                       Width="44" Height="22"
+                                       VerticalAlignment="Center" />
+            </Grid>
+
+            <!-- FnLock Toggle -->
+            <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Fn Lock" Style="{StaticResource BodyTextStyle}" />
+                    <TextBlock Text="Use F1-F12 as standard function keys"
+                               Style="{StaticResource DimTextStyle}" FontSize="10" />
+                </StackPanel>
+                <controls:ToggleSwitch Grid.Column="1"
+                                       IsChecked="{Binding FnLockEnabled, Mode=TwoWay}"
+                                       Width="44" Height="22" />
+            </Grid>
+
+            <!-- Boot Sound -->
+            <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Boot Sound" Style="{StaticResource BodyTextStyle}" />
+                    <TextBlock Text="ASUS POST sound on startup"
+                               Style="{StaticResource DimTextStyle}" FontSize="10" />
+                </StackPanel>
+                <controls:ToggleSwitch Grid.Column="1"
+                                       IsChecked="{Binding BootSound, Mode=TwoWay}"
+                                       Width="44" Height="22" />
+            </Grid>
+
+            <!-- Advanced Settings -->
+            <Border Margin="0,12,0,0" BorderBrush="#10FFFFFF" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+                <StackPanel>
+                    <!-- GPU Fix -->
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="GPU Fix on Shutdown" Style="{StaticResource BodyTextStyle}" />
+                            <TextBlock Text="Disable dGPU before shutdown"
+                                       Style="{StaticResource DimTextStyle}" FontSize="10" />
+                        </StackPanel>
+                        <controls:ToggleSwitch Grid.Column="1"
+                                               IsChecked="{Binding GpuFixEnabled, Mode=TwoWay}"
+                                               Width="44" Height="22"
+                                               VerticalAlignment="Center" />
+                    </Grid>
+
+                    <!-- Window Topmost -->
+                    <Grid Margin="0,4,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Always on Top" Style="{StaticResource BodyTextStyle}" />
+                            <TextBlock Text="Keep window above all other windows"
+                                       Style="{StaticResource DimTextStyle}" FontSize="10" />
+                        </StackPanel>
+                        <controls:ToggleSwitch Grid.Column="1"
+                                               IsChecked="{Binding WindowTopmost, Mode=TwoWay}"
+                                               Width="44" Height="22" />
+                    </Grid>
+
+                    <!-- B&W Tray Icon -->
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="B&amp;W Tray Icon" Style="{StaticResource BodyTextStyle}" />
+                            <TextBlock Text="Use monochrome system tray icon"
+                                       Style="{StaticResource DimTextStyle}" FontSize="10" />
+                        </StackPanel>
+                        <controls:ToggleSwitch Grid.Column="1"
+                                               IsChecked="{Binding BwTrayIcon, Mode=TwoWay}"
+                                               Width="44" Height="22" />
+                    </Grid>
+
+                    <!-- Advanced RGB -->
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Advanced RGB" Style="{StaticResource BodyTextStyle}" />
+                            <TextBlock Text="Enable per-key RGB control (requires restart)"
+                                       Style="{StaticResource DimTextStyle}" FontSize="10" />
+                        </StackPanel>
+                        <controls:ToggleSwitch Grid.Column="1"
+                                               IsChecked="{Binding AdvancedRgb, Mode=TwoWay}"
+                                               Width="44" Height="22"
+                                               VerticalAlignment="Center" />
+                    </Grid>
+
+                    <!-- Stop Armory Crate toggle -->
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Stop Armory Crate" Style="{StaticResource BodyTextStyle}" />
+                            <TextBlock Text="Also manage Armory Crate services"
+                                       Style="{StaticResource DimTextStyle}" FontSize="10" />
+                        </StackPanel>
+                        <controls:ToggleSwitch Grid.Column="1"
+                                               IsChecked="{Binding StopArmoryCrate, Mode=TwoWay}"
+                                               Width="44" Height="22"
+                                               VerticalAlignment="Center" />
+                    </Grid>
+
+                    <!-- ASUS Services -->
+                    <Border Background="#10FFFFFF" CornerRadius="6" Padding="12,8" Margin="0,0,0,8">
+                        <StackPanel>
+                            <!-- Summary row -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                           VerticalAlignment="Center" Margin="0,0,10,0">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="&#xE72E;" />
+                                            <Setter Property="Foreground" Value="#4CC95E" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding AsusServicesCount}" Value="0">
+                                                    <Setter Property="Text" Value="&#xE73E;" />
+                                                    <Setter Property="Foreground" Value="#4CC95E" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="ASUS Services"
+                                               Style="{StaticResource BodyTextStyle}" />
+                                    <TextBlock Text="{Binding AsusServicesText}"
+                                               Style="{StaticResource DimTextStyle}" FontSize="10" />
+                                </StackPanel>
+                                <Button Grid.Column="2"
+                                        Command="{Binding ToggleServicesExpandedCommand}"
+                                        Background="Transparent" BorderThickness="0"
+                                        Padding="8,4" Cursor="Hand" VerticalAlignment="Center"
+                                        Margin="0,0,4,0">
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="10"
+                                               Foreground="#80FFFFFF">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text" Value="&#xE70D;" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ServicesExpanded}" Value="True">
+                                                        <Setter Property="Text" Value="&#xE70E;" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Button>
+                                <Button Grid.Column="3"
+                                        Content="{Binding AsusServicesButtonText}"
+                                        Command="{Binding ToggleAsusServicesCommand}"
+                                        IsEnabled="{Binding AsusServicesButtonEnabled}"
+                                        Background="#20FFFFFF" Foreground="White"
+                                        BorderThickness="0" Padding="16,4"
+                                        FontSize="12" Cursor="Hand">
+                                    <Button.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="CornerRadius" Value="4" />
+                                        </Style>
+                                    </Button.Resources>
+                                </Button>
+                            </Grid>
+
+                            <!-- Expandable service detail list -->
+                            <ItemsControl ItemsSource="{Binding ServiceDetails}"
+                                          Margin="0,6,0,0">
+                                <ItemsControl.Style>
+                                    <Style TargetType="ItemsControl">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ServicesExpanded}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ItemsControl.Style>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="4,3" Margin="0,1">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="8"
+                                                           VerticalAlignment="Center" Margin="0,0,8,0">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Text" Value="&#xEA39;" />
+                                                            <Setter Property="Foreground" Value="#50FFFFFF" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                                                    <Setter Property="Text" Value="&#xEA3A;" />
+                                                                    <Setter Property="Foreground" Value="#FF6B35" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding DisplayName}"
+                                                               FontSize="11" Foreground="#DDFFFFFF" />
+                                                    <TextBlock Text="{Binding Description}"
+                                                               FontSize="9" Foreground="#60FFFFFF" />
+                                                </StackPanel>
+                                                <TextBlock Grid.Column="2" VerticalAlignment="Center"
+                                                           FontSize="9" Margin="8,0,0,0">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Text" Value="Stopped" />
+                                                            <Setter Property="Foreground" Value="#50FFFFFF" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                                                    <Setter Property="Text" Value="Running" />
+                                                                    <Setter Property="Foreground" Value="#FF6B35" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Updates Link -->
+                    <Button Content="Check for Updates"
+                            Command="{Binding OpenUpdatesCommand}"
+                            Style="{StaticResource LinkButtonStyle}"
+                            Margin="0,4,0,0" />
+
+                    <TextBlock Style="{StaticResource DimTextStyle}"
+                               FontSize="9"
+                               HorizontalAlignment="Center"
+                               Margin="0,8,0,0"
+                               Text="{Binding VersionText}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Border>
+</UserControl>

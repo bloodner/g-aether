@@ -1,0 +1,168 @@
+<UserControl x:Class="GHelper.WPF.Views.Panels.KeyboardPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:GHelper.WPF.Controls">
+
+    <StackPanel Margin="0,0,0,8">
+
+        <!-- Keyboard Backlight Card -->
+        <Border Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <!-- Header -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="&#xE765;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="Lighting"
+                               Style="{StaticResource CardTitleStyle}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Backlight Brightness -->
+                <TextBlock Text="Backlight Brightness" Style="{StaticResource DimTextStyle}" Margin="0,0,0,4" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Slider Minimum="0" Maximum="3"
+                            Value="{Binding BacklightBrightness, Mode=TwoWay}"
+                            TickFrequency="1" IsSnapToTickEnabled="True"
+                            VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding BrightnessText}"
+                               Style="{StaticResource BodyTextStyle}"
+                               VerticalAlignment="Center" Margin="8,0,0,0"
+                               MinWidth="40" TextAlignment="Right" />
+                </Grid>
+
+                <!-- Aura Mode -->
+                <TextBlock Text="Lighting Mode" Style="{StaticResource DimTextStyle}" Margin="0,14,0,6" />
+                <controls:LightingModeSelector
+                    Items="{Binding AuraModeLabels}"
+                    Icons="{Binding AuraModeIcons}"
+                    SelectedIndex="{Binding SelectedAuraModeIndex, Mode=TwoWay}" />
+
+                <!-- Color Picker (hidden for modes that generate their own colors) -->
+                <StackPanel Margin="0,14,0,0"
+                            Visibility="{Binding ShowColorPicker, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="Color" Style="{StaticResource DimTextStyle}" Margin="0,0,0,6" />
+                    <controls:ColorWheel x:Name="AuraColorWheel"
+                        Color1="{Binding AuraColor1, Mode=TwoWay}"
+                        Color2="{Binding AuraColor2, Mode=TwoWay}"
+                        ShowSecondary="{Binding ShowSecondColor}" />
+                </StackPanel>
+
+                <!-- Animation Speed -->
+                <TextBlock Text="Animation Speed" Style="{StaticResource DimTextStyle}" Margin="0,14,0,4" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Slider Minimum="0" Maximum="2"
+                            Value="{Binding AnimationSpeed, Mode=TwoWay}"
+                            TickFrequency="1" IsSnapToTickEnabled="True"
+                            VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding SpeedText}"
+                               Style="{StaticResource BodyTextStyle}"
+                               VerticalAlignment="Center" Margin="8,0,0,0"
+                               MinWidth="50" TextAlignment="Right" />
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- Slash Lighting Card (only for Slash-equipped models) -->
+        <Border Style="{StaticResource CardStyle}"
+                Visibility="{Binding HasSlash, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel>
+                <!-- Header -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="&#xE781;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="Slash Lighting"
+                               Style="{StaticResource CardTitleStyle}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Brightness -->
+                <TextBlock Text="Brightness" Style="{StaticResource DimTextStyle}" Margin="0,0,0,4" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Slider Minimum="0" Maximum="3"
+                            Value="{Binding SlashBrightness, Mode=TwoWay}"
+                            TickFrequency="1" IsSnapToTickEnabled="True"
+                            VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding SlashBrightnessText}"
+                               Style="{StaticResource BodyTextStyle}"
+                               VerticalAlignment="Center" Margin="8,0,0,0"
+                               MinWidth="50" TextAlignment="Right" />
+                </Grid>
+
+                <!-- Mode -->
+                <TextBlock Text="Animation Mode" Style="{StaticResource DimTextStyle}" Margin="0,12,0,6" />
+                <ComboBox ItemsSource="{Binding SlashModeLabels}"
+                          SelectedIndex="{Binding SelectedSlashMode, Mode=TwoWay}" />
+
+                <!-- Options -->
+                <Border Margin="0,12,0,0" BorderBrush="#10FFFFFF" BorderThickness="0,1,0,0" Padding="0,10,0,0">
+                    <StackPanel>
+                        <!-- Battery Saver -->
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Battery Saver" Style="{StaticResource BodyTextStyle}" />
+                                <TextBlock Text="Disable on battery power"
+                                           Style="{StaticResource DimTextStyle}" FontSize="10" />
+                            </StackPanel>
+                            <controls:ToggleSwitch Grid.Column="1"
+                                                   IsChecked="{Binding SlashBatterySaver, Mode=TwoWay}"
+                                                   Width="44" Height="22"
+                                                   VerticalAlignment="Center" />
+                        </Grid>
+
+                        <!-- Sleep Animation -->
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Active in Sleep" Style="{StaticResource BodyTextStyle}" />
+                                <TextBlock Text="Keep slash active during sleep"
+                                           Style="{StaticResource DimTextStyle}" FontSize="10" />
+                            </StackPanel>
+                            <controls:ToggleSwitch Grid.Column="1"
+                                                   IsChecked="{Binding SlashSleepActive, Mode=TwoWay}"
+                                                   Width="44" Height="22"
+                                                   VerticalAlignment="Center" />
+                        </Grid>
+
+                        <!-- Lid Close Animation -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Lid Close Animation" Style="{StaticResource BodyTextStyle}" />
+                                <TextBlock Text="Play animation when lid closes"
+                                           Style="{StaticResource DimTextStyle}" FontSize="10" />
+                            </StackPanel>
+                            <controls:ToggleSwitch Grid.Column="1"
+                                                   IsChecked="{Binding SlashLidAnimation, Mode=TwoWay}"
+                                                   Width="44" Height="22"
+                                                   VerticalAlignment="Center" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

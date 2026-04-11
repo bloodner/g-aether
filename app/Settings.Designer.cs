@@ -30,19 +30,19 @@ namespace GHelper
         /// </summary>
         private void InitializeComponent()
         {
-            panelMatrix = new Panel();
+            panelMatrix = new CardPanel();
             panelMatrixAuto = new Panel();
             checkMatrixLid = new CheckBox();
             checkMatrix = new CheckBox();
             tableLayoutMatrix = new TableLayoutPanel();
-            comboMatrix = new RComboBox();
-            comboMatrixRunning = new RComboBox();
-            comboInterval = new RComboBox();
+            comboMatrix = new ButtonSelector();
+            comboMatrixRunning = new ButtonSelector();
+            comboInterval = new ButtonSelector();
             buttonMatrix = new RButton();
             panelMatrixTitle = new Panel();
             pictureMatrix = new PictureBox();
             labelMatrix = new Label();
-            panelBattery = new Panel();
+            panelBattery = new CardPanel();
             buttonBatteryFull = new RButton();
             sliderBattery = new Slider();
             panelBatteryTitle = new Panel();
@@ -55,7 +55,7 @@ namespace GHelper
             buttonQuit = new RButton();
             buttonUpdates = new RButton();
             checkStartup = new CheckBox();
-            panelPerformance = new Panel();
+            panelPerformance = new CardPanel();
             tablePerf = new TableLayoutPanel();
             buttonSilent = new RButton();
             buttonBalanced = new RButton();
@@ -65,7 +65,7 @@ namespace GHelper
             picturePerf = new PictureBox();
             labelPerf = new Label();
             labelCPUFan = new Label();
-            panelGPU = new Panel();
+            panelGPU = new CardPanel();
             labelTipGPU = new Label();
             tableAMD = new TableLayoutPanel();
             buttonAutoTDP = new RButton();
@@ -82,7 +82,7 @@ namespace GHelper
             pictureGPU = new PictureBox();
             labelGPU = new Label();
             labelGPUFan = new Label();
-            panelScreen = new Panel();
+            panelScreen = new CardPanel();
             labelTipScreen = new Label();
             tableScreen = new TableLayoutPanel();
             buttonScreenAuto = new RButton();
@@ -94,27 +94,24 @@ namespace GHelper
             labelMidFan = new Label();
             pictureScreen = new PictureBox();
             labelSreen = new Label();
-            panelKeyboard = new Panel();
+            panelKeyboard = new CardPanel();
             labelBacklight = new Label();
             tableLayoutKeyboard = new TableLayoutPanel();
             buttonKeyboard = new RButton();
-            panelColor = new Panel();
-            pictureColor2 = new PictureBox();
-            pictureColor = new PictureBox();
-            buttonKeyboardColor = new RButton();
-            comboKeyboard = new RComboBox();
+            colorPicker = new ColorPickerPanel();
+            comboKeyboard = new ButtonSelector();
             panelKeyboardTitle = new Panel();
             buttonFnLock = new RButton();
             pictureKeyboard = new PictureBox();
             labelKeyboard = new Label();
             panelStartup = new Panel();
             labelCharge = new Label();
-            panelPeripherals = new Panel();
+            panelPeripherals = new CardPanel();
             tableLayoutPeripherals = new TableLayoutPanel();
             buttonPeripheral3 = new RButton();
             buttonPeripheral2 = new RButton();
             buttonPeripheral1 = new RButton();
-            panelAlly = new Panel();
+            panelAlly = new CardPanel();
             tableLayoutAlly = new TableLayoutPanel();
             buttonController = new RButton();
             buttonBacklight = new RButton();
@@ -122,23 +119,51 @@ namespace GHelper
             panelAllyTitle = new Panel();
             pictureAlly = new PictureBox();
             labelAlly = new Label();
-            panelGamma = new Panel();
+            panelGamma = new CardPanel();
             labelVisual = new Label();
             tableVisual = new TableLayoutPanel();
             buttonInstallColor = new RButton();
-            comboVisual = new RComboBox();
-            comboColorTemp = new RComboBox();
-            comboGamut = new RComboBox();
+            comboVisual = new ButtonSelector();
+            comboColorTemp = new ButtonSelector();
+            comboGamut = new ButtonSelector();
             sliderGamma = new Slider();
             panelGammaTitle = new Panel();
             labelGamma = new Label();
             pictureGamma = new PictureBox();
             labelGammaTitle = new Label();
-            panelVersion = new Panel();
+            panelVersion = new CardPanel();
             buttonEnergySaver = new RButton();
             buttonAmdOled = new RButton();
             labelVersion = new Label();
             buttonHDRControl = new RButton();
+            sliderPerformance = new GradientModeSlider();
+            toggleAutoPilot = new ToggleSwitch();
+            labelTempPill = new Label();
+            gpuSchematic = new GpuSchematicPanel();
+            gpuModeSelector = new ButtonSelector();
+            labelRequiresRestart = new Label();
+            panelSecondary = new CardPanel();
+            panelSecondaryTitle = new Panel();
+            labelSecondary = new Label();
+            pictureSecondary = new PictureBox();
+            tableSecondary = new TableLayoutPanel();
+            panelBatteryCol = new Panel();
+            gaugeCharge = new CircularGauge();
+            toggleStartup = new ToggleSwitch();
+            panelMacroCol = new Panel();
+            labelMacroHeader = new Label();
+            labelM1 = new Label();
+            labelM2 = new Label();
+            labelM3 = new Label();
+            labelM4 = new Label();
+            panelSlashCol = new Panel();
+            labelSlashHeader = new Label();
+            panelGlow = new CardPanel();
+            panelGlowTitle = new Panel();
+            labelGlow = new Label();
+            pictureGlow = new PictureBox();
+            sliderBrightness = new Slider();
+            screenModeSelector = new ButtonSelector();
             panelMatrix.SuspendLayout();
             panelMatrixAuto.SuspendLayout();
             tableLayoutMatrix.SuspendLayout();
@@ -164,9 +189,6 @@ namespace GHelper
             ((System.ComponentModel.ISupportInitialize)pictureScreen).BeginInit();
             panelKeyboard.SuspendLayout();
             tableLayoutKeyboard.SuspendLayout();
-            panelColor.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureColor2).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureColor).BeginInit();
             panelKeyboardTitle.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureKeyboard).BeginInit();
             panelStartup.SuspendLayout();
@@ -181,6 +203,16 @@ namespace GHelper
             panelGammaTitle.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureGamma).BeginInit();
             panelVersion.SuspendLayout();
+            panelSecondary.SuspendLayout();
+            panelSecondaryTitle.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureSecondary).BeginInit();
+            tableSecondary.SuspendLayout();
+            panelBatteryCol.SuspendLayout();
+            panelMacroCol.SuspendLayout();
+            panelSlashCol.SuspendLayout();
+            panelGlow.SuspendLayout();
+            panelGlowTitle.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureGlow).BeginInit();
             SuspendLayout();
             // 
             // panelMatrix
@@ -193,8 +225,9 @@ namespace GHelper
             panelMatrix.Controls.Add(panelMatrixTitle);
             panelMatrix.Dock = DockStyle.Top;
             panelMatrix.Location = new Point(11, 1071);
-            panelMatrix.Margin = new Padding(0);
+            panelMatrix.Margin = new Padding(0, 0, 0, 2);
             panelMatrix.Name = "panelMatrix";
+            panelMatrix.Tag = "card";
             panelMatrix.Padding = new Padding(20, 20, 20, 11);
             panelMatrix.Size = new Size(827, 183);
             panelMatrix.TabIndex = 3;
@@ -215,7 +248,8 @@ namespace GHelper
             // checkMatrixLid
             // 
             checkMatrixLid.AutoSize = true;
-            checkMatrixLid.Dock = DockStyle.Left;
+            checkMatrixLid.Dock = DockStyle.Top;
+            checkMatrixLid.Font = new Font("Segoe UI", 7.5F);
             checkMatrixLid.ForeColor = SystemColors.GrayText;
             checkMatrixLid.Location = new Point(260, 0);
             checkMatrixLid.Margin = new Padding(8, 4, 8, 4);
@@ -229,7 +263,8 @@ namespace GHelper
             // checkMatrix
             // 
             checkMatrix.AutoSize = true;
-            checkMatrix.Dock = DockStyle.Left;
+            checkMatrix.Dock = DockStyle.Top;
+            checkMatrix.Font = new Font("Segoe UI", 7.5F);
             checkMatrix.ForeColor = SystemColors.GrayText;
             checkMatrix.Location = new Point(8, 0);
             checkMatrix.Margin = new Padding(8, 4, 8, 4);
@@ -266,13 +301,7 @@ namespace GHelper
             // 
             // comboMatrix
             // 
-            comboMatrix.BorderColor = Color.White;
-            comboMatrix.ButtonColor = Color.FromArgb(255, 255, 255);
             comboMatrix.Dock = DockStyle.Top;
-            comboMatrix.Font = new Font("Segoe UI", 9F);
-            comboMatrix.FormattingEnabled = true;
-            comboMatrix.ItemHeight = 32;
-            comboMatrix.Items.AddRange(new object[] { Properties.Strings.MatrixOff, Properties.Strings.MatrixDim, Properties.Strings.MatrixMedium, Properties.Strings.MatrixBright });
             comboMatrix.Location = new Point(10, 8);
             comboMatrix.Margin = new Padding(7, 8, 7, 4);
             comboMatrix.Name = "comboMatrix";
@@ -281,13 +310,7 @@ namespace GHelper
             // 
             // comboMatrixRunning
             // 
-            comboMatrixRunning.BorderColor = Color.White;
-            comboMatrixRunning.ButtonColor = Color.FromArgb(255, 255, 255);
             comboMatrixRunning.Dock = DockStyle.Top;
-            comboMatrixRunning.Font = new Font("Segoe UI", 9F);
-            comboMatrixRunning.FormattingEnabled = true;
-            comboMatrixRunning.ItemHeight = 32;
-            comboMatrixRunning.Items.AddRange(new object[] { Properties.Strings.MatrixBanner, Properties.Strings.MatrixLogo, Properties.Strings.MatrixPicture, Properties.Strings.MatrixClock, Properties.Strings.MatrixAudio });
             comboMatrixRunning.Location = new Point(270, 8);
             comboMatrixRunning.Margin = new Padding(7, 8, 7, 4);
             comboMatrixRunning.Name = "comboMatrixRunning";
@@ -296,12 +319,7 @@ namespace GHelper
             // 
             // comboInterval
             // 
-            comboInterval.BorderColor = Color.White;
-            comboInterval.ButtonColor = Color.FromArgb(255, 255, 255);
             comboInterval.Dock = DockStyle.Top;
-            comboInterval.Font = new Font("Segoe UI", 9F);
-            comboInterval.FormattingEnabled = true;
-            comboInterval.ItemHeight = 32;
             comboInterval.Location = new Point(10, 60);
             comboInterval.Margin = new Padding(7, 8, 7, 4);
             comboInterval.Name = "comboInterval";
@@ -373,8 +391,9 @@ namespace GHelper
             panelBattery.Controls.Add(panelBatteryTitle);
             panelBattery.Dock = DockStyle.Top;
             panelBattery.Location = new Point(11, 1683);
-            panelBattery.Margin = new Padding(0);
+            panelBattery.Margin = new Padding(0, 0, 0, 2);
             panelBattery.Name = "panelBattery";
+            panelBattery.Tag = "card";
             panelBattery.Padding = new Padding(20, 15, 20, 0);
             panelBattery.Size = new Size(827, 104);
             panelBattery.TabIndex = 5;
@@ -382,7 +401,7 @@ namespace GHelper
             // buttonBatteryFull
             // 
             buttonBatteryFull.Activated = false;
-            buttonBatteryFull.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            buttonBatteryFull.Dock = DockStyle.Top;
             buttonBatteryFull.BackColor = SystemColors.ControlLight;
             buttonBatteryFull.BorderColor = Color.Transparent;
             buttonBatteryFull.BorderRadius = 2;
@@ -390,24 +409,24 @@ namespace GHelper
             buttonBatteryFull.FlatStyle = FlatStyle.Flat;
             buttonBatteryFull.Font = new Font("Segoe UI", 7.125F, FontStyle.Bold);
             buttonBatteryFull.ForeColor = SystemColors.ControlDark;
-            buttonBatteryFull.Location = new Point(728, 62);
+            buttonBatteryFull.Location = new Point(8, 240);
             buttonBatteryFull.Margin = new Padding(0);
             buttonBatteryFull.Name = "buttonBatteryFull";
             buttonBatteryFull.Secondary = true;
-            buttonBatteryFull.Size = new Size(73, 36);
+            buttonBatteryFull.Size = new Size(240, 32);
             buttonBatteryFull.TabIndex = 41;
             buttonBatteryFull.Text = "100%";
             buttonBatteryFull.UseVisualStyleBackColor = false;
             // 
             // sliderBattery
             // 
-            sliderBattery.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            sliderBattery.Location = new Point(20, 60);
+            sliderBattery.Dock = DockStyle.Top;
+            sliderBattery.Location = new Point(8, 200);
             sliderBattery.Margin = new Padding(4);
             sliderBattery.Max = 100;
             sliderBattery.Min = 40;
             sliderBattery.Name = "sliderBattery";
-            sliderBattery.Size = new Size(707, 40);
+            sliderBattery.Size = new Size(240, 40);
             sliderBattery.Step = 5;
             sliderBattery.TabIndex = 20;
             sliderBattery.Text = "sliderBattery";
@@ -450,11 +469,12 @@ namespace GHelper
             // 
             // labelBatteryTitle
             // 
+            labelBatteryTitle.Dock = DockStyle.Top;
             labelBatteryTitle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            labelBatteryTitle.Location = new Point(43, 0);
+            labelBatteryTitle.Location = new Point(8, 8);
             labelBatteryTitle.Margin = new Padding(8, 0, 8, 0);
             labelBatteryTitle.Name = "labelBatteryTitle";
-            labelBatteryTitle.Size = new Size(467, 32);
+            labelBatteryTitle.Size = new Size(240, 32);
             labelBatteryTitle.TabIndex = 37;
             labelBatteryTitle.Text = "Battery Charge Limit";
             // 
@@ -462,6 +482,9 @@ namespace GHelper
             // 
             panelFooter.AutoSize = true;
             panelFooter.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            panelFooter.Controls.Add(buttonEnergySaver);
+            panelFooter.Controls.Add(buttonAmdOled);
+            panelFooter.Controls.Add(labelVersion);
             panelFooter.Controls.Add(tableButtons);
             panelFooter.Dock = DockStyle.Top;
             panelFooter.Location = new Point(11, 1887);
@@ -570,14 +593,15 @@ namespace GHelper
             panelPerformance.AccessibleRole = AccessibleRole.Grouping;
             panelPerformance.AutoSize = true;
             panelPerformance.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            panelPerformance.Controls.Add(tablePerf);
+            panelPerformance.Controls.Add(sliderPerformance);
             panelPerformance.Controls.Add(panelCPUTitle);
             panelPerformance.Dock = DockStyle.Top;
             panelPerformance.Location = new Point(11, 11);
-            panelPerformance.Margin = new Padding(0);
+            panelPerformance.Margin = new Padding(0, 0, 0, 2);
             panelPerformance.Name = "panelPerformance";
-            panelPerformance.Padding = new Padding(20);
-            panelPerformance.Size = new Size(827, 208);
+            panelPerformance.Tag = "card";
+            panelPerformance.Padding = new Padding(20, 20, 20, 18);
+            panelPerformance.Size = new Size(827, 160);
             panelPerformance.TabIndex = 0;
             panelPerformance.TabStop = true;
             // 
@@ -693,9 +717,10 @@ namespace GHelper
             // 
             // panelCPUTitle
             // 
-            panelCPUTitle.Controls.Add(picturePerf);
+            panelCPUTitle.Controls.Add(labelTempPill);
+            panelCPUTitle.Controls.Add(toggleAutoPilot);
             panelCPUTitle.Controls.Add(labelPerf);
-            panelCPUTitle.Controls.Add(labelCPUFan);
+            panelCPUTitle.Controls.Add(picturePerf);
             panelCPUTitle.Dock = DockStyle.Top;
             panelCPUTitle.Location = new Point(20, 20);
             panelCPUTitle.Margin = new Padding(4);
@@ -740,22 +765,63 @@ namespace GHelper
             labelCPUFan.TabIndex = 33;
             labelCPUFan.Text = "      ";
             labelCPUFan.TextAlign = ContentAlignment.TopRight;
-            // 
+            //
+            // sliderPerformance
+            //
+            sliderPerformance.Dock = DockStyle.Top;
+            sliderPerformance.Location = new Point(20, 60);
+            sliderPerformance.Name = "sliderPerformance";
+            sliderPerformance.Size = new Size(787, 100);
+            sliderPerformance.TabIndex = 40;
+            sliderPerformance.GradientStops = new[] {
+                Color.FromArgb(255, 6, 180, 180),
+                Color.FromArgb(255, 50, 200, 120),
+                Color.FromArgb(255, 255, 200, 0),
+                Color.FromArgb(255, 255, 128, 0),
+                Color.FromArgb(255, 255, 32, 32)
+            };
+            sliderPerformance.Labels = new[] { "Silent", "Balanced", "Turbo", "Fans + Power" };
+            sliderPerformance.ModeCount = 4;
+            sliderPerformance.SelectedIndex = 1;
+            //
+            // toggleAutoPilot
+            //
+            toggleAutoPilot.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            toggleAutoPilot.Label = "Auto-Pilot";
+            toggleAutoPilot.Location = new Point(430, 4);
+            toggleAutoPilot.Name = "toggleAutoPilot";
+            toggleAutoPilot.Size = new Size(140, 30);
+            toggleAutoPilot.TabIndex = 41;
+            //
+            // labelTempPill
+            //
+            labelTempPill.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            labelTempPill.Font = new Font("Segoe UI", 8F);
+            labelTempPill.ForeColor = SystemColors.GrayText;
+            labelTempPill.Location = new Point(575, 0);
+            labelTempPill.Name = "labelTempPill";
+            labelTempPill.Size = new Size(210, 36);
+            labelTempPill.TabIndex = 42;
+            labelTempPill.Text = "CPU: --°C GPU: --°C";
+            labelTempPill.TextAlign = ContentAlignment.MiddleRight;
+            //
             // panelGPU
-            // 
+            //
             panelGPU.AccessibleRole = AccessibleRole.Grouping;
             panelGPU.AutoSize = true;
             panelGPU.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             panelGPU.Controls.Add(labelTipGPU);
+            panelGPU.Controls.Add(gpuModeSelector);
+            panelGPU.Controls.Add(gpuSchematic);
             panelGPU.Controls.Add(tableAMD);
-            panelGPU.Controls.Add(tableGPU);
             panelGPU.Controls.Add(panelGPUTitle);
             panelGPU.Dock = DockStyle.Top;
             panelGPU.Location = new Point(11, 219);
-            panelGPU.Margin = new Padding(0);
+            panelGPU.Margin = new Padding(0, 0, 0, 2);
             panelGPU.Name = "panelGPU";
-            panelGPU.Padding = new Padding(20, 20, 20, 0);
-            panelGPU.Size = new Size(827, 432);
+            panelGPU.Tag = "card";
+            panelGPU.Padding = new Padding(20, 20, 20, 16);
+            panelGPU.Size = new Size(827, 320);
             panelGPU.TabIndex = 1;
             panelGPU.TabStop = true;
             // 
@@ -1021,6 +1087,7 @@ namespace GHelper
             // 
             panelGPUTitle.Controls.Add(pictureGPU);
             panelGPUTitle.Controls.Add(labelGPU);
+            panelGPUTitle.Controls.Add(labelRequiresRestart);
             panelGPUTitle.Controls.Add(labelGPUFan);
             panelGPUTitle.Dock = DockStyle.Top;
             panelGPUTitle.Location = new Point(20, 20);
@@ -1061,9 +1128,40 @@ namespace GHelper
             labelGPUFan.TabIndex = 20;
             labelGPUFan.Text = "         ";
             labelGPUFan.TextAlign = ContentAlignment.TopRight;
-            // 
+            //
+            // gpuSchematic
+            //
+            gpuSchematic.Dock = DockStyle.Top;
+            gpuSchematic.Location = new Point(20, 60);
+            gpuSchematic.Name = "gpuSchematic";
+            gpuSchematic.Size = new Size(787, 130);
+            gpuSchematic.TabIndex = 30;
+            gpuSchematic.ActiveMode = 1;
+            //
+            // gpuModeSelector
+            //
+            gpuModeSelector.Dock = DockStyle.Top;
+            gpuModeSelector.Location = new Point(20, 210);
+            gpuModeSelector.Margin = new Padding(7, 8, 7, 4);
+            gpuModeSelector.Name = "gpuModeSelector";
+            gpuModeSelector.Size = new Size(787, 40);
+            gpuModeSelector.TabIndex = 31;
+            //
+            // labelRequiresRestart
+            //
+            labelRequiresRestart.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            labelRequiresRestart.Font = new Font("Segoe UI", 8F, FontStyle.Italic);
+            labelRequiresRestart.ForeColor = Color.FromArgb(200, 255, 180, 0);
+            labelRequiresRestart.Location = new Point(560, 4);
+            labelRequiresRestart.Name = "labelRequiresRestart";
+            labelRequiresRestart.Size = new Size(220, 32);
+            labelRequiresRestart.TabIndex = 32;
+            labelRequiresRestart.Text = "Requires Restart";
+            labelRequiresRestart.TextAlign = ContentAlignment.MiddleRight;
+            labelRequiresRestart.Visible = false;
+            //
             // panelScreen
-            // 
+            //
             panelScreen.AccessibleRole = AccessibleRole.Grouping;
             panelScreen.AutoSize = true;
             panelScreen.AutoSizeMode = AutoSizeMode.GrowAndShrink;
@@ -1072,8 +1170,9 @@ namespace GHelper
             panelScreen.Controls.Add(panelScreenTitle);
             panelScreen.Dock = DockStyle.Top;
             panelScreen.Location = new Point(11, 651);
-            panelScreen.Margin = new Padding(0);
+            panelScreen.Margin = new Padding(0, 0, 0, 2);
             panelScreen.Name = "panelScreen";
+            panelScreen.Tag = "card";
             panelScreen.Padding = new Padding(20, 11, 20, 0);
             panelScreen.Size = new Size(827, 187);
             panelScreen.TabIndex = 2;
@@ -1268,9 +1367,10 @@ namespace GHelper
             panelKeyboard.Controls.Add(panelKeyboardTitle);
             panelKeyboard.Dock = DockStyle.Top;
             panelKeyboard.Location = new Point(11, 1394);
-            panelKeyboard.Margin = new Padding(0);
+            panelKeyboard.Margin = new Padding(0, 0, 0, 2);
             panelKeyboard.Name = "panelKeyboard";
-            panelKeyboard.Padding = new Padding(20, 20, 20, 0);
+            panelKeyboard.Tag = "card";
+            panelKeyboard.Padding = new Padding(20, 20, 20, 6);
             panelKeyboard.Size = new Size(827, 146);
             panelKeyboard.TabIndex = 4;
             panelKeyboard.TabStop = true;
@@ -1296,8 +1396,8 @@ namespace GHelper
             tableLayoutKeyboard.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
             tableLayoutKeyboard.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
             tableLayoutKeyboard.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
-            tableLayoutKeyboard.Controls.Add(buttonKeyboard, 0, 0);
-            tableLayoutKeyboard.Controls.Add(panelColor, 0, 0);
+            tableLayoutKeyboard.Controls.Add(buttonKeyboard, 2, 0);
+            tableLayoutKeyboard.Controls.Add(colorPicker, 1, 0);
             tableLayoutKeyboard.Controls.Add(comboKeyboard, 0, 0);
             tableLayoutKeyboard.Dock = DockStyle.Top;
             tableLayoutKeyboard.Location = new Point(20, 60);
@@ -1332,72 +1432,19 @@ namespace GHelper
             buttonKeyboard.Text = "&Extra";
             buttonKeyboard.TextImageRelation = TextImageRelation.ImageBeforeText;
             buttonKeyboard.UseVisualStyleBackColor = false;
-            // 
-            // panelColor
-            // 
-            panelColor.AutoSize = true;
-            panelColor.Controls.Add(pictureColor2);
-            panelColor.Controls.Add(pictureColor);
-            panelColor.Controls.Add(buttonKeyboardColor);
-            panelColor.Dock = DockStyle.Fill;
-            panelColor.Location = new Point(266, 4);
-            panelColor.Margin = new Padding(4);
-            panelColor.Name = "panelColor";
-            panelColor.Size = new Size(254, 44);
-            panelColor.TabIndex = 36;
-            // 
-            // pictureColor2
-            // 
-            pictureColor2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            pictureColor2.Location = new Point(187, 13);
-            pictureColor2.Margin = new Padding(8);
-            pictureColor2.Name = "pictureColor2";
-            pictureColor2.Size = new Size(20, 20);
-            pictureColor2.TabIndex = 41;
-            pictureColor2.TabStop = false;
-            // 
-            // pictureColor
-            // 
-            pictureColor.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            pictureColor.Location = new Point(218, 13);
-            pictureColor.Margin = new Padding(8);
-            pictureColor.Name = "pictureColor";
-            pictureColor.Size = new Size(20, 20);
-            pictureColor.TabIndex = 40;
-            pictureColor.TabStop = false;
-            // 
-            // buttonKeyboardColor
-            // 
-            buttonKeyboardColor.Activated = false;
-            buttonKeyboardColor.AutoSize = true;
-            buttonKeyboardColor.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            buttonKeyboardColor.BackColor = SystemColors.ButtonHighlight;
-            buttonKeyboardColor.BorderColor = Color.Transparent;
-            buttonKeyboardColor.BorderRadius = 2;
-            buttonKeyboardColor.Dock = DockStyle.Top;
-            buttonKeyboardColor.FlatStyle = FlatStyle.Flat;
-            buttonKeyboardColor.ForeColor = SystemColors.ControlText;
-            buttonKeyboardColor.Location = new Point(0, 0);
-            buttonKeyboardColor.Margin = new Padding(4);
-            buttonKeyboardColor.MaximumSize = new Size(0, 48);
-            buttonKeyboardColor.MinimumSize = new Size(0, 44);
-            buttonKeyboardColor.Name = "buttonKeyboardColor";
-            buttonKeyboardColor.Secondary = false;
-            buttonKeyboardColor.Size = new Size(254, 44);
-            buttonKeyboardColor.TabIndex = 14;
-            buttonKeyboardColor.Text = Properties.Strings.Color;
-            buttonKeyboardColor.UseVisualStyleBackColor = false;
+            //
+            // colorPicker
+            //
+            colorPicker.Dock = DockStyle.Fill;
+            colorPicker.Location = new Point(266, 4);
+            colorPicker.Margin = new Padding(4);
+            colorPicker.Name = "colorPicker";
+            colorPicker.Size = new Size(510, 44);
+            colorPicker.TabIndex = 36;
             // 
             // comboKeyboard
             // 
-            comboKeyboard.BorderColor = Color.White;
-            comboKeyboard.ButtonColor = Color.FromArgb(255, 255, 255);
             comboKeyboard.Dock = DockStyle.Top;
-            comboKeyboard.FlatStyle = FlatStyle.Flat;
-            comboKeyboard.Font = new Font("Segoe UI", 9F);
-            comboKeyboard.FormattingEnabled = true;
-            comboKeyboard.ItemHeight = 32;
-            comboKeyboard.Items.AddRange(new object[] { "Static", "Breathe", "Rainbow", "Strobe" });
             comboKeyboard.Location = new Point(7, 7);
             comboKeyboard.Margin = new Padding(7, 7, 7, 4);
             comboKeyboard.Name = "comboKeyboard";
@@ -1490,9 +1537,10 @@ namespace GHelper
             panelPeripherals.Controls.Add(tableLayoutPeripherals);
             panelPeripherals.Dock = DockStyle.Top;
             panelPeripherals.Location = new Point(11, 1540);
-            panelPeripherals.Margin = new Padding(0);
+            panelPeripherals.Margin = new Padding(0, 0, 0, 2);
             panelPeripherals.Name = "panelPeripherals";
-            panelPeripherals.Padding = new Padding(20, 5, 20, 10);
+            panelPeripherals.Tag = "card";
+            panelPeripherals.Padding = new Padding(20, 5, 20, 16);
             panelPeripherals.Size = new Size(827, 143);
             panelPeripherals.TabIndex = 4;
             panelPeripherals.Visible = false;
@@ -1599,9 +1647,10 @@ namespace GHelper
             panelAlly.Controls.Add(panelAllyTitle);
             panelAlly.Dock = DockStyle.Top;
             panelAlly.Location = new Point(11, 1254);
-            panelAlly.Margin = new Padding(0);
+            panelAlly.Margin = new Padding(0, 0, 0, 2);
             panelAlly.Name = "panelAlly";
-            panelAlly.Padding = new Padding(20, 20, 20, 0);
+            panelAlly.Tag = "card";
+            panelAlly.Padding = new Padding(20, 20, 20, 6);
             panelAlly.Size = new Size(827, 140);
             panelAlly.TabIndex = 8;
             panelAlly.TabStop = true;
@@ -1733,12 +1782,14 @@ namespace GHelper
             panelGamma.Controls.Add(labelVisual);
             panelGamma.Controls.Add(tableVisual);
             panelGamma.Controls.Add(sliderGamma);
+            panelGamma.Controls.Add(screenModeSelector);
             panelGamma.Controls.Add(panelGammaTitle);
             panelGamma.Dock = DockStyle.Top;
             panelGamma.Location = new Point(11, 838);
-            panelGamma.Margin = new Padding(0);
+            panelGamma.Margin = new Padding(0, 0, 0, 2);
             panelGamma.Name = "panelGamma";
-            panelGamma.Padding = new Padding(20, 11, 20, 11);
+            panelGamma.Tag = "card";
+            panelGamma.Padding = new Padding(20, 11, 20, 17);
             panelGamma.Size = new Size(827, 233);
             panelGamma.TabIndex = 9;
             panelGamma.Visible = false;
@@ -1804,13 +1855,7 @@ namespace GHelper
             // 
             // comboVisual
             // 
-            comboVisual.BorderColor = Color.White;
-            comboVisual.ButtonColor = Color.FromArgb(255, 255, 255);
             comboVisual.Dock = DockStyle.Top;
-            comboVisual.FlatStyle = FlatStyle.Flat;
-            comboVisual.Font = new Font("Segoe UI", 9F);
-            comboVisual.FormattingEnabled = true;
-            comboVisual.ItemHeight = 32;
             comboVisual.Location = new Point(10, 8);
             comboVisual.Margin = new Padding(7, 8, 7, 4);
             comboVisual.Name = "comboVisual";
@@ -1820,13 +1865,7 @@ namespace GHelper
             // 
             // comboColorTemp
             // 
-            comboColorTemp.BorderColor = Color.White;
-            comboColorTemp.ButtonColor = Color.FromArgb(255, 255, 255);
             comboColorTemp.Dock = DockStyle.Top;
-            comboColorTemp.FlatStyle = FlatStyle.Flat;
-            comboColorTemp.Font = new Font("Segoe UI", 9F);
-            comboColorTemp.FormattingEnabled = true;
-            comboColorTemp.ItemHeight = 32;
             comboColorTemp.Location = new Point(530, 8);
             comboColorTemp.Margin = new Padding(7, 8, 7, 4);
             comboColorTemp.Name = "comboColorTemp";
@@ -1836,13 +1875,7 @@ namespace GHelper
             // 
             // comboGamut
             // 
-            comboGamut.BorderColor = Color.White;
-            comboGamut.ButtonColor = Color.FromArgb(255, 255, 255);
             comboGamut.Dock = DockStyle.Top;
-            comboGamut.FlatStyle = FlatStyle.Flat;
-            comboGamut.Font = new Font("Segoe UI", 9F);
-            comboGamut.FormattingEnabled = true;
-            comboGamut.ItemHeight = 32;
             comboGamut.Location = new Point(10, 67);
             comboGamut.Margin = new Padding(7, 8, 7, 4);
             comboGamut.Name = "comboGamut";
@@ -1907,7 +1940,7 @@ namespace GHelper
             labelGammaTitle.Name = "labelGammaTitle";
             labelGammaTitle.Size = new Size(540, 32);
             labelGammaTitle.TabIndex = 37;
-            labelGammaTitle.Text = "Flicker-free Dimming";
+            labelGammaTitle.Text = "Display / Visual Mode";
             // 
             // panelVersion
             // 
@@ -1919,7 +1952,9 @@ namespace GHelper
             panelVersion.Dock = DockStyle.Top;
             panelVersion.Location = new Point(11, 1837);
             panelVersion.MinimumSize = new Size(0, 50);
+            panelVersion.Margin = new Padding(0, 0, 0, 2);
             panelVersion.Name = "panelVersion";
+            panelVersion.Tag = "card";
             panelVersion.Padding = new Padding(20, 5, 24, 5);
             panelVersion.Size = new Size(827, 50);
             panelVersion.TabIndex = 10;
@@ -2002,24 +2037,274 @@ namespace GHelper
             buttonHDRControl.Text = "HDR Color Control";
             buttonHDRControl.UseVisualStyleBackColor = false;
             buttonHDRControl.Visible = false;
-            // 
+            //
+            // panelSecondary
+            //
+            panelSecondary.AutoSize = true;
+            panelSecondary.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            panelSecondary.Controls.Add(tableSecondary);
+            panelSecondary.Controls.Add(panelSecondaryTitle);
+            panelSecondary.Dock = DockStyle.Top;
+            panelSecondary.Margin = new Padding(0, 0, 0, 2);
+            panelSecondary.Name = "panelSecondary";
+            panelSecondary.Tag = "card";
+            panelSecondary.Padding = new Padding(20, 20, 20, 17);
+            panelSecondary.Size = new Size(827, 400);
+            panelSecondary.TabIndex = 50;
+            panelSecondary.TabStop = true;
+            //
+            // panelSecondaryTitle
+            //
+            panelSecondaryTitle.Controls.Add(pictureSecondary);
+            panelSecondaryTitle.Controls.Add(labelSecondary);
+            panelSecondaryTitle.Dock = DockStyle.Top;
+            panelSecondaryTitle.Location = new Point(20, 20);
+            panelSecondaryTitle.Name = "panelSecondaryTitle";
+            panelSecondaryTitle.Size = new Size(787, 40);
+            panelSecondaryTitle.TabIndex = 0;
+            //
+            // pictureSecondary
+            //
+            pictureSecondary.BackgroundImage = Properties.Resources.icons8_settings_32;
+            pictureSecondary.BackgroundImageLayout = ImageLayout.Zoom;
+            pictureSecondary.Location = new Point(8, 3);
+            pictureSecondary.Name = "pictureSecondary";
+            pictureSecondary.Size = new Size(32, 32);
+            pictureSecondary.TabIndex = 0;
+            pictureSecondary.TabStop = false;
+            //
+            // labelSecondary
+            //
+            labelSecondary.AutoSize = true;
+            labelSecondary.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            labelSecondary.Location = new Point(44, 0);
+            labelSecondary.Name = "labelSecondary";
+            labelSecondary.Size = new Size(300, 32);
+            labelSecondary.TabIndex = 1;
+            labelSecondary.Text = "Secondary Control Panel";
+            //
+            // tableSecondary
+            //
+            tableSecondary.AutoSize = true;
+            tableSecondary.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            tableSecondary.ColumnCount = 3;
+            tableSecondary.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            tableSecondary.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            tableSecondary.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.34F));
+            tableSecondary.Controls.Add(panelBatteryCol, 0, 0);
+            tableSecondary.Controls.Add(panelMacroCol, 1, 0);
+            tableSecondary.Controls.Add(panelSlashCol, 2, 0);
+            tableSecondary.Dock = DockStyle.Top;
+            tableSecondary.Location = new Point(20, 60);
+            tableSecondary.Name = "tableSecondary";
+            tableSecondary.RowCount = 1;
+            tableSecondary.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tableSecondary.Size = new Size(787, 320);
+            tableSecondary.TabIndex = 2;
+            //
+            // panelBatteryCol
+            //
+            panelBatteryCol.AutoSize = true;
+            panelBatteryCol.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            panelBatteryCol.Controls.Add(toggleStartup);
+            panelBatteryCol.Controls.Add(buttonBatteryFull);
+            panelBatteryCol.Controls.Add(sliderBattery);
+            panelBatteryCol.Controls.Add(gaugeCharge);
+            panelBatteryCol.Controls.Add(labelBatteryTitle);
+            panelBatteryCol.Dock = DockStyle.Fill;
+            panelBatteryCol.Name = "panelBatteryCol";
+            panelBatteryCol.Padding = new Padding(8);
+            panelBatteryCol.TabIndex = 0;
+            //
+            // gaugeCharge
+            //
+            gaugeCharge.Dock = DockStyle.Top;
+            gaugeCharge.Location = new Point(8, 40);
+            gaugeCharge.Name = "gaugeCharge";
+            gaugeCharge.Size = new Size(240, 160);
+            gaugeCharge.TabIndex = 0;
+            gaugeCharge.Value = 100;
+            gaugeCharge.HealthText = "Health %: --";
+            gaugeCharge.CyclesText = "Cycles: --";
+            //
+            // toggleStartup
+            //
+            toggleStartup.Dock = DockStyle.Top;
+            toggleStartup.Label = "Run on Startup";
+            toggleStartup.Location = new Point(8, 240);
+            toggleStartup.Name = "toggleStartup";
+            toggleStartup.Size = new Size(240, 36);
+            toggleStartup.TabIndex = 1;
+            //
+            // panelMacroCol
+            //
+            panelMacroCol.AutoSize = true;
+            panelMacroCol.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            panelMacroCol.Controls.Add(labelM4);
+            panelMacroCol.Controls.Add(labelM3);
+            panelMacroCol.Controls.Add(labelM2);
+            panelMacroCol.Controls.Add(labelM1);
+            panelMacroCol.Controls.Add(labelMacroHeader);
+            panelMacroCol.Dock = DockStyle.Fill;
+            panelMacroCol.Name = "panelMacroCol";
+            panelMacroCol.Padding = new Padding(8);
+            panelMacroCol.TabIndex = 1;
+            //
+            // labelMacroHeader
+            //
+            labelMacroHeader.Dock = DockStyle.Top;
+            labelMacroHeader.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            labelMacroHeader.Location = new Point(8, 8);
+            labelMacroHeader.Name = "labelMacroHeader";
+            labelMacroHeader.Size = new Size(240, 32);
+            labelMacroHeader.TabIndex = 0;
+            labelMacroHeader.Text = "Macro Input";
+            //
+            // labelM1
+            //
+            labelM1.Dock = DockStyle.Top;
+            labelM1.Font = new Font("Segoe UI", 8.5F);
+            labelM1.ForeColor = SystemColors.GrayText;
+            labelM1.Name = "labelM1";
+            labelM1.Size = new Size(240, 28);
+            labelM1.TabIndex = 1;
+            labelM1.Text = "  M1   Mic Toggle";
+            //
+            // labelM2
+            //
+            labelM2.Dock = DockStyle.Top;
+            labelM2.Font = new Font("Segoe UI", 8.5F);
+            labelM2.ForeColor = SystemColors.GrayText;
+            labelM2.Name = "labelM2";
+            labelM2.Size = new Size(240, 28);
+            labelM2.TabIndex = 2;
+            labelM2.Text = "  M2   Macro";
+            //
+            // labelM3
+            //
+            labelM3.Dock = DockStyle.Top;
+            labelM3.Font = new Font("Segoe UI", 8.5F);
+            labelM3.ForeColor = SystemColors.GrayText;
+            labelM3.Name = "labelM3";
+            labelM3.Size = new Size(240, 28);
+            labelM3.TabIndex = 3;
+            labelM3.Text = "  M3   Fan";
+            //
+            // labelM4
+            //
+            labelM4.Dock = DockStyle.Top;
+            labelM4.Font = new Font("Segoe UI", 8.5F);
+            labelM4.ForeColor = SystemColors.GrayText;
+            labelM4.Name = "labelM4";
+            labelM4.Size = new Size(240, 28);
+            labelM4.TabIndex = 4;
+            labelM4.Text = "  M4   AURA Sync";
+            //
+            // panelSlashCol
+            //
+            panelSlashCol.AutoSize = true;
+            panelSlashCol.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            panelSlashCol.Controls.Add(checkMatrixLid);
+            panelSlashCol.Controls.Add(checkMatrix);
+            panelSlashCol.Controls.Add(buttonMatrix);
+            panelSlashCol.Controls.Add(comboInterval);
+            panelSlashCol.Controls.Add(comboMatrixRunning);
+            panelSlashCol.Controls.Add(comboMatrix);
+            panelSlashCol.Controls.Add(labelSlashHeader);
+            panelSlashCol.Dock = DockStyle.Fill;
+            panelSlashCol.Name = "panelSlashCol";
+            panelSlashCol.Padding = new Padding(8);
+            panelSlashCol.TabIndex = 2;
+            //
+            // labelSlashHeader
+            //
+            labelSlashHeader.Dock = DockStyle.Top;
+            labelSlashHeader.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            labelSlashHeader.Location = new Point(8, 8);
+            labelSlashHeader.Name = "labelSlashHeader";
+            labelSlashHeader.Size = new Size(240, 32);
+            labelSlashHeader.TabIndex = 0;
+            labelSlashHeader.Text = "Slash Lighting";
+            //
+            // panelGlow
+            //
+            panelGlow.AutoSize = true;
+            panelGlow.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            panelGlow.Controls.Add(sliderBrightness);
+            panelGlow.Controls.Add(panelGlowTitle);
+            panelGlow.Dock = DockStyle.Top;
+            panelGlow.Margin = new Padding(0, 0, 0, 2);
+            panelGlow.Name = "panelGlow";
+            panelGlow.Tag = "card";
+            panelGlow.Padding = new Padding(20, 15, 20, 16);
+            panelGlow.Size = new Size(827, 100);
+            panelGlow.TabIndex = 51;
+            //
+            // panelGlowTitle
+            //
+            panelGlowTitle.Controls.Add(pictureGlow);
+            panelGlowTitle.Controls.Add(labelGlow);
+            panelGlowTitle.Dock = DockStyle.Top;
+            panelGlowTitle.Location = new Point(20, 15);
+            panelGlowTitle.Name = "panelGlowTitle";
+            panelGlowTitle.Size = new Size(787, 40);
+            panelGlowTitle.TabIndex = 0;
+            //
+            // pictureGlow
+            //
+            pictureGlow.BackgroundImage = Properties.Resources.icons8_brightness_32;
+            pictureGlow.BackgroundImageLayout = ImageLayout.Zoom;
+            pictureGlow.Location = new Point(8, 3);
+            pictureGlow.Name = "pictureGlow";
+            pictureGlow.Size = new Size(32, 32);
+            pictureGlow.TabIndex = 0;
+            pictureGlow.TabStop = false;
+            //
+            // labelGlow
+            //
+            labelGlow.AutoSize = true;
+            labelGlow.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            labelGlow.Location = new Point(44, 0);
+            labelGlow.Name = "labelGlow";
+            labelGlow.Size = new Size(280, 32);
+            labelGlow.TabIndex = 1;
+            labelGlow.Text = "Unified Glow Control";
+            //
+            // sliderBrightness
+            //
+            sliderBrightness.Dock = DockStyle.Top;
+            sliderBrightness.Location = new Point(20, 55);
+            sliderBrightness.Name = "sliderBrightness";
+            sliderBrightness.Size = new Size(787, 36);
+            sliderBrightness.Min = 0;
+            sliderBrightness.Max = 3;
+            sliderBrightness.Step = 1;
+            sliderBrightness.Value = 3;
+            sliderBrightness.TabIndex = 1;
+            //
+            // screenModeSelector
+            //
+            screenModeSelector.Dock = DockStyle.Top;
+            screenModeSelector.Location = new Point(20, 51);
+            screenModeSelector.Margin = new Padding(7, 8, 7, 4);
+            screenModeSelector.Name = "screenModeSelector";
+            screenModeSelector.Size = new Size(787, 40);
+            screenModeSelector.TabIndex = 50;
+            //
             // SettingsForm
-            // 
+            //
             AutoScaleDimensions = new SizeF(192F, 192F);
             AutoScaleMode = AutoScaleMode.Dpi;
             AutoSize = true;
             AutoSizeMode = AutoSizeMode.GrowAndShrink;
             ClientSize = new Size(849, 2075);
             Controls.Add(panelFooter);
-            Controls.Add(panelVersion);
-            Controls.Add(panelStartup);
-            Controls.Add(panelBattery);
             Controls.Add(panelPeripherals);
-            Controls.Add(panelKeyboard);
             Controls.Add(panelAlly);
-            Controls.Add(panelMatrix);
+            Controls.Add(panelKeyboard);
             Controls.Add(panelGamma);
-            Controls.Add(panelScreen);
+            Controls.Add(panelGlow);
+            Controls.Add(panelSecondary);
             Controls.Add(panelGPU);
             Controls.Add(panelPerformance);
             Margin = new Padding(8, 4, 8, 4);
@@ -2070,10 +2355,6 @@ namespace GHelper
             panelKeyboard.PerformLayout();
             tableLayoutKeyboard.ResumeLayout(false);
             tableLayoutKeyboard.PerformLayout();
-            panelColor.ResumeLayout(false);
-            panelColor.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureColor2).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureColor).EndInit();
             panelKeyboardTitle.ResumeLayout(false);
             panelKeyboardTitle.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureKeyboard).EndInit();
@@ -2094,40 +2375,52 @@ namespace GHelper
             panelGammaTitle.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureGamma).EndInit();
             panelVersion.ResumeLayout(false);
+            panelSecondary.ResumeLayout(false);
+            panelSecondary.PerformLayout();
+            panelSecondaryTitle.ResumeLayout(false);
+            panelSecondaryTitle.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureSecondary).EndInit();
+            tableSecondary.ResumeLayout(false);
+            panelBatteryCol.ResumeLayout(false);
+            panelMacroCol.ResumeLayout(false);
+            panelSlashCol.ResumeLayout(false);
+            panelGlow.ResumeLayout(false);
+            panelGlow.PerformLayout();
+            panelGlowTitle.ResumeLayout(false);
+            panelGlowTitle.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureGlow).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
-        private Panel panelMatrix;
-        private Panel panelBattery;
+        private CardPanel panelMatrix;
+        private CardPanel panelBattery;
         private Panel panelFooter;
         private RButton buttonQuit;
         private CheckBox checkStartup;
-        private Panel panelPerformance;
+        private CardPanel panelPerformance;
         private TableLayoutPanel tablePerf;
         private RButton buttonTurbo;
         private RButton buttonBalanced;
         private RButton buttonSilent;
-        private Panel panelGPU;
+        private CardPanel panelGPU;
         private TableLayoutPanel tableGPU;
         private RButton buttonXGM;
         private RButton buttonUltimate;
         private RButton buttonStandard;
         private RButton buttonEco;
-        private Panel panelScreen;
+        private CardPanel panelScreen;
         private TableLayoutPanel tableScreen;
         private RButton buttonScreenAuto;
         private RButton button60Hz;
-        private Panel panelKeyboard;
+        private CardPanel panelKeyboard;
         private TableLayoutPanel tableLayoutMatrix;
-        private RComboBox comboMatrixRunning;
-        private RComboBox comboMatrix;
+        private ButtonSelector comboMatrixRunning;
+        private ButtonSelector comboMatrix;
         private TableLayoutPanel tableLayoutKeyboard;
-        private RComboBox comboKeyboard;
-        private Panel panelColor;
-        private PictureBox pictureColor2;
-        private PictureBox pictureColor;
+        private ButtonSelector comboKeyboard;
+        private ColorPickerPanel colorPicker;
         private CheckBox checkMatrix;
         private RButton button120Hz;
         private RButton buttonOptimized;
@@ -2135,7 +2428,6 @@ namespace GHelper
         private Label labelTipScreen;
         private RButton buttonMiniled;
         private RButton buttonMatrix;
-        private RButton buttonKeyboardColor;
         private RButton buttonFans;
         private Slider sliderBattery;
         private Panel panelGPUTitle;
@@ -2163,7 +2455,7 @@ namespace GHelper
         private Panel panelStartup;
         private RButton buttonStopGPU;
         private TableLayoutPanel tableButtons;
-        private Panel panelPeripherals;
+        private CardPanel panelPeripherals;
         private TableLayoutPanel tableLayoutPeripherals;
         private RButton buttonPeripheral2;
         private RButton buttonPeripheral3;
@@ -2173,7 +2465,7 @@ namespace GHelper
         private Label labelCharge;
         private RButton buttonFnLock;
         private RButton buttonBatteryFull;
-        private Panel panelAlly;
+        private CardPanel panelAlly;
         private TableLayoutPanel tableLayoutAlly;
         private RButton buttonControllerMode;
         private Panel panelAllyTitle;
@@ -2184,8 +2476,8 @@ namespace GHelper
         private RButton buttonFPS;
         private RButton buttonController;
         private RButton buttonOverlay;
-        private RComboBox comboInterval;
-        private Panel panelGamma;
+        private ButtonSelector comboInterval;
+        private CardPanel panelGamma;
         private Slider sliderGamma;
         private Panel panelGammaTitle;
         private Label labelGamma;
@@ -2194,19 +2486,47 @@ namespace GHelper
         private CheckBox checkMatrixLid;
         private Panel panelMatrixAuto;
         private TableLayoutPanel tableVisual;
-        private RComboBox comboVisual;
-        private RComboBox comboGamut;
-        private RComboBox comboColorTemp;
+        private ButtonSelector comboVisual;
+        private ButtonSelector comboGamut;
+        private ButtonSelector comboColorTemp;
         private RButton buttonInstallColor;
         private Label labelVisual;
         private RButton buttonFHD;
         private RButton buttonAutoTDP;
         private Label labelBacklight;
-        private Panel panelVersion;
+        private CardPanel panelVersion;
         private Label labelVersion;
         private RBadgeButton buttonDonate;
         private RButton buttonEnergySaver;
         private RButton buttonAmdOled;
         private RButton buttonHDRControl;
+        private GradientModeSlider sliderPerformance;
+        private ToggleSwitch toggleAutoPilot;
+        private Label labelTempPill;
+        private GpuSchematicPanel gpuSchematic;
+        private ButtonSelector gpuModeSelector;
+        private Label labelRequiresRestart;
+        private CardPanel panelSecondary;
+        private Panel panelSecondaryTitle;
+        private Label labelSecondary;
+        private PictureBox pictureSecondary;
+        private TableLayoutPanel tableSecondary;
+        private Panel panelBatteryCol;
+        private CircularGauge gaugeCharge;
+        private ToggleSwitch toggleStartup;
+        private Panel panelMacroCol;
+        private Label labelMacroHeader;
+        private Label labelM1;
+        private Label labelM2;
+        private Label labelM3;
+        private Label labelM4;
+        private Panel panelSlashCol;
+        private Label labelSlashHeader;
+        private CardPanel panelGlow;
+        private Panel panelGlowTitle;
+        private Label labelGlow;
+        private PictureBox pictureGlow;
+        private Slider sliderBrightness;
+        private ButtonSelector screenModeSelector;
     }
 }

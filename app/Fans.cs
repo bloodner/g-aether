@@ -12,6 +12,7 @@ namespace GHelper
 {
     public partial class Fans : RForm
     {
+        private bool _updatingSliders = false;
 
         int curIndex = -1;
         DataPoint? curPoint = null;
@@ -77,6 +78,18 @@ namespace GHelper
             labelTip.Visible = false;
             labelTip.BackColor = Color.Transparent;
 
+            var hintLabel = new Label
+            {
+                Text = "Drag points to adjust fan curve",
+                ForeColor = Color.Gray,
+                Font = new Font("Segoe UI", 7.5f, FontStyle.Italic),
+                AutoSize = true,
+                Dock = DockStyle.Right,
+                TextAlign = ContentAlignment.MiddleRight,
+                Padding = new Padding(0, 0, 10, 0)
+            };
+            panelTitleFans.Controls.Add(hintLabel);
+
             seriesCPU = chartCPU.Series.Add("CPU");
             seriesGPU = chartGPU.Series.Add("GPU");
             seriesMid = chartMid.Series.Add("Mid");
@@ -110,22 +123,22 @@ namespace GHelper
 
             buttonReset.Click += ButtonReset_Click;
 
-            trackTotal.Maximum = AsusACPI.MaxTotal;
-            trackTotal.Minimum = AsusACPI.MinTotal;
+            trackTotal.Max = AsusACPI.MaxTotal;
+            trackTotal.Min = AsusACPI.MinTotal;
 
-            trackSlow.Maximum = AsusACPI.MaxTotal;
-            trackSlow.Minimum = AsusACPI.MinTotal;
+            trackSlow.Max = AsusACPI.MaxTotal;
+            trackSlow.Min = AsusACPI.MinTotal;
 
-            trackCPU.Maximum = AsusACPI.MaxCPU;
-            trackCPU.Minimum = AsusACPI.MinCPU;
+            trackCPU.Max = AsusACPI.MaxCPU;
+            trackCPU.Min = AsusACPI.MinCPU;
 
-            trackFast.Maximum = AsusACPI.MaxTotal;
-            trackFast.Minimum = AsusACPI.MinTotal;
+            trackFast.Max = AsusACPI.MaxTotal;
+            trackFast.Min = AsusACPI.MinTotal;
 
-            trackTotal.Scroll += TrackTotal_Scroll;
-            trackSlow.Scroll += TrackSlow_Scroll;
-            trackFast.Scroll += TrackFast_Scroll;
-            trackCPU.Scroll += TrackCPU_Scroll;
+            trackTotal.ValueChanged += TrackTotal_Scroll;
+            trackSlow.ValueChanged += TrackSlow_Scroll;
+            trackFast.ValueChanged += TrackFast_Scroll;
+            trackCPU.ValueChanged += TrackCPU_Scroll;
 
             trackFast.MouseUp += TrackPower_MouseUp;
             trackCPU.MouseUp += TrackPower_MouseUp;
@@ -140,31 +153,31 @@ namespace GHelper
             checkApplyFans.Click += CheckApplyFans_Click;
             checkApplyPower.Click += CheckApplyPower_Click;
 
-            trackGPUClockLimit.Minimum = NvidiaGpuControl.MinClockLimit;
-            trackGPUClockLimit.Maximum = NvidiaGpuControl.MaxClockLimit;
+            trackGPUClockLimit.Min = NvidiaGpuControl.MinClockLimit;
+            trackGPUClockLimit.Max = NvidiaGpuControl.MaxClockLimit;
 
-            trackGPUCore.Minimum = NvidiaGpuControl.MinCoreOffset;
-            trackGPUCore.Maximum = NvidiaGpuControl.MaxCoreOffset;
+            trackGPUCore.Min = NvidiaGpuControl.MinCoreOffset;
+            trackGPUCore.Max = NvidiaGpuControl.MaxCoreOffset;
 
-            trackGPUMemory.Minimum = NvidiaGpuControl.MinMemoryOffset;
-            trackGPUMemory.Maximum = NvidiaGpuControl.MaxMemoryOffset;
+            trackGPUMemory.Min = NvidiaGpuControl.MinMemoryOffset;
+            trackGPUMemory.Max = NvidiaGpuControl.MaxMemoryOffset;
 
-            trackGPUBoost.Minimum = AsusACPI.MinGPUBoost;
-            trackGPUBoost.Maximum = AsusACPI.MaxGPUBoost;
+            trackGPUBoost.Min = AsusACPI.MinGPUBoost;
+            trackGPUBoost.Max = AsusACPI.MaxGPUBoost;
 
-            trackGPUTemp.Minimum = AsusACPI.MinGPUTemp;
-            trackGPUTemp.Maximum = AsusACPI.MaxGPUTemp;
+            trackGPUTemp.Min = AsusACPI.MinGPUTemp;
+            trackGPUTemp.Max = AsusACPI.MaxGPUTemp;
 
-            trackGPUPower.Minimum = AsusACPI.MinGPUPower;
-            trackGPUPower.Maximum = AsusACPI.MaxGPUPower;
+            trackGPUPower.Min = AsusACPI.MinGPUPower;
+            trackGPUPower.Max = AsusACPI.MaxGPUPower;
 
-            trackGPUClockLimit.Scroll += trackGPUClockLimit_Scroll;
-            trackGPUCore.Scroll += trackGPU_Scroll;
-            trackGPUMemory.Scroll += trackGPU_Scroll;
+            trackGPUClockLimit.ValueChanged += trackGPUClockLimit_Scroll;
+            trackGPUCore.ValueChanged += trackGPU_Scroll;
+            trackGPUMemory.ValueChanged += trackGPU_Scroll;
 
-            trackGPUBoost.Scroll += trackGPUPower_Scroll;
-            trackGPUTemp.Scroll += trackGPUPower_Scroll;
-            trackGPUPower.Scroll += trackGPUPower_Scroll;
+            trackGPUBoost.ValueChanged += trackGPUPower_Scroll;
+            trackGPUTemp.ValueChanged += trackGPUPower_Scroll;
+            trackGPUPower.ValueChanged += trackGPUPower_Scroll;
 
             trackGPUCore.MouseUp += TrackGPUClocks_MouseUp;
             trackGPUMemory.MouseUp += TrackGPUClocks_MouseUp;
@@ -179,14 +192,14 @@ namespace GHelper
             labelFansResult.Visible = false;
 
 
-            trackUV.Minimum = RyzenControl.MinCPUUV;
-            trackUV.Maximum = RyzenControl.MaxCPUUV;
+            trackUV.Min = RyzenControl.MinCPUUV;
+            trackUV.Max = RyzenControl.MaxCPUUV;
 
-            trackUViGPU.Minimum = RyzenControl.MinIGPUUV;
-            trackUViGPU.Maximum = RyzenControl.MaxIGPUUV;
+            trackUViGPU.Min = RyzenControl.MinIGPUUV;
+            trackUViGPU.Max = RyzenControl.MaxIGPUUV;
 
-            trackTemp.Minimum = RyzenControl.MinTemp;
-            trackTemp.Maximum = RyzenControl.MaxTemp;
+            trackTemp.Min = RyzenControl.MinTemp;
+            trackTemp.Max = RyzenControl.MaxTemp;
 
             comboPowerMode.DropDownStyle = ComboBoxStyle.DropDownList;
             comboPowerMode.DataSource = new BindingSource(PowerNative.powerModes, null);
@@ -212,9 +225,9 @@ namespace GHelper
             buttonRename.Click += ButtonRename_Click;
 
 
-            trackUV.Scroll += TrackUV_Scroll;
-            trackUViGPU.Scroll += TrackUV_Scroll;
-            trackTemp.Scroll += TrackUV_Scroll;
+            trackUV.ValueChanged += TrackUV_Scroll;
+            trackUViGPU.ValueChanged += TrackUV_Scroll;
+            trackTemp.ValueChanged += TrackUV_Scroll;
 
             buttonApplyAdvanced.Click += ButtonApplyAdvanced_Click;
 
@@ -387,8 +400,8 @@ namespace GHelper
 
             //if (!ProcessHelper.IsUserAdministrator()) return;
 
-            int cpuUV = Math.Max(trackUV.Minimum, Math.Min(trackUV.Maximum, AppConfig.GetMode("cpu_uv", 0)));
-            int igpuUV = Math.Max(trackUViGPU.Minimum, Math.Min(trackUViGPU.Maximum, AppConfig.GetMode("igpu_uv", 0)));
+            int cpuUV = Math.Max(trackUV.Min, Math.Min(trackUV.Max, AppConfig.GetMode("cpu_uv", 0)));
+            int igpuUV = Math.Max(trackUViGPU.Min, Math.Min(trackUViGPU.Max, AppConfig.GetMode("igpu_uv", 0)));
 
             int temp = AppConfig.GetMode("cpu_temp");
             if (temp < RyzenControl.MinTemp || temp > RyzenControl.MaxTemp) temp = RyzenControl.MaxTemp;
@@ -560,8 +573,8 @@ namespace GHelper
             if (maxGPUPower > 0)
             {
                 AsusACPI.MaxGPUPower = maxGPUPower - gpuPowerBase - AsusACPI.MaxGPUBoost;
-                trackGPUPower.Minimum = AsusACPI.MinGPUPower;
-                trackGPUPower.Maximum = AsusACPI.MaxGPUPower;
+                trackGPUPower.Min = AsusACPI.MinGPUPower;
+                trackGPUPower.Max = AsusACPI.MaxGPUPower;
             }
 
             Task.Run(async () =>
@@ -698,7 +711,7 @@ namespace GHelper
         private void trackGPU_Scroll(object? sender, EventArgs e)
         {
             if (sender is null) return;
-            TrackBar track = (TrackBar)sender;
+            Slider track = (Slider)sender;
             track.Value = (int)Math.Round((float)track.Value / 5) * 5;
 
             AppConfig.SetMode("gpu_core", trackGPUCore.Value);
@@ -1001,30 +1014,54 @@ namespace GHelper
 
         private void TrackTotal_Scroll(object? sender, EventArgs e)
         {
-            if (trackTotal.Value > trackSlow.Value) trackSlow.Value = trackTotal.Value;
-            if (trackTotal.Value > trackFast.Value) trackFast.Value = trackTotal.Value;
-            if (trackTotal.Value < trackCPU.Value) trackCPU.Value = trackTotal.Value;
-            SavePower();
+            if (_updatingSliders) return;
+            _updatingSliders = true;
+            try
+            {
+                if (trackTotal.Value > trackSlow.Value) trackSlow.Value = trackTotal.Value;
+                if (trackTotal.Value > trackFast.Value) trackFast.Value = trackTotal.Value;
+                if (trackTotal.Value < trackCPU.Value) trackCPU.Value = trackTotal.Value;
+                SavePower();
+            }
+            finally { _updatingSliders = false; }
         }
 
         private void TrackSlow_Scroll(object? sender, EventArgs e)
         {
-            if (trackSlow.Value < trackTotal.Value) trackTotal.Value = trackSlow.Value;
-            if (trackSlow.Value > trackFast.Value) trackFast.Value = trackSlow.Value;
-            SavePower();
+            if (_updatingSliders) return;
+            _updatingSliders = true;
+            try
+            {
+                if (trackSlow.Value < trackTotal.Value) trackTotal.Value = trackSlow.Value;
+                if (trackSlow.Value > trackFast.Value) trackFast.Value = trackSlow.Value;
+                SavePower();
+            }
+            finally { _updatingSliders = false; }
         }
 
         private void TrackFast_Scroll(object? sender, EventArgs e)
         {
-            if (trackFast.Value < trackSlow.Value) trackSlow.Value = trackFast.Value;
-            if (trackFast.Value < trackTotal.Value) trackTotal.Value = trackFast.Value;
-            SavePower();
+            if (_updatingSliders) return;
+            _updatingSliders = true;
+            try
+            {
+                if (trackFast.Value < trackSlow.Value) trackSlow.Value = trackFast.Value;
+                if (trackFast.Value < trackTotal.Value) trackTotal.Value = trackFast.Value;
+                SavePower();
+            }
+            finally { _updatingSliders = false; }
         }
 
         private void TrackCPU_Scroll(object? sender, EventArgs e)
         {
-            if (trackCPU.Value > trackTotal.Value) trackTotal.Value = trackCPU.Value;
-            SavePower();
+            if (_updatingSliders) return;
+            _updatingSliders = true;
+            try
+            {
+                if (trackCPU.Value > trackTotal.Value) trackTotal.Value = trackCPU.Value;
+                SavePower();
+            }
+            finally { _updatingSliders = false; }
         }
 
         public void InitFans()

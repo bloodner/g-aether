@@ -9,13 +9,13 @@ namespace GHelper.Gpu
 {
     public class GPUModeControl
     {
-        SettingsForm settings;
+        SettingsForm? settings;
 
         public static int gpuMode;
         public static bool? gpuExists = null;
 
 
-        public GPUModeControl(SettingsForm settingsForm)
+        public GPUModeControl(SettingsForm? settingsForm = null)
         {
             settings = settingsForm;
         }
@@ -24,7 +24,7 @@ namespace GHelper.Gpu
         {
             if (AppConfig.NoGpu())
             {
-                settings.HideGPUModes(false);
+                settings?.HideGPUModes(false);
                 return;
             }
 
@@ -34,7 +34,7 @@ namespace GHelper.Gpu
             Logger.WriteLine("Eco flag : " + eco);
             Logger.WriteLine("Mux flag : " + mux);
 
-            settings.VisualiseGPUButtons(eco >= 0, mux >= 0);
+            settings?.VisualiseGPUButtons(eco >= 0, mux >= 0);
 
             if (mux == 0)
             {
@@ -51,12 +51,12 @@ namespace GHelper.Gpu
                 if (eco < 0 && mux < 0)
                 {
                     if (gpuExists is null) gpuExists = Program.acpi.GetFan(AsusFan.GPU) >= 0;
-                    settings.HideGPUModes((bool)gpuExists);
+                    settings?.HideGPUModes((bool)gpuExists);
                 }
             }
 
             AppConfig.Set("gpu_mode", gpuMode);
-            settings.VisualiseGPUMode(gpuMode);
+            settings?.VisualiseGPUMode(gpuMode);
 
             Aura.CustomRGB.ApplyGPUColor(gpuMode);
 
@@ -72,7 +72,7 @@ namespace GHelper.Gpu
 
             if (CurrentGPU == GPUMode)
             {
-                settings.VisualiseGPUMode();
+                settings?.VisualiseGPUMode();
                 return;
             }
 
@@ -105,7 +105,7 @@ namespace GHelper.Gpu
                         Logger.WriteLine("Eco flag : " + eco);
                         if (eco == 1)
                         {
-                            settings.VisualiseGPUMode();
+                            settings?.VisualiseGPUMode();
                             return;
                         }
                     }
@@ -117,13 +117,13 @@ namespace GHelper.Gpu
             }
             else if (GPUMode == AsusACPI.GPUModeEco)
             {
-                settings.VisualiseGPUMode(GPUMode);
+                settings?.VisualiseGPUMode(GPUMode);
                 SetGPUEco(1);
                 changed = true;
             }
             else if (GPUMode == AsusACPI.GPUModeStandard)
             {
-                settings.VisualiseGPUMode(GPUMode);
+                settings?.VisualiseGPUMode(GPUMode);
                 SetGPUEco(0);
                 changed = true;
             }
@@ -135,7 +135,7 @@ namespace GHelper.Gpu
 
             if (restart)
             {
-                settings.VisualiseGPUMode();
+                settings?.VisualiseGPUMode();
                 Process.Start("shutdown", "/r /t 1");
             }
 
@@ -146,7 +146,7 @@ namespace GHelper.Gpu
         public void SetGPUEco(int eco)
         {
 
-            settings.LockGPUModes();
+            settings?.LockGPUModes();
 
             Task.Run(async () =>
             {
@@ -167,7 +167,7 @@ namespace GHelper.Gpu
                     status = Program.acpi.SetGPUEco(eco);
                     await Task.Delay(TimeSpan.FromMilliseconds(AppConfig.Get("refresh_delay", 500)));
 
-                    settings.Invoke(delegate
+                    settings?.Invoke(delegate
                     {
                         InitGPUMode();
                         ScreenControl.AutoScreen();
@@ -274,7 +274,7 @@ namespace GHelper.Gpu
 
             Task.Run(async () =>
             {
-                settings.LockGPUModes();
+                settings?.LockGPUModes();
 
                 if (Program.acpi.DeviceGet(AsusACPI.GPUXG) == 1)
                 {
@@ -289,7 +289,7 @@ namespace GHelper.Gpu
                     else
                     {
                         DialogResult dialogResult = DialogResult.No;
-                        settings.Invoke((MethodInvoker)delegate
+                        settings?.Invoke((MethodInvoker)delegate
                         {
                             dialogResult = MessageBox.Show(settings, "Did you close all applications running on XG Mobile?", "Disabling XG Mobile", MessageBoxButtons.YesNo);
                         });
@@ -320,7 +320,7 @@ namespace GHelper.Gpu
 
                 }
 
-                settings.Invoke(delegate
+                settings?.Invoke(delegate
                 {
                     InitGPUMode();
                 });

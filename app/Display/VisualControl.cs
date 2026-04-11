@@ -274,7 +274,7 @@ namespace GHelper.Display
         {
             Task.Run(async () =>
             {
-                if (AmdDisplay.IsOledPowerOptimization()) Program.settingsForm.VisualiseAmdOled(true);
+                if (AmdDisplay.IsOledPowerOptimization()) Program.settingsForm?.VisualiseAmdOled(true);
             });
 
             if (mode == SplendidCommand.None) return;
@@ -375,7 +375,7 @@ namespace GHelper.Display
             if (AmdDisplay.IsOledPowerOptimization())
             {
                 Logger.WriteLine("Skipping command due to AMD OLED Power Optimization flag");
-                Program.settingsForm.VisualiseAmdOled(true);
+                Program.settingsForm?.VisualiseAmdOled(true);
                 return 0;
             }
 
@@ -445,7 +445,7 @@ namespace GHelper.Display
 
             brightnessTimer.Start();
 
-            Program.settingsForm.VisualiseBrightness();
+            Program.settingsForm?.VisualiseBrightness();
             //if (brightness < 100) ResetGamut();
 
             return _brightness;
@@ -459,7 +459,7 @@ namespace GHelper.Display
             {
                 skipGamut = true;
                 AppConfig.Set("gamut", defaultGamut);
-                Program.settingsForm.VisualiseGamut();
+                Program.settingsForm?.VisualiseGamut();
                 skipGamut = false;
             }
         }

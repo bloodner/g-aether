@@ -30,7 +30,7 @@ namespace GHelper.UI
         public Color accentColor = Color.FromArgb(255, 58, 174, 239);
         public Color borderColor = Color.White;
 
-        public event EventHandler ValueChanged;
+        public event EventHandler? ValueChanged;
 
         public Slider()
         {
@@ -62,6 +62,9 @@ namespace GHelper.UI
             }
         }
 
+        // TrackBar compatibility aliases
+        public int Minimum { get => Min; set => Min = value; }
+        public int Maximum { get => Max; set => Max = value; }
 
         private int _step = 1;
         public int Step
@@ -129,18 +132,48 @@ namespace GHelper.UI
         {
             base.OnPaint(e);
 
-            Brush brushAccent = new SolidBrush(accentColor);
-            Brush brushEmpty = new SolidBrush(Color.Gray);
-            Brush brushBorder = new SolidBrush(borderColor);
+            using Brush brushAccent = new SolidBrush(accentColor);
+            using Brush brushEmpty = new SolidBrush(Color.FromArgb(100, 128, 128, 128));
+            using Brush brushWhite = new SolidBrush(RForm.foreMain);
 
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            e.Graphics.FillRectangle(brushEmpty,
-                _barPos.X, _barPos.Y, _barSize.Width, _barSize.Height);
-            e.Graphics.FillRectangle(brushAccent,
-                _barPos.X, _barPos.Y, _thumbPos.X - _barPos.X, _barSize.Height);
 
-            e.Graphics.FillCircle(brushBorder, _thumbPos.X, _thumbPos.Y, _radius);
-            e.Graphics.FillCircle(brushAccent, _thumbPos.X, _thumbPos.Y, 0.7f * _radius);
+            // Thin rounded rail
+            float barRadius = _barSize.Height / 2;
+            var emptyRect = new RectangleF(_barPos.X, _barPos.Y, _barSize.Width, _barSize.Height);
+            var filledRect = new RectangleF(_barPos.X, _barPos.Y, Math.Max(0, _thumbPos.X - _barPos.X), _barSize.Height);
+
+            using var emptyPath = CreateRoundedBarPath(emptyRect, barRadius);
+            e.Graphics.FillPath(brushEmpty, emptyPath);
+
+            if (filledRect.Width > 0)
+            {
+                using var filledPath = CreateRoundedBarPath(filledRect, barRadius);
+                e.Graphics.FillPath(brushAccent, filledPath);
+            }
+
+            // Thumb: accent outer, white inner (WinUI 3 style)
+            e.Graphics.FillCircle(brushAccent, _thumbPos.X, _thumbPos.Y, _radius);
+            e.Graphics.FillCircle(brushWhite, _thumbPos.X, _thumbPos.Y, 0.55f * _radius);
+        }
+
+        private static GraphicsPath CreateRoundedBarPath(RectangleF rect, float radius)
+        {
+            var path = new GraphicsPath();
+            float diameter = radius * 2;
+            if (diameter > rect.Height) diameter = rect.Height;
+            if (diameter > rect.Width) diameter = rect.Width;
+            var arcRect = new RectangleF(rect.Location, new SizeF(diameter, diameter));
+
+            path.AddArc(arcRect, 180, 90);
+            arcRect.X = rect.Right - diameter;
+            path.AddArc(arcRect, 270, 90);
+            arcRect.Y = rect.Bottom - diameter;
+            path.AddArc(arcRect, 0, 90);
+            arcRect.X = rect.Left;
+            path.AddArc(arcRect, 90, 90);
+            path.CloseFigure();
+            return path;
         }
 
         protected override void OnResize(EventArgs e)
@@ -151,11 +184,13 @@ namespace GHelper.UI
 
         private void RecalculateParameters()
         {
-            _radius = 0.4F * ClientSize.Height;
-            _barSize = new SizeF(ClientSize.Width - 2 * _radius, ClientSize.Height * 0.15F);
+            _radius = 0.35F * ClientSize.Height;
+            float barHeight = Math.Max(4, ClientSize.Height * 0.12F);
+            _barSize = new SizeF(ClientSize.Width - 2 * _radius, barHeight);
             _barPos = new PointF(_radius, (ClientSize.Height - _barSize.Height) / 2);
+            float range = Max - Min;
             _thumbPos = new PointF(
-                _barSize.Width / (Max - Min) * (Value - Min) + _barPos.X,
+                range > 0 ? _barSize.Width / range * (Value - Min) + _barPos.X : _barPos.X,
                 _barPos.Y + 0.5f * _barSize.Height);
             Invalidate();
         }
@@ -183,7 +218,7 @@ namespace GHelper.UI
 
         private void _calculateValue(MouseEventArgs e)
         {
-            float thumbX = e.Location.X; // - _delta.Width;
+            float thumbX = e.Location.X;
             if (thumbX < _barPos.X)
             {
                 thumbX = _barPos.X;

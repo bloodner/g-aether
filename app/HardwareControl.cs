@@ -62,7 +62,7 @@ public static class HardwareControl
             Debug.WriteLine(ex.ToString());
         }
 
-        return 0;
+        return -1;
     }
 
 
@@ -245,11 +245,75 @@ public static class HardwareControl
         return gpuTemp;
     }
 
+    /// <summary>
+    /// Reads GPU utilization from Windows Performance Counters ("GPU Engine" category).
+    /// This works for any GPU (Intel, AMD, NVIDIA) — same source as Task Manager.
+    /// Caches counter instances between calls so NextValue() returns accurate deltas.
+    /// </summary>
+    private static List<PerformanceCounter>? _gpuEngineCounters;
+    private static DateTime _gpuCountersLastRefresh = DateTime.MinValue;
+
+    private static int GetGpuUseFromPerfCounters()
+    {
+        try
+        {
+            // Refresh counter instances every 10 seconds (processes come and go)
+            if (_gpuEngineCounters == null || (DateTime.Now - _gpuCountersLastRefresh).TotalSeconds > 10)
+            {
+                // Dispose old counters
+                if (_gpuEngineCounters != null)
+                {
+                    foreach (var c in _gpuEngineCounters) c.Dispose();
+                }
+
+                _gpuEngineCounters = new List<PerformanceCounter>();
+                var category = new PerformanceCounterCategory("GPU Engine");
+
+                foreach (string instance in category.GetInstanceNames())
+                {
+                    if (!instance.Contains("engtype_3D")) continue;
+                    var counter = new PerformanceCounter("GPU Engine", "Utilization Percentage", instance);
+                    counter.NextValue(); // prime the counter (first call always returns 0)
+                    _gpuEngineCounters.Add(counter);
+                }
+
+                _gpuCountersLastRefresh = DateTime.Now;
+                return -1; // first call after refresh can't give accurate data yet
+            }
+
+            float totalUsage = 0;
+            var deadCounters = new List<PerformanceCounter>();
+
+            foreach (var counter in _gpuEngineCounters)
+            {
+                try
+                {
+                    totalUsage += counter.NextValue();
+                }
+                catch
+                {
+                    deadCounters.Add(counter);
+                }
+            }
+
+            // Clean up counters for processes that exited
+            foreach (var dead in deadCounters)
+            {
+                _gpuEngineCounters.Remove(dead);
+                dead.Dispose();
+            }
+
+            return (int)Math.Round(totalUsage);
+        }
+        catch
+        {
+            return -1;
+        }
+    }
 
     public static void ReadSensors(bool log = false)
     {
         batteryRate = 0;
-        gpuUse = -1;
 
         cpuFan = FanSensorControl.FormatFan(AsusFan.CPU, Program.acpi.GetFan(AsusFan.CPU));
         gpuFan = FanSensorControl.FormatFan(AsusFan.GPU, Program.acpi.GetFan(AsusFan.GPU));
@@ -257,6 +321,17 @@ public static class HardwareControl
 
         cpuTemp = GetCPUTemp();
         gpuTemp = GetGPUTemp();
+
+        // GPU usage: try vendor API (NVAPI/ADL) first, then Windows Performance Counters
+        int dGpuUse = GetGpuUse();
+        if (dGpuUse >= 0)
+        {
+            gpuUse = dGpuUse;
+        }
+        else
+        {
+            gpuUse = GetGpuUseFromPerfCounters();
+        }
 
         if (log) Logger.WriteLine($"Temps: {cpuTemp} {gpuTemp} {cpuFan} {gpuFan} {midFan}");
 
@@ -299,10 +374,14 @@ public static class HardwareControl
 
     public static bool IsUsedGPU(int threshold = 10)
     {
-        if (GetGpuUse() > threshold)
+        int use = GetGpuUse();
+        if (use < 0) use = GetGpuUseFromPerfCounters();
+        if (use > threshold)
         {
             Thread.Sleep(1000);
-            return (GetGpuUse() > threshold);
+            use = GetGpuUse();
+            if (use < 0) use = GetGpuUseFromPerfCounters();
+            return (use > threshold);
         }
         return false;
     }
