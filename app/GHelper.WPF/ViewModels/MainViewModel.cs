@@ -128,11 +128,10 @@ namespace GHelper.WPF.ViewModels
                     _lastMode = currentMode;
                     Performance.SetFromMode(currentMode);
 
-                    // Show OSD toast for hotkey-triggered mode changes (skip initial sync)
-                    if (!isFirstSync)
+                    // Show carousel for hotkey-triggered mode changes (skip initial sync)
+                    if (!isFirstSync && !ModeCarouselService.IsVisible)
                     {
-                        string modeName = Modes.GetCurrentName();
-                        ToastService.ShowPerformanceMode(currentMode, modeName);
+                        ModeCarouselService.ShowPerformanceModes();
                     }
                 }
 

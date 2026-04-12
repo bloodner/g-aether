@@ -62,8 +62,7 @@ namespace GHelper.WPF.ViewModels
         {
             if (_ignoreIndexChange) return;
 
-            string modeName = value < ModeLabels.Length ? ModeLabels[value] : "Unknown";
-            ToastService.ShowPerformanceMode(value, modeName);
+            ModeCarouselService.ShowPerformanceModes();
 
             switch (value)
             {

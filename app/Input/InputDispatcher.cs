@@ -19,6 +19,9 @@ namespace GHelper.Input
         public static Action<int>? OnCycleAura;
         public static Action<int>? OnCycleVisual;
         public static Action? OnToggleApp;
+        public static Action? OnCyclePerformanceMode;
+        public static Action<int>? OnSetGpuMode;
+        public static Action? OnToggleScreenRate;
         public static bool lidClose = false;
         public static bool tentMode = false;
         private static bool? _fnLock = null;
@@ -460,20 +463,20 @@ namespace GHelper.Input
 
             if (e.Modifier == keyModifier)
             {
-                if (e.Key == keyProfile) modeControl.CyclePerformanceMode();
+                if (e.Key == keyProfile) { modeControl.CyclePerformanceMode(); OnCyclePerformanceMode?.Invoke(); }
                 if (e.Key == keyApp) Program.SettingsToggle();
                 if (e.Key == Keys.F20) ToggleMic();
             }
 
             if (e.Modifier == keyModifierAlt)
             {
-                if (e.Key == keyProfile) modeControl.CyclePerformanceMode(true);
+                if (e.Key == keyProfile) { modeControl.CyclePerformanceMode(true); OnCyclePerformanceMode?.Invoke(); }
 
-                if (e.Key == keyProfile0) modeControl.SetPerformanceMode(0, true);
-                if (e.Key == keyProfile1) modeControl.SetPerformanceMode(1, true);
-                if (e.Key == keyProfile2) modeControl.SetPerformanceMode(2, true);
-                if (e.Key == keyProfile3) modeControl.SetPerformanceMode(3, true);
-                if (e.Key == keyProfile4) modeControl.SetPerformanceMode(4, true);
+                if (e.Key == keyProfile0) { modeControl.SetPerformanceMode(0, true); OnCyclePerformanceMode?.Invoke(); }
+                if (e.Key == keyProfile1) { modeControl.SetPerformanceMode(1, true); OnCyclePerformanceMode?.Invoke(); }
+                if (e.Key == keyProfile2) { modeControl.SetPerformanceMode(2, true); OnCyclePerformanceMode?.Invoke(); }
+                if (e.Key == keyProfile3) { modeControl.SetPerformanceMode(3, true); OnCyclePerformanceMode?.Invoke(); }
+                if (e.Key == keyProfile4) { modeControl.SetPerformanceMode(4, true); OnCyclePerformanceMode?.Invoke(); }
                 if (e.Key == keyXGM) Program.settingsForm.gpuControl.ToggleXGM(true);
 
                 switch (e.Key)
@@ -506,14 +509,17 @@ namespace GHelper.Input
                         break;
                     case Keys.F13:
                         ToggleScreenRate();
+                        OnToggleScreenRate?.Invoke();
                         break;
                     case Keys.F14:
                         Program.toast.RunToast(Properties.Strings.EcoMode);
                         Program.settingsForm.gpuControl.SetGPUMode(AsusACPI.GPUModeEco);
+                        OnSetGpuMode?.Invoke(AsusACPI.GPUModeEco);
                         break;
                     case Keys.F15:
                         Program.toast.RunToast(Properties.Strings.StandardMode);
                         Program.settingsForm.gpuControl.SetGPUMode(AsusACPI.GPUModeStandard);
+                        OnSetGpuMode?.Invoke(AsusACPI.GPUModeStandard);
                         break;
                 }
             }
