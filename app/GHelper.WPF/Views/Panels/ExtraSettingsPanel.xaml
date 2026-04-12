@@ -283,8 +283,8 @@
                     </Border>
 
                     <!-- Updates Link -->
-                    <Button Content="Check for Updates"
-                            Command="{Binding OpenUpdatesCommand}"
+                    <Button Content="{Binding UpdateButtonText}"
+                            Command="{Binding CheckForUpdatesCommand}"
                             Style="{StaticResource LinkButtonStyle}"
                             Margin="0,4,0,0" />
 

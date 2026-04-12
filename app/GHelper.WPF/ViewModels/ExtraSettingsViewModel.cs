@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Net.Http;
 using System.Reflection;
+using System.Text.Json;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,7 +13,20 @@ namespace GHelper.WPF.ViewModels
 {
     public partial class ExtraSettingsViewModel : ObservableObject
     {
-        public string VersionText { get; } = $"G-Aether v{Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.1"}";
+        private static readonly string AppVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.1";
+        private const string GitHubApiUrl = "https://api.github.com/repos/bloodner/g-aether/releases/latest";
+        private const string ReleasesPageUrl = "https://github.com/bloodner/g-aether/releases";
+
+        [ObservableProperty]
+        private string _versionText = $"G-Aether v{AppVersion}";
+
+        [ObservableProperty]
+        private string _updateButtonText = "Check for Updates";
+
+        [ObservableProperty]
+        private bool _isUpdateAvailable;
+
+        private string? _updateDownloadUrl;
 
         [ObservableProperty]
         private bool _runOnStartup;
@@ -211,17 +226,71 @@ namespace GHelper.WPF.ViewModels
         }
 
         [RelayCommand]
-        private void OpenUpdates()
+        private async Task CheckForUpdates()
         {
+            if (IsUpdateAvailable && _updateDownloadUrl != null)
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = _updateDownloadUrl,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine("Failed to open update URL: " + ex.Message);
+                }
+                return;
+            }
+
+            UpdateButtonText = "Checking...";
+
             try
             {
-                Process.Start(new ProcessStartInfo
+                using var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Add("User-Agent", "G-Aether");
+                var json = await httpClient.GetStringAsync(GitHubApiUrl);
+                var release = JsonSerializer.Deserialize<JsonElement>(json);
+                var tag = release.GetProperty("tag_name").GetString()?.TrimStart('v') ?? "";
+                var assets = release.GetProperty("assets");
+
+                string? downloadUrl = null;
+                for (int i = 0; i < assets.GetArrayLength(); i++)
                 {
-                    FileName = "https://github.com/seerge/g-helper/releases",
-                    UseShellExecute = true
-                });
+                    var url = assets[i].GetProperty("browser_download_url").GetString();
+                    if (url != null && url.Contains(".zip"))
+                    {
+                        downloadUrl = url;
+                        break;
+                    }
+                }
+                downloadUrl ??= ReleasesPageUrl;
+
+                var gitVersion = new Version(tag);
+                var appVersion = new Version(AppVersion);
+
+                if (gitVersion.CompareTo(appVersion) > 0)
+                {
+                    _updateDownloadUrl = downloadUrl;
+                    IsUpdateAvailable = true;
+                    UpdateButtonText = $"Download v{tag}";
+                    VersionText = $"G-Aether v{AppVersion} → v{tag}";
+                    ToastService.Show($"Update available: v{tag}", ToastType.Info);
+                }
+                else
+                {
+                    UpdateButtonText = "Check for Updates";
+                    ToastService.Show("You're up to date!", ToastType.Success);
+                }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Logger.WriteLine("Update check failed: " + ex.Message);
+                UpdateButtonText = "Check for Updates";
+                ToastService.Show("Update check failed", ToastType.Error);
+            }
         }
 
         public void Initialize()
