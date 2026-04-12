@@ -179,7 +179,7 @@ namespace GHelper.WPF.Services
 
         /// <summary>
         /// Update the tray icon to reflect current performance and GPU modes.
-        /// Ring = GPU mode color, Fill = Performance mode color.
+        /// Left half = Performance mode color, Right half = GPU mode color.
         /// </summary>
         public void UpdateIcon(int perfMode, int gpuMode)
         {
@@ -192,15 +192,15 @@ namespace GHelper.WPF.Services
 
             Logger.WriteLine($"Tray icon update: perf={perfMode}, gpu={gpuMode}");
 
-            var fillColor = perfMode >= 0 && perfMode < PerfColors.Length
+            var perfColor = perfMode >= 0 && perfMode < PerfColors.Length
                 ? PerfColors[perfMode]
-                : PerfColors[1]; // default to Balanced green
+                : PerfColors[0]; // default to Balanced blue
 
-            var ringColor = GpuColors.TryGetValue(gpuMode, out var gc)
+            var gpuColor = GpuColors.TryGetValue(gpuMode, out var gc)
                 ? gc
                 : System.Drawing.Color.FromArgb(96, 205, 255); // default to Standard blue
 
-            var newIcon = CreateIcon(fillColor, ringColor);
+            var newIcon = CreateIcon(perfColor, gpuColor);
             var oldIcon = _trayIcon.Icon;
             _trayIcon.Icon = newIcon;
             oldIcon?.Dispose();
@@ -218,7 +218,7 @@ namespace GHelper.WPF.Services
             _trayIcon.Text = $"G-Aether — {perfName} / {gpuName}";
         }
 
-        private static Icon CreateIcon(System.Drawing.Color fill, System.Drawing.Color ring)
+        private static Icon CreateIcon(System.Drawing.Color perfColor, System.Drawing.Color gpuColor)
         {
             int size = 32;
             using var bmp = new Bitmap(size, size);
@@ -227,14 +227,25 @@ namespace GHelper.WPF.Services
                 g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
                 g.Clear(System.Drawing.Color.Transparent);
 
-                // Outer ring (GPU mode)
-                using var ringBrush = new SolidBrush(ring);
-                g.FillEllipse(ringBrush, 0, 0, size - 1, size - 1);
+                int mid = size / 2;
 
-                // Inner fill (Performance mode) — inset by 6px for visible ring
-                int inset = 6;
-                using var fillBrush = new SolidBrush(fill);
-                g.FillEllipse(fillBrush, inset, inset, size - 1 - inset * 2, size - 1 - inset * 2);
+                // Left half — Performance mode
+                g.SetClip(new Rectangle(0, 0, mid, size));
+                using (var leftBrush = new SolidBrush(perfColor))
+                    g.FillEllipse(leftBrush, 0, 0, size - 1, size - 1);
+
+                // Right half — GPU mode
+                g.SetClip(new Rectangle(mid, 0, size - mid, size));
+                using (var rightBrush = new SolidBrush(gpuColor))
+                    g.FillEllipse(rightBrush, 0, 0, size - 1, size - 1);
+
+                // Subtle divider line when colors differ
+                g.ResetClip();
+                if (perfColor != gpuColor)
+                {
+                    using var pen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(80, 0, 0, 0), 1f);
+                    g.DrawLine(pen, mid, 3, mid, size - 4);
+                }
             }
             var hIcon = bmp.GetHicon();
             var icon = Icon.FromHandle(hIcon);
@@ -246,8 +257,8 @@ namespace GHelper.WPF.Services
         private static Icon CreateDefaultIcon()
         {
             return CreateIcon(
-                System.Drawing.Color.FromArgb(76, 201, 94),    // Balanced green fill
-                System.Drawing.Color.FromArgb(96, 205, 255)    // Standard blue ring
+                System.Drawing.Color.FromArgb(96, 205, 255),   // Balanced blue (left)
+                System.Drawing.Color.FromArgb(96, 205, 255)    // Standard blue (right)
             );
         }
 
