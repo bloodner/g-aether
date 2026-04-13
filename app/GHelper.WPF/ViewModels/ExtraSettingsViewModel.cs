@@ -169,9 +169,9 @@ namespace GHelper.WPF.ViewModels
                 try
                 {
                     if (isRunning)
-                        OptimizationService.StopAsusServices();
+                        AsusService.StopAsusServices();
                     else
-                        OptimizationService.StartAsusServices();
+                        AsusService.StartAsusServices();
                 }
                 catch (Exception ex)
                 {
@@ -195,7 +195,7 @@ namespace GHelper.WPF.ViewModels
         {
             Task.Run(() =>
             {
-                var details = OptimizationService.GetServiceDetails();
+                var details = AsusService.GetServiceDetails();
                 int count = details.Count(s => s.IsRunning);
 
                 Application.Current?.Dispatcher.Invoke(() =>

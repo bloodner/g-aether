@@ -1,5 +1,6 @@
-﻿using Microsoft.Win32;
-using Ryzen;
+using Microsoft.Win32;
+using PawnIO;
+using System.Diagnostics;
 
 public static class AmdDisplay
 {
@@ -41,7 +42,7 @@ public static class AmdDisplay
 
     public static bool IsOledPowerOptimization()
     {
-        if (!AppConfig.IsOLED() || !RyzenControl.IsAMD()) return false;
+        if (!AppConfig.IsOLED() || !CpuInfo.IsAMD) return false;
 
         try
         {
@@ -61,4 +62,36 @@ public static class AmdDisplay
 
         return false;
     }
+
+    public static void RunAdrenaline()
+    {
+        string desktopPath = @"C:\Program Files\AMD\CNext\CNext\RadeonSoftware.exe";
+        string uwpPackageFolder = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            @"Packages\AdvancedMicroDevicesInc-2.AMDRadeonSoftware_0a9344xs7nr4m"
+        );
+
+        if (File.Exists(desktopPath))
+        {
+            Process.Start(new ProcessStartInfo(desktopPath)
+            {
+                UseShellExecute = true,
+                Verb = "runas" 
+            });
+            return; 
+        }
+
+        if (Directory.Exists(uwpPackageFolder))
+        {
+            string aumid = @"shell:AppsFolder\AdvancedMicroDevicesInc-2.AMDRadeonSoftware_0a9344xs7nr4m!App";
+            Process.Start(new ProcessStartInfo("explorer.exe", aumid)
+            {
+                UseShellExecute = true
+            });
+            return;
+        }
+
+        Logger.WriteLine("AMD Radeon Software is not installed.");
+    }
+
 }

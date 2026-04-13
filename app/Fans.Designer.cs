@@ -72,42 +72,43 @@ namespace GHelper
             panelUViGPU = new Panel();
             labelUViGPU = new Label();
             labelLeftUViGPU = new Label();
-            trackUViGPU = new Slider();
+            trackUViGPU = new RTrackBar();
             panelUV = new Panel();
             labelUV = new Label();
             labelLeftUV = new Label();
-            trackUV = new Slider();
+            trackUV = new RTrackBar();
             panelTitleAdvanced = new Panel();
             pictureUV = new PictureBox();
             labelTitleUV = new Label();
             panelTemperature = new Panel();
             labelTemp = new Label();
             labelLeftTemp = new Label();
-            trackTemp = new Slider();
+            trackTemp = new RTrackBar();
             panelTitleTemp = new Panel();
             pictureTemp = new PictureBox();
             labelTempLimit = new Label();
             panelDownload = new Panel();
             buttonDownload = new RButton();
+            panelPawnIO = new Panel();
             panelPower = new Panel();
             panelApplyPower = new Panel();
             checkApplyPower = new RCheckBox();
             panelCPU = new Panel();
             labelCPU = new Label();
             labelLeftCPU = new Label();
-            trackCPU = new Slider();
+            trackCPU = new RTrackBar();
             panelFast = new Panel();
             labelFast = new Label();
             labelLeftFast = new Label();
-            trackFast = new Slider();
+            trackFast = new RTrackBar();
             panelSlow = new Panel();
             labelSlow = new Label();
             labelLeftSlow = new Label();
-            trackSlow = new Slider();
+            trackSlow = new RTrackBar();
             panelTotal = new Panel();
             labelTotal = new Label();
             labelLeftTotal = new Label();
-            trackTotal = new Slider();
+            trackTotal = new RTrackBar();
             panelTitleCPU = new Panel();
             pictureBoxCPU = new PictureBox();
             labelPowerLimits = new Label();
@@ -124,26 +125,26 @@ namespace GHelper
             panelGPUTemp = new Panel();
             labelGPUTemp = new Label();
             labelGPUTempTitle = new Label();
-            trackGPUTemp = new Slider();
+            trackGPUTemp = new RTrackBar();
             panelGPUBoost = new Panel();
             labelGPUBoost = new Label();
             labelGPUBoostTitle = new Label();
-            trackGPUBoost = new Slider();
+            trackGPUBoost = new RTrackBar();
             panelGPUPower = new Panel();
             labelGPUPower = new Label();
             labelGPUPowerTitle = new Label();
-            trackGPUPower = new Slider();
+            trackGPUPower = new RTrackBar();
             panelGPUMemory = new Panel();
             labelGPUMemory = new Label();
             labelGPUMemoryTitle = new Label();
-            trackGPUMemory = new Slider();
+            trackGPUMemory = new RTrackBar();
             panelGPUCore = new Panel();
             labelGPUCore = new Label();
-            trackGPUCore = new Slider();
+            trackGPUCore = new RTrackBar();
             labelGPUCoreTitle = new Label();
             panelGPUClockLimit = new Panel();
             labelGPUClockLimit = new Label();
-            trackGPUClockLimit = new Slider();
+            trackGPUClockLimit = new RTrackBar();
             labelGPUClockLimitTitle = new Label();
             panelTitleGPU = new Panel();
             pictureGPU = new PictureBox();
@@ -168,26 +169,27 @@ namespace GHelper
             panelAdvancedAlways.SuspendLayout();
             panelAdvancedApply.SuspendLayout();
             panelUViGPU.SuspendLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackUViGPU).BeginInit();
             panelUV.SuspendLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackUV).BeginInit();
             panelTitleAdvanced.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureUV).BeginInit();
             panelTemperature.SuspendLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackTemp).BeginInit();
             panelTitleTemp.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureTemp).BeginInit();
             panelDownload.SuspendLayout();
+            panelPawnIO.SuspendLayout();
             panelPower.SuspendLayout();
             panelApplyPower.SuspendLayout();
             panelCPU.SuspendLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackCPU).BeginInit();
             panelFast.SuspendLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackFast).BeginInit();
             panelSlow.SuspendLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackSlow).BeginInit();
             panelTotal.SuspendLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackTotal).BeginInit();
             panelTitleCPU.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBoxCPU).BeginInit();
             panelBoost.SuspendLayout();
@@ -198,17 +200,17 @@ namespace GHelper
             ((System.ComponentModel.ISupportInitialize)picturePowerMode).BeginInit();
             panelGPU.SuspendLayout();
             panelGPUTemp.SuspendLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackGPUTemp).BeginInit();
             panelGPUBoost.SuspendLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackGPUBoost).BeginInit();
             panelGPUPower.SuspendLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackGPUPower).BeginInit();
             panelGPUMemory.SuspendLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackGPUMemory).BeginInit();
             panelGPUCore.SuspendLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackGPUCore).BeginInit();
             panelGPUClockLimit.SuspendLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackGPUClockLimit).BeginInit();
             panelTitleGPU.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureGPU).BeginInit();
             panelNav.SuspendLayout();
@@ -563,14 +565,7 @@ namespace GHelper
             // 
             panelAdvanced.AutoSize = true;
             panelAdvanced.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            panelAdvanced.Controls.Add(panelAdvancedAlways);
-            panelAdvanced.Controls.Add(panelAdvancedApply);
-            panelAdvanced.Controls.Add(labelRisky);
-            panelAdvanced.Controls.Add(panelUViGPU);
-            panelAdvanced.Controls.Add(panelUV);
-            panelAdvanced.Controls.Add(panelTitleAdvanced);
-            panelAdvanced.Controls.Add(panelTemperature);
-            panelAdvanced.Controls.Add(panelTitleTemp);
+            panelAdvanced.Controls.Add(panelPawnIO);
             panelAdvanced.Controls.Add(panelDownload);
             panelAdvanced.Dock = DockStyle.Top;
             panelAdvanced.Location = new Point(10, 1768);
@@ -687,11 +682,13 @@ namespace GHelper
             // 
             trackUViGPU.Location = new Point(6, 48);
             trackUViGPU.Margin = new Padding(4, 2, 4, 2);
-            trackUViGPU.Max = 0;
-            trackUViGPU.Min = -40;
+            trackUViGPU.Maximum = 0;
+            trackUViGPU.Minimum = -40;
             trackUViGPU.Name = "trackUViGPU";
             trackUViGPU.Size = new Size(508, 90);
             trackUViGPU.TabIndex = 11;
+            trackUViGPU.TickFrequency = 5;
+            trackUViGPU.TickStyle = TickStyle.TopLeft;
             // 
             // panelUV
             // 
@@ -733,11 +730,13 @@ namespace GHelper
             // 
             trackUV.Location = new Point(6, 48);
             trackUV.Margin = new Padding(4, 2, 4, 2);
-            trackUV.Max = 0;
-            trackUV.Min = -40;
+            trackUV.Maximum = 0;
+            trackUV.Minimum = -40;
             trackUV.Name = "trackUV";
             trackUV.Size = new Size(508, 90);
             trackUV.TabIndex = 11;
+            trackUV.TickFrequency = 5;
+            trackUV.TickStyle = TickStyle.TopLeft;
             // 
             // panelTitleAdvanced
             // 
@@ -812,11 +811,13 @@ namespace GHelper
             // 
             trackTemp.Location = new Point(6, 48);
             trackTemp.Margin = new Padding(4, 2, 4, 2);
-            trackTemp.Max = 0;
-            trackTemp.Min = -40;
+            trackTemp.Maximum = 0;
+            trackTemp.Minimum = -40;
             trackTemp.Name = "trackTemp";
             trackTemp.Size = new Size(508, 90);
             trackTemp.TabIndex = 11;
+            trackTemp.TickFrequency = 5;
+            trackTemp.TickStyle = TickStyle.TopLeft;
             // 
             // panelTitleTemp
             // 
@@ -853,6 +854,23 @@ namespace GHelper
             // 
             // panelDownload
             // 
+            // 
+            // panelPawnIO
+            // 
+            panelPawnIO.AutoSize = true;
+            panelPawnIO.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            panelPawnIO.Controls.Add(panelAdvancedAlways);
+            panelPawnIO.Controls.Add(panelAdvancedApply);
+            panelPawnIO.Controls.Add(labelRisky);
+            panelPawnIO.Controls.Add(panelUViGPU);
+            panelPawnIO.Controls.Add(panelUV);
+            panelPawnIO.Controls.Add(panelTitleAdvanced);
+            panelPawnIO.Controls.Add(panelTemperature);
+            panelPawnIO.Controls.Add(panelTitleTemp);
+            panelPawnIO.Dock = DockStyle.Top;
+            panelPawnIO.Name = "panelPawnIO";
+            panelPawnIO.TabIndex = 53;
+            // 
             panelDownload.AutoSize = true;
             panelDownload.Controls.Add(buttonDownload);
             panelDownload.Dock = DockStyle.Top;
@@ -880,7 +898,7 @@ namespace GHelper
             buttonDownload.Secondary = true;
             buttonDownload.Size = new Size(480, 64);
             buttonDownload.TabIndex = 19;
-            buttonDownload.Text = "Download Advanced Settings Plugin";
+            buttonDownload.Text = "Install PawnIO Driver (pawnio.eu)";
             buttonDownload.UseVisualStyleBackColor = false;
             // 
             // panelPower
@@ -968,11 +986,13 @@ namespace GHelper
             // 
             trackCPU.Location = new Point(6, 44);
             trackCPU.Margin = new Padding(4, 2, 4, 2);
-            trackCPU.Max = 85;
-            trackCPU.Min = 5;
+            trackCPU.Maximum = 85;
+            trackCPU.Minimum = 5;
             trackCPU.Name = "trackCPU";
             trackCPU.Size = new Size(508, 90);
             trackCPU.TabIndex = 11;
+            trackCPU.TickFrequency = 5;
+            trackCPU.TickStyle = TickStyle.TopLeft;
             trackCPU.Value = 80;
             // 
             // panelFast
@@ -1015,11 +1035,13 @@ namespace GHelper
             // 
             trackFast.Location = new Point(6, 48);
             trackFast.Margin = new Padding(4, 2, 4, 2);
-            trackFast.Max = 85;
-            trackFast.Min = 5;
+            trackFast.Maximum = 85;
+            trackFast.Minimum = 5;
             trackFast.Name = "trackFast";
             trackFast.Size = new Size(508, 90);
             trackFast.TabIndex = 11;
+            trackFast.TickFrequency = 5;
+            trackFast.TickStyle = TickStyle.TopLeft;
             trackFast.Value = 80;
             // 
             // panelSlow
@@ -1062,11 +1084,13 @@ namespace GHelper
             // 
             trackSlow.Location = new Point(6, 48);
             trackSlow.Margin = new Padding(4, 2, 4, 2);
-            trackSlow.Max = 180;
-            trackSlow.Min = 10;
+            trackSlow.Maximum = 180;
+            trackSlow.Minimum = 10;
             trackSlow.Name = "trackSlow";
             trackSlow.Size = new Size(508, 90);
             trackSlow.TabIndex = 10;
+            trackSlow.TickFrequency = 5;
+            trackSlow.TickStyle = TickStyle.TopLeft;
             trackSlow.Value = 125;
             // 
             // panelTotal
@@ -1109,11 +1133,13 @@ namespace GHelper
             // 
             trackTotal.Location = new Point(6, 48);
             trackTotal.Margin = new Padding(4, 2, 4, 2);
-            trackTotal.Max = 180;
-            trackTotal.Min = 10;
+            trackTotal.Maximum = 180;
+            trackTotal.Minimum = 10;
             trackTotal.Name = "trackTotal";
             trackTotal.Size = new Size(508, 90);
             trackTotal.TabIndex = 10;
+            trackTotal.TickFrequency = 5;
+            trackTotal.TickStyle = TickStyle.TopLeft;
             trackTotal.Value = 125;
             // 
             // panelTitleCPU
@@ -1317,11 +1343,13 @@ namespace GHelper
             // 
             trackGPUTemp.Location = new Point(6, 56);
             trackGPUTemp.Margin = new Padding(4, 2, 4, 2);
-            trackGPUTemp.Max = 87;
-            trackGPUTemp.Min = 75;
+            trackGPUTemp.Maximum = 87;
+            trackGPUTemp.Minimum = 75;
             trackGPUTemp.Name = "trackGPUTemp";
             trackGPUTemp.Size = new Size(496, 90);
             trackGPUTemp.TabIndex = 42;
+            trackGPUTemp.TickFrequency = 5;
+            trackGPUTemp.TickStyle = TickStyle.TopLeft;
             trackGPUTemp.Value = 87;
             // 
             // panelGPUBoost
@@ -1364,11 +1392,13 @@ namespace GHelper
             // 
             trackGPUBoost.Location = new Point(6, 48);
             trackGPUBoost.Margin = new Padding(4, 2, 4, 2);
-            trackGPUBoost.Max = 25;
-            trackGPUBoost.Min = 5;
+            trackGPUBoost.Maximum = 25;
+            trackGPUBoost.Minimum = 5;
             trackGPUBoost.Name = "trackGPUBoost";
             trackGPUBoost.Size = new Size(496, 90);
             trackGPUBoost.TabIndex = 42;
+            trackGPUBoost.TickFrequency = 5;
+            trackGPUBoost.TickStyle = TickStyle.TopLeft;
             trackGPUBoost.Value = 25;
             // 
             // panelGPUPower
@@ -1411,11 +1441,13 @@ namespace GHelper
             // 
             trackGPUPower.Location = new Point(6, 48);
             trackGPUPower.Margin = new Padding(4, 2, 4, 2);
-            trackGPUPower.Max = 25;
-            trackGPUPower.Min = 5;
+            trackGPUPower.Maximum = 25;
+            trackGPUPower.Minimum = 5;
             trackGPUPower.Name = "trackGPUPower";
             trackGPUPower.Size = new Size(496, 90);
             trackGPUPower.TabIndex = 42;
+            trackGPUPower.TickFrequency = 5;
+            trackGPUPower.TickStyle = TickStyle.TopLeft;
             trackGPUPower.Value = 25;
             // 
             // panelGPUMemory
@@ -1456,12 +1488,16 @@ namespace GHelper
             // 
             // trackGPUMemory
             // 
+            trackGPUMemory.LargeChange = 100;
             trackGPUMemory.Location = new Point(6, 48);
             trackGPUMemory.Margin = new Padding(4, 2, 4, 2);
-            trackGPUMemory.Max = 300;
+            trackGPUMemory.Maximum = 300;
             trackGPUMemory.Name = "trackGPUMemory";
             trackGPUMemory.Size = new Size(496, 90);
+            trackGPUMemory.SmallChange = 10;
             trackGPUMemory.TabIndex = 42;
+            trackGPUMemory.TickFrequency = 50;
+            trackGPUMemory.TickStyle = TickStyle.TopLeft;
             // 
             // panelGPUCore
             // 
@@ -1491,12 +1527,17 @@ namespace GHelper
             // 
             // trackGPUCore
             // 
+            trackGPUCore.LargeChange = 100;
             trackGPUCore.Location = new Point(6, 48);
             trackGPUCore.Margin = new Padding(4, 2, 4, 2);
-            trackGPUCore.Max = 300;
+            trackGPUCore.Maximum = 300;
             trackGPUCore.Name = "trackGPUCore";
+            trackGPUCore.RightToLeft = RightToLeft.No;
             trackGPUCore.Size = new Size(496, 90);
+            trackGPUCore.SmallChange = 10;
             trackGPUCore.TabIndex = 18;
+            trackGPUCore.TickFrequency = 50;
+            trackGPUCore.TickStyle = TickStyle.TopLeft;
             // 
             // labelGPUCoreTitle
             // 
@@ -1536,12 +1577,17 @@ namespace GHelper
             // 
             // trackGPUClockLimit
             // 
+            trackGPUClockLimit.LargeChange = 100;
             trackGPUClockLimit.Location = new Point(6, 48);
             trackGPUClockLimit.Margin = new Padding(4, 2, 4, 2);
-            trackGPUClockLimit.Max = 3000;
+            trackGPUClockLimit.Maximum = 3000;
             trackGPUClockLimit.Name = "trackGPUClockLimit";
+            trackGPUClockLimit.RightToLeft = RightToLeft.No;
             trackGPUClockLimit.Size = new Size(496, 90);
+            trackGPUClockLimit.SmallChange = 10;
             trackGPUClockLimit.TabIndex = 18;
+            trackGPUClockLimit.TickFrequency = 50;
+            trackGPUClockLimit.TickStyle = TickStyle.TopLeft;
             // 
             // labelGPUClockLimitTitle
             // 
@@ -1713,36 +1759,38 @@ namespace GHelper
             panelAdvancedApply.ResumeLayout(false);
             panelUViGPU.ResumeLayout(false);
             panelUViGPU.PerformLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackUViGPU).EndInit();
             panelUV.ResumeLayout(false);
             panelUV.PerformLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackUV).EndInit();
             panelTitleAdvanced.ResumeLayout(false);
             panelTitleAdvanced.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureUV).EndInit();
             panelTemperature.ResumeLayout(false);
             panelTemperature.PerformLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackTemp).EndInit();
             panelTitleTemp.ResumeLayout(false);
             panelTitleTemp.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureTemp).EndInit();
             panelDownload.ResumeLayout(false);
             panelDownload.PerformLayout();
+            panelPawnIO.ResumeLayout(false);
+            panelPawnIO.PerformLayout();
             panelPower.ResumeLayout(false);
             panelPower.PerformLayout();
             panelApplyPower.ResumeLayout(false);
             panelCPU.ResumeLayout(false);
             panelCPU.PerformLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackCPU).EndInit();
             panelFast.ResumeLayout(false);
             panelFast.PerformLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackFast).EndInit();
             panelSlow.ResumeLayout(false);
             panelSlow.PerformLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackSlow).EndInit();
             panelTotal.ResumeLayout(false);
             panelTotal.PerformLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackTotal).EndInit();
             panelTitleCPU.ResumeLayout(false);
             panelTitleCPU.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBoxCPU).EndInit();
@@ -1758,22 +1806,22 @@ namespace GHelper
             panelGPU.PerformLayout();
             panelGPUTemp.ResumeLayout(false);
             panelGPUTemp.PerformLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackGPUTemp).EndInit();
             panelGPUBoost.ResumeLayout(false);
             panelGPUBoost.PerformLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackGPUBoost).EndInit();
             panelGPUPower.ResumeLayout(false);
             panelGPUPower.PerformLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackGPUPower).EndInit();
             panelGPUMemory.ResumeLayout(false);
             panelGPUMemory.PerformLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackGPUMemory).EndInit();
             panelGPUCore.ResumeLayout(false);
             panelGPUCore.PerformLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackGPUCore).EndInit();
             panelGPUClockLimit.ResumeLayout(false);
             panelGPUClockLimit.PerformLayout();
-
+            ((System.ComponentModel.ISupportInitialize)trackGPUClockLimit).EndInit();
             panelTitleGPU.ResumeLayout(false);
             panelTitleGPU.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureGPU).EndInit();
@@ -1796,11 +1844,11 @@ namespace GHelper
         private Panel panelCPU;
         private Label labelCPU;
         private Label labelLeftCPU;
-        private Slider trackCPU;
+        private RTrackBar trackCPU;
         private Panel panelTotal;
         private Label labelTotal;
         private Label labelLeftTotal;
-        private Slider trackTotal;
+        private RTrackBar trackTotal;
         private Panel panelTitleCPU;
         private PictureBox pictureBoxCPU;
         private Label labelPowerLimits;
@@ -1808,10 +1856,10 @@ namespace GHelper
         private Panel panelGPUMemory;
         private Label labelGPUMemory;
         private Label labelGPUMemoryTitle;
-        private Slider trackGPUMemory;
+        private RTrackBar trackGPUMemory;
         private Panel panelGPUCore;
         private Label labelGPUCore;
-        private Slider trackGPUCore;
+        private RTrackBar trackGPUCore;
         private Label labelGPUCoreTitle;
         private Panel panelTitleGPU;
         private PictureBox pictureGPU;
@@ -1820,11 +1868,11 @@ namespace GHelper
         private Panel panelGPUBoost;
         private Label labelGPUBoost;
         private Label labelGPUBoostTitle;
-        private Slider trackGPUBoost;
+        private RTrackBar trackGPUBoost;
         private Panel panelGPUTemp;
         private Label labelGPUTemp;
         private Label labelGPUTempTitle;
-        private Slider trackGPUTemp;
+        private RTrackBar trackGPUTemp;
         private Panel panelTitleFans;
         private Panel panelApplyFans;
         private Label labelFansResult;
@@ -1837,7 +1885,7 @@ namespace GHelper
         private Panel panelFast;
         private Label labelFast;
         private Label labelLeftFast;
-        private Slider trackFast;
+        private RTrackBar trackFast;
         private Panel panelBoost;
         private RComboBox comboModes;
         private RButton buttonAdd;
@@ -1846,7 +1894,7 @@ namespace GHelper
         private Panel panelUV;
         private Label labelUV;
         private Label labelLeftUV;
-        private Slider trackUV;
+        private RTrackBar trackUV;
         private PictureBox pictureUV;
         private Label labelTitleUV;
         private RButton buttonApplyAdvanced;
@@ -1857,7 +1905,7 @@ namespace GHelper
         private Panel panelUViGPU;
         private Label labelUViGPU;
         private Label labelLeftUViGPU;
-        private Slider trackUViGPU;
+        private RTrackBar trackUViGPU;
         private Panel panelNav;
         private TableLayoutPanel tableNav;
         private RButton buttonCPU;
@@ -1873,7 +1921,7 @@ namespace GHelper
         private Panel panelTemperature;
         private Label labelTemp;
         private Label labelLeftTemp;
-        private Slider trackTemp;
+        private RTrackBar trackTemp;
         private Panel panelAdvancedAlways;
         private RCheckBox checkApplyUV;
         private Panel panelPowerMode;
@@ -1883,19 +1931,20 @@ namespace GHelper
         private Label labelPowerModeTitle;
         private Panel panelGPUClockLimit;
         private Label labelGPUClockLimit;
-        private Slider trackGPUClockLimit;
+        private RTrackBar trackGPUClockLimit;
         private Label labelGPUClockLimitTitle;
         private RButton buttonCalibrate;
         private Panel panelSlow;
         private Label labelSlow;
         private Label labelLeftSlow;
-        private Slider trackSlow;
+        private RTrackBar trackSlow;
         private Panel panelDownload;
         private RButton buttonDownload;
+        private Panel panelPawnIO;
         private Panel panelGPUPower;
         private Label labelGPUPower;
         private Label labelGPUPowerTitle;
-        private Slider trackGPUPower;
+        private RTrackBar trackGPUPower;
         private TableLayoutPanel tableLayoutModes;
         private RCheckBox checkFanClamp;
     }

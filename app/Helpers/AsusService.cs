@@ -11,8 +11,62 @@ namespace GHelper.Helpers
         public bool IsArmoryCrate { get; init; }
     }
 
-    public static class OptimizationService
+    public static class AsusService
     {
+
+        static List<string> services = new() {
+                "ArmouryCrateControlInterface",
+                "ArmouryCrateProArtService",
+                "AsHidService",
+                "ASUSOptimization",
+                "AsusAppService",
+                "ASUSLinkNear",
+                "ASUSLinkRemote",
+                "ASUSSoftwareManager",
+                "ASUSLiveUpdateAgent",
+                "ASUSSwitch",
+                "ASUSSystemAnalysis",
+                "ASUSSystemDiagnosis",
+                "AsusCertService"
+        };
+
+        //"AsusPTPService",
+
+        static List<string> processesAC = new() {
+                "ArmouryCrateSE.Service",
+                "ArmouryCrate.Service",
+                "LightingService",
+        };
+
+        static List<string> servicesAC = new() {
+                "ArmouryCrateSEService",
+                "ArmouryCrateService",
+                "LightingService",
+        };
+
+        public static bool IsAsusOptimizationRunning()
+        {
+            return Process.GetProcessesByName("AsusOptimization").Length > 0;
+        }
+
+        public static bool IsArmouryRunning()
+        {
+            var acService = Process.GetProcessesByName("ArmouryCrate.Service").Length > 0;
+            var lightingService = Process.GetProcessesByName("LightingService").Length > 0;   
+            Logger.WriteLine($"AC Service: {acService}, Lighting Service: {lightingService}");
+            return acService || lightingService;
+        }
+
+        public static void RunArmouryUninstaller()
+        {
+            Process.Start(new ProcessStartInfo("https://dlcdnets.asus.com/pub/ASUS/mb/14Utilities/Armoury_Crate_Uninstall_Tool.zip") { UseShellExecute = true });
+        }
+
+        public static bool IsOSDRunning()
+        {
+            return Process.GetProcessesByName("AsusOSD").Length > 0;
+        }
+
 
         static List<ServiceInfo> serviceDefinitions = new()
         {
@@ -38,32 +92,9 @@ namespace GHelper.Helpers
             new() { ProcessName = "LightingService", DisplayName = "Lighting Service", Description = "Aura RGB lighting control", IsArmoryCrate = true },
         };
 
-        static List<string> services = serviceDefinitions.Select(s => s.ProcessName).ToList();
-
-        //"AsusPTPService",
-
-        static List<string> processesAC = acServiceDefinitions.Select(s => s.ProcessName).ToList();
-
-        static List<string> servicesAC = new() {
-                "ArmouryCrateSEService",
-                "ArmouryCrateService",
-                "LightingService",
-        };
-
-        public static bool IsRunning()
-        {
-            return Process.GetProcessesByName("AsusOptimization").Count() > 0;
-        }
-
-        public static bool IsOSDRunning()
-        {
-            return Process.GetProcessesByName("AsusOSD").Count() > 0;
-        }
-
         public static List<ServiceInfo> GetServiceDetails()
         {
             var results = new List<ServiceInfo>();
-
             foreach (var def in serviceDefinitions)
             {
                 results.Add(new ServiceInfo
@@ -75,7 +106,6 @@ namespace GHelper.Helpers
                     IsArmoryCrate = false,
                 });
             }
-
             if (AppConfig.IsStopAC())
             {
                 foreach (var def in acServiceDefinitions)
@@ -90,7 +120,6 @@ namespace GHelper.Helpers
                     });
                 }
             }
-
             return results;
         }
 

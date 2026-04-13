@@ -2,7 +2,7 @@ using GHelper.Helpers;
 using GHelper.Input;
 using GHelper.Mode;
 using GHelper.Gpu;
-using Ryzen;
+using PawnIO;
 
 namespace GHelper.WPF.Services
 {
@@ -26,7 +26,7 @@ namespace GHelper.WPF.Services
             Program.gpuControl = new GPUModeControl();
 
             HardwareControl.RecreateGpuControl();
-            RyzenControl.Init();
+            // PawnIO replaces old RyzenControl — no explicit Init needed
 
             // Initialize toast (required by InputDispatcher actions that call Program.toast)
             Program.toast = new ToastForm();

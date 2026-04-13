@@ -8,7 +8,6 @@ using GHelper.Mode;
 using GHelper.Peripherals;
 using GHelper.USB;
 using Microsoft.Win32;
-using Ryzen;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
@@ -23,14 +22,14 @@ namespace GHelper
         public static NotifyIcon trayIcon;
         public static AsusACPI acpi;
 
-        public static SettingsForm? settingsForm;
+        public static SettingsForm settingsForm;
 
-        public static ModeControl? modeControl;
-        public static GPUModeControl? gpuControl;
-        public static AllyControl? allyControl;
-        public static ClamshellModeControl? clamshellControl;
+        public static ModeControl modeControl;
+        public static GPUModeControl gpuControl;
+        public static AllyControl allyControl;
+        public static ClamshellModeControl clamshellControl;
 
-        public static ToastForm? toast;
+        public static ToastForm toast;
 
         public static IntPtr unRegPowerNotify, unRegPowerNotifyLid;
         public static int WM_TASKBARCREATED = 0;
@@ -72,6 +71,15 @@ namespace GHelper
                 return;
             }
 
+            settingsForm = new SettingsForm();
+
+            modeControl = new ModeControl();
+            gpuControl = new GPUModeControl(settingsForm);
+            allyControl = new AllyControl(settingsForm);
+            clamshellControl = new ClamshellModeControl();
+
+            toast = new ToastForm();
+
             string language = AppConfig.GetString("language");
 
             if (language != null && language.Length > 0)
@@ -85,14 +93,6 @@ namespace GHelper
 
             ProcessHelper.CheckAlreadyRunning();
             ProcessHelper.SetPriority();
-
-            // Initialize form and controllers (deferred from static init for WPF compatibility)
-            settingsForm = new SettingsForm();
-            modeControl = new ModeControl();
-            gpuControl = new GPUModeControl(settingsForm);
-            allyControl = new AllyControl(settingsForm);
-            clamshellControl = new ClamshellModeControl();
-            toast = new ToastForm();
 
             Logger.WriteLine("------------");
             Logger.WriteLine("App launched: " + AppConfig.GetModel() + " :" + Assembly.GetExecutingAssembly().GetName().Version.ToString() + CultureInfo.CurrentUICulture + (ProcessHelper.IsUserAdministrator() ? "." : ""));
@@ -120,7 +120,6 @@ namespace GHelper
             Application.EnableVisualStyles();
 
             HardwareControl.RecreateGpuControl();
-            RyzenControl.Init();
 
             trayIcon = new NotifyIcon
             {
@@ -204,6 +203,11 @@ namespace GHelper
                     break;
             }
 
+            Task.Run(() =>
+            {
+                settingsForm.VisualiseArmoury(AsusService.IsArmouryRunning());
+            });
+
             Application.Run();
 
         }
@@ -222,7 +226,13 @@ namespace GHelper
             if (e.Reason == SessionSwitchReason.SessionLogon || e.Reason == SessionSwitchReason.SessionUnlock)
             {
                 Logger.WriteLine("Session:" + e.Reason.ToString());
+                Aura.sessionLock = false;
                 ScreenControl.AutoScreen();
+            }
+            if (e.Reason == SessionSwitchReason.SessionLock)
+            {
+                Logger.WriteLine("Session:" + e.Reason.ToString());
+                Aura.sessionLock = true;
             }
         }
 
