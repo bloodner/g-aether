@@ -282,11 +282,27 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- Updates Link -->
-                    <Button Content="Check for Updates"
-                            Command="{Binding OpenUpdatesCommand}"
-                            Style="{StaticResource LinkButtonStyle}"
-                            Margin="0,4,0,0" />
+                    <!-- Updates -->
+                    <StackPanel Margin="0,4,0,0">
+                        <Button Content="{Binding UpdateButtonText}"
+                                Command="{Binding CheckForUpdatesCommand}"
+                                IsEnabled="{Binding UpdateButtonEnabled}"
+                                Style="{StaticResource LinkButtonStyle}" />
+                        <TextBlock Text="{Binding UpdateStatusText}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,2,0,0">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource DimTextStyle}">
+                                    <Setter Property="FontSize" Value="10" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding UpdateAvailable}" Value="True">
+                                            <Setter Property="Foreground" Value="#FF6B35" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
 
                     <TextBlock Style="{StaticResource DimTextStyle}"
                                FontSize="9"

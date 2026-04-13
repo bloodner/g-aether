@@ -168,27 +168,22 @@ namespace GHelper.WPF.Controls
                 }
             }
 
-            // Layout with wrapping
-            double x = 0;
-            double y = (rowH - pillH) / 2.0;
-            int rowStartIdx = 0;
+            // Force single row: shrink padding if needed to fit all items
+            double totalContent = 0;
+            for (int i = 0; i < items.Length; i++) totalContent += contentWidths[i];
+            double totalGaps = (items.Length - 1) * gap;
+            double defaultTotal = totalContent + (items.Length * pillPadX * 2) + totalGaps;
 
-            for (int i = 0; i < items.Length; i++)
+            double effectivePadX = pillPadX;
+            if (defaultTotal > w)
             {
-                double pillW = contentWidths[i] + pillPadX * 2;
-
-                if (x > 0 && x + pillW > w)
-                {
-                    DistributeRowSpace(items, contentWidths, rowStartIdx, i, w, y, pillH, pillPadX, gap, dpiScale, dc, typeface);
-                    y += rowH + rowGap;
-                    x = 0;
-                    rowStartIdx = i;
-                }
-
-                x += pillW + gap;
+                // Shrink padding to fit — floor at 4px so pills stay visually distinct
+                double availableForPadding = w - totalContent - totalGaps;
+                effectivePadX = Math.Max(4, availableForPadding / (items.Length * 2));
             }
 
-            DistributeRowSpace(items, contentWidths, rowStartIdx, items.Length, w, y, pillH, pillPadX, gap, dpiScale, dc, typeface);
+            double y = (rowH - pillH) / 2.0;
+            DistributeRowSpace(items, contentWidths, 0, items.Length, w, y, pillH, effectivePadX, gap, dpiScale, dc, typeface);
         }
 
         private void DistributeRowSpace(string[] items, double[] contentWidths, int start, int end, double width,

@@ -58,6 +58,21 @@ namespace GHelper.WPF.ViewModels
         [ObservableProperty]
         private List<ServiceInfo> _serviceDetails = new();
 
+        [ObservableProperty]
+        private string _updateStatusText = "";
+
+        [ObservableProperty]
+        private string _updateButtonText = "Check for Updates";
+
+        [ObservableProperty]
+        private bool _updateButtonEnabled = true;
+
+        [ObservableProperty]
+        private bool _updateAvailable;
+
+        private string? _updateDownloadUrl;
+        private string? _updateReleaseUrl;
+
         private bool _ignoreChange;
 
         partial void OnRunOnStartupChanged(bool value)
@@ -211,17 +226,58 @@ namespace GHelper.WPF.ViewModels
         }
 
         [RelayCommand]
-        private void OpenUpdates()
+        private async Task CheckForUpdates()
+        {
+            // If an update is already known, clicking the button downloads it
+            if (UpdateAvailable && !string.IsNullOrEmpty(_updateReleaseUrl))
+            {
+                OpenUrl(_updateReleaseUrl);
+                return;
+            }
+
+            UpdateButtonEnabled = false;
+            UpdateButtonText = "Checking...";
+            UpdateStatusText = "";
+
+            var result = await UpdateService.CheckAsync();
+
+            switch (result.Status)
+            {
+                case UpdateStatus.UpToDate:
+                    UpdateStatusText = $"Up to date (v{result.CurrentVersion})";
+                    UpdateButtonText = "Check for Updates";
+                    UpdateAvailable = false;
+                    break;
+
+                case UpdateStatus.UpdateAvailable:
+                    UpdateStatusText = $"Update available: {result.LatestVersion}";
+                    UpdateButtonText = $"Download {result.LatestVersion}";
+                    UpdateAvailable = true;
+                    _updateDownloadUrl = result.DownloadUrl;
+                    _updateReleaseUrl = result.ReleaseUrl;
+                    ToastService.Show($"G-Aether {result.LatestVersion} available", ToastType.Info);
+                    break;
+
+                case UpdateStatus.CheckFailed:
+                    UpdateStatusText = "Check failed — try again later";
+                    UpdateButtonText = "Check for Updates";
+                    UpdateAvailable = false;
+                    break;
+            }
+
+            UpdateButtonEnabled = true;
+        }
+
+        private static void OpenUrl(string url)
         {
             try
             {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = "https://github.com/seerge/g-helper/releases",
-                    UseShellExecute = true
-                });
+                Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Logger.WriteLine("Failed to open URL: " + ex.Message);
+            }
         }
 
         public void Initialize()
