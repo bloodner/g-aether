@@ -42,9 +42,29 @@ namespace GHelper.WPF.Services
                 {
                     var vm = (System.Windows.Application.Current?.MainWindow?.DataContext as GHelper.WPF.ViewModels.MainViewModel);
                     vm?.Keyboard.CycleAuraMode(delta);
-                    string modeName = vm?.Keyboard.AuraModeLabels.ElementAtOrDefault(vm.Keyboard.SelectedAuraModeIndex) ?? "Aura";
-                    // Lighting icon \uE781 with default accent blue
-                    ToastService.ShowOsdOnly(modeName, "\uE781", System.Windows.Media.Color.FromRgb(0x60, 0xCD, 0xFF));
+                    if (vm?.Keyboard.AuraModeLabels != null && vm.Keyboard.AuraModeIcons != null)
+                    {
+                        ModeCarouselService.ShowAuraModes(
+                            vm.Keyboard.AuraModeLabels,
+                            vm.Keyboard.AuraModeIcons,
+                            vm.Keyboard.SelectedAuraModeIndex);
+                    }
+                });
+            };
+
+            InputDispatcher.OnCyclePerformanceMode = () =>
+            {
+                System.Windows.Application.Current?.Dispatcher.BeginInvoke(() =>
+                {
+                    ModeCarouselService.ShowPerformanceModes();
+                });
+            };
+
+            InputDispatcher.OnSetGpuMode = (gpuMode) =>
+            {
+                System.Windows.Application.Current?.Dispatcher.BeginInvoke(() =>
+                {
+                    ModeCarouselService.ShowGpuModes(gpuMode);
                 });
             };
 

@@ -73,9 +73,6 @@ namespace GHelper.WPF.ViewModels
 
             SchematicMode = mode;
 
-            string modeName = value < ModeLabels.Length ? ModeLabels[value] : "Unknown";
-            ToastService.Show($"GPU Mode: {modeName}", ToastType.Success);
-
             // Show restart warning when mode requires reboot (Ultimate or switching away from Ultimate)
             int currentMode = _currentHardwareMode;
             bool needsRestart = (mode == 2) || (currentMode == AsusACPI.GPUModeUltimate && mode != 2);
