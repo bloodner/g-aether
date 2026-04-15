@@ -16,6 +16,11 @@
             </StackPanel>
 
             <!-- Screen Refresh Rate Arc -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,4"
+                        Visibility="{Binding IsScreenEnabled, Converter={StaticResource BoolToVisibility}}">
+                <TextBlock Text="Refresh Rate" Style="{StaticResource DimTextStyle}" />
+                <controls:HelpButton HelpKey="refresh_rate" VerticalAlignment="Center" Margin="8,0,0,0" />
+            </StackPanel>
             <controls:RefreshRateArc
                 Height="180"
                 Items="{Binding FrequencyLabels}"
@@ -26,7 +31,10 @@
                 Visibility="{Binding IsScreenEnabled, Converter={StaticResource BoolToVisibility}}" />
 
             <!-- Color Temperature Slider -->
-            <TextBlock Text="Color Temperature" Style="{StaticResource DimTextStyle}" Margin="0,0,0,4" />
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                <TextBlock Text="Color Temperature" Style="{StaticResource DimTextStyle}" />
+                <controls:HelpButton HelpKey="color_temp" VerticalAlignment="Center" Margin="8,0,0,0" />
+            </StackPanel>
             <controls:GradientModeSlider
                 Height="70"
                 ModeCount="7"
@@ -44,7 +52,10 @@
             </controls:GradientModeSlider>
 
             <!-- Gamut Selection -->
-            <TextBlock Text="Color Gamut" Style="{StaticResource DimTextStyle}" Margin="0,8,0,6" />
+            <StackPanel Orientation="Horizontal" Margin="0,8,0,6">
+                <TextBlock Text="Color Gamut" Style="{StaticResource DimTextStyle}" />
+                <controls:HelpButton HelpKey="gamut" VerticalAlignment="Center" Margin="8,0,0,0" />
+            </StackPanel>
             <controls:PillSelector
                                    Items="{Binding GamutOptions}"
                                    SelectedIndex="{Binding SelectedGamutIndex, Mode=TwoWay}" />
@@ -60,7 +71,10 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel>
-                            <TextBlock Text="Overdrive" Style="{StaticResource BodyTextStyle}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Overdrive" Style="{StaticResource BodyTextStyle}" />
+                                <controls:HelpButton HelpKey="overdrive" VerticalAlignment="Center" Margin="6,0,0,0" />
+                            </StackPanel>
                             <TextBlock Text="Reduces ghosting at high refresh rates"
                                        Style="{StaticResource DimTextStyle}" FontSize="10" />
                         </StackPanel>

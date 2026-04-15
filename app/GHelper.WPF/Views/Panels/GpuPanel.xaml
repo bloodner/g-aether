@@ -20,6 +20,7 @@
                     <TextBlock Text="{Binding HeaderText}"
                                Style="{StaticResource CardTitleStyle}"
                                VerticalAlignment="Center" />
+                    <controls:HelpButton HelpKey="gpu_mode" VerticalAlignment="Center" Margin="8,0,0,0" />
                 </StackPanel>
 
                 <TextBlock Grid.Column="1" Text="Requires Restart &#x26A0;"

@@ -39,7 +39,10 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="Fn Lock" Style="{StaticResource BodyTextStyle}" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Fn Lock" Style="{StaticResource BodyTextStyle}" />
+                        <controls:HelpButton HelpKey="fn_lock" VerticalAlignment="Center" Margin="6,0,0,0" />
+                    </StackPanel>
                     <TextBlock Text="Use F1-F12 as standard function keys"
                                Style="{StaticResource DimTextStyle}" FontSize="10" />
                 </StackPanel>
@@ -55,7 +58,10 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="Boot Sound" Style="{StaticResource BodyTextStyle}" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Boot Sound" Style="{StaticResource BodyTextStyle}" />
+                        <controls:HelpButton HelpKey="boot_sound" VerticalAlignment="Center" Margin="6,0,0,0" />
+                    </StackPanel>
                     <TextBlock Text="ASUS POST sound on startup"
                                Style="{StaticResource DimTextStyle}" FontSize="10" />
                 </StackPanel>
@@ -74,7 +80,10 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel>
-                            <TextBlock Text="GPU Fix on Shutdown" Style="{StaticResource BodyTextStyle}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="GPU Fix on Shutdown" Style="{StaticResource BodyTextStyle}" />
+                                <controls:HelpButton HelpKey="gpu_fix" VerticalAlignment="Center" Margin="6,0,0,0" />
+                            </StackPanel>
                             <TextBlock Text="Disable dGPU before shutdown"
                                        Style="{StaticResource DimTextStyle}" FontSize="10" />
                         </StackPanel>
@@ -177,8 +186,11 @@
                                     </TextBlock.Style>
                                 </TextBlock>
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock Text="ASUS Services"
-                                               Style="{StaticResource BodyTextStyle}" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="ASUS Services"
+                                                   Style="{StaticResource BodyTextStyle}" />
+                                        <controls:HelpButton HelpKey="asus_services" VerticalAlignment="Center" Margin="6,0,0,0" />
+                                    </StackPanel>
                                     <TextBlock Text="{Binding AsusServicesText}"
                                                Style="{StaticResource DimTextStyle}" FontSize="10" />
                                 </StackPanel>

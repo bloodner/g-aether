@@ -17,10 +17,13 @@
                     <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" FontSize="16"
                                Foreground="{DynamicResource AccentBrush}"
                                VerticalAlignment="Center" Margin="0,0,8,0" />
-                    <TextBlock Grid.Column="1" Style="{StaticResource CardTitleStyle}" VerticalAlignment="Center">
-                        <Run Text="Mode: " />
-                        <Run Text="{Binding ModeSummaryLabel}" />
-                    </TextBlock>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource CardTitleStyle}" VerticalAlignment="Center">
+                            <Run Text="Mode: " />
+                            <Run Text="{Binding ModeSummaryLabel}" />
+                        </TextBlock>
+                        <controls:HelpButton HelpKey="perf_mode" VerticalAlignment="Center" Margin="8,0,0,0" />
+                    </StackPanel>
                 </Grid>
 
                 <!-- Performance Mode Arc (Silent / Balanced / Turbo) -->
@@ -30,9 +33,12 @@
                     Items="{Binding ModeLabels}" />
 
                 <!-- Apply Strategy Selector -->
-                <TextBlock Text="Fan &amp; Power Control"
-                           Style="{StaticResource DimTextStyle}"
-                           FontSize="10" Margin="0,4,0,6" />
+                <StackPanel Orientation="Horizontal" Margin="0,4,0,6">
+                    <TextBlock Text="Fan &amp; Power Control"
+                               Style="{StaticResource DimTextStyle}"
+                               FontSize="10" />
+                    <controls:HelpButton HelpKey="fan_control" VerticalAlignment="Center" Margin="8,0,0,0" />
+                </StackPanel>
                 <controls:PillSelector
                     Items="{Binding ApplyStrategyLabels}"
                     SelectedIndex="{Binding ApplyStrategyIndex, Mode=TwoWay}"
