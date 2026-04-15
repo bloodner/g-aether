@@ -70,6 +70,27 @@ namespace GHelper.WPF.ViewModels
         [ObservableProperty]
         private bool _updateAvailable;
 
+        [ObservableProperty]
+        private string _optimizeProfileName = "";
+
+        [ObservableProperty]
+        private string _optimizeReason = "";
+
+        [ObservableProperty]
+        private string _optimizeButtonText = "Optimize for Me";
+
+        [ObservableProperty]
+        private bool _optimizeButtonEnabled = true;
+
+        [ObservableProperty]
+        private bool _optimizeResultVisible;
+
+        [ObservableProperty]
+        private List<Recommendation> _optimizeRecommendations = new();
+
+        [ObservableProperty]
+        private int _optimizeChangeCount;
+
         private string? _updateDownloadUrl;
         private string? _updateReleaseUrl;
 
@@ -266,6 +287,69 @@ namespace GHelper.WPF.ViewModels
             }
 
             UpdateButtonEnabled = true;
+        }
+
+        [RelayCommand]
+        private async Task OptimizeForMe()
+        {
+            // Second click: apply recommendations
+            if (OptimizeResultVisible && OptimizeChangeCount > 0)
+            {
+                OptimizeButtonEnabled = false;
+                OptimizeButtonText = "Applying...";
+
+                await Task.Run(() =>
+                {
+                    foreach (var rec in OptimizeRecommendations.Where(r => r.IsChange))
+                    {
+                        try
+                        {
+                            rec.Apply();
+                            Logger.WriteLine($"AutoConfig applied: {rec.SettingName} → {rec.RecommendedValue}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.WriteLine($"AutoConfig failed: {rec.SettingName} — {ex.Message}");
+                        }
+                    }
+                });
+
+                OptimizeButtonText = "Done!";
+                ToastService.Show($"Settings optimized: {OptimizeProfileName}", ToastType.Success);
+
+                await Task.Delay(2000);
+                OptimizeButtonText = "Optimize for Me";
+                OptimizeButtonEnabled = true;
+                OptimizeResultVisible = false;
+                return;
+            }
+
+            // First click: analyze
+            OptimizeButtonEnabled = false;
+            OptimizeButtonText = "Analyzing...";
+            OptimizeResultVisible = false;
+
+            var result = await Task.Run(() => AutoConfigService.GenerateRecommendations());
+
+            OptimizeProfileName = result.ProfileName;
+            OptimizeReason = result.Reason;
+            OptimizeRecommendations = result.Recommendations;
+            OptimizeChangeCount = result.ChangeCount;
+            OptimizeResultVisible = true;
+
+            if (result.ChangeCount > 0)
+            {
+                OptimizeButtonText = $"Apply {result.ChangeCount} Change{(result.ChangeCount == 1 ? "" : "s")}";
+                OptimizeButtonEnabled = true;
+            }
+            else
+            {
+                OptimizeButtonText = "Already Optimal";
+                await Task.Delay(3000);
+                OptimizeButtonText = "Optimize for Me";
+                OptimizeButtonEnabled = true;
+                OptimizeResultVisible = false;
+            }
         }
 
         private static void OpenUrl(string url)
