@@ -93,6 +93,8 @@ namespace GHelper.WPF.ViewModels
 
         private string? _updateDownloadUrl;
         private string? _updateReleaseUrl;
+        private string? _updateReleaseBody;
+        private string? _updateLatestVersion;
 
         private bool _ignoreChange;
 
@@ -249,10 +251,10 @@ namespace GHelper.WPF.ViewModels
         [RelayCommand]
         private async Task CheckForUpdates()
         {
-            // If an update is already known, clicking the button downloads it
+            // If an update is already known, show the changelog dialog
             if (UpdateAvailable && !string.IsNullOrEmpty(_updateReleaseUrl))
             {
-                OpenUrl(_updateReleaseUrl);
+                ShowPendingUpdateDialog();
                 return;
             }
 
@@ -272,10 +274,12 @@ namespace GHelper.WPF.ViewModels
 
                 case UpdateStatus.UpdateAvailable:
                     UpdateStatusText = $"Update available: {result.LatestVersion}";
-                    UpdateButtonText = $"Download {result.LatestVersion}";
+                    UpdateButtonText = $"View {result.LatestVersion}";
                     UpdateAvailable = true;
                     _updateDownloadUrl = result.DownloadUrl;
                     _updateReleaseUrl = result.ReleaseUrl;
+                    _updateReleaseBody = result.ReleaseBody;
+                    _updateLatestVersion = result.LatestVersion;
                     ToastService.Show($"G-Aether {result.LatestVersion} available", ToastType.Info);
                     break;
 
@@ -287,6 +291,27 @@ namespace GHelper.WPF.ViewModels
             }
 
             UpdateButtonEnabled = true;
+        }
+
+        [RelayCommand]
+        private void ShowChangelog()
+        {
+            Application.Current?.Dispatcher.Invoke(() =>
+            {
+                Views.ChangelogWindow.ShowHistory(Application.Current?.MainWindow);
+            });
+        }
+
+        private void ShowPendingUpdateDialog()
+        {
+            Application.Current?.Dispatcher.Invoke(() =>
+            {
+                Views.ChangelogWindow.ShowPendingUpdate(
+                    Application.Current?.MainWindow,
+                    _updateLatestVersion ?? "new version",
+                    _updateReleaseBody ?? "No release notes available.",
+                    _updateReleaseUrl ?? "");
+            });
         }
 
         [RelayCommand]
@@ -369,7 +394,7 @@ namespace GHelper.WPF.ViewModels
             _ignoreChange = true;
             try
             {
-                RunOnStartup = Startup.IsScheduled();
+                // Config reads are instant (in-memory)
                 FnLockEnabled = AppConfig.Is("fn_lock");
                 GpuFixEnabled = AppConfig.Is("gpu_fix");
                 NoOverdrive = AppConfig.Is("no_overdrive");
@@ -383,6 +408,21 @@ namespace GHelper.WPF.ViewModels
             {
                 _ignoreChange = false;
             }
+
+            // Task Scheduler COM query — slow, push to background.
+            Task.Run(() =>
+            {
+                bool scheduled = false;
+                try { scheduled = Startup.IsScheduled(); }
+                catch (Exception ex) { Logger.WriteLine("Startup scheduled check error: " + ex.Message); }
+
+                Application.Current?.Dispatcher.Invoke(() =>
+                {
+                    _ignoreChange = true;
+                    try { RunOnStartup = scheduled; }
+                    finally { _ignoreChange = false; }
+                });
+            });
 
             RefreshAsusServices();
         }

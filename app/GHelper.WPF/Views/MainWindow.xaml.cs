@@ -105,5 +105,14 @@ namespace GHelper.WPF.Views
         {
             Hide();
         }
+
+        private void ModeBadge_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.Button btn && btn.Tag is string tag && int.TryParse(tag, out int index))
+            {
+                if (index >= 0 && index < _navButtons.Length && _navButtons[index] != null)
+                    _navButtons[index].IsChecked = true;
+            }
+        }
     }
 }

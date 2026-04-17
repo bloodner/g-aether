@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using GHelper.Gpu;
@@ -36,6 +37,31 @@ namespace GHelper.WPF.ViewModels
         [ObservableProperty]
         private FansPowerViewModel _fansPower = new();
 
+        // Mode Badge Strip — live-updated badges shown above content on every panel
+        [ObservableProperty] private string _perfBadgeName = "Balanced";
+        [ObservableProperty] private Brush _perfBadgeBrush = new SolidColorBrush(Color.FromRgb(0x60, 0xCD, 0xFF));
+        [ObservableProperty] private bool _perfBadgeIsWarning;
+
+        [ObservableProperty] private string _gpuBadgeName = "Standard";
+        [ObservableProperty] private Brush _gpuBadgeBrush = new SolidColorBrush(Color.FromRgb(0x60, 0xCD, 0xFF));
+        [ObservableProperty] private bool _gpuBadgeIsWarning;
+
+        [ObservableProperty] private string _displayBadgeName = "Auto";
+        [ObservableProperty] private Brush _displayBadgeBrush = new SolidColorBrush(Color.FromRgb(0x60, 0xCD, 0xFF));
+
+        [ObservableProperty] private string _servicesBadgeName = "Healthy";
+        [ObservableProperty] private Brush _servicesBadgeBrush = new SolidColorBrush(Color.FromRgb(0x4C, 0xC9, 0x5E));
+        [ObservableProperty] private bool _servicesBadgeIsWarning;
+
+        // Header accent hairline — reflects overall system health
+        [ObservableProperty] private Brush _headerAccentBrush = new SolidColorBrush(Color.FromRgb(0x4C, 0xC9, 0x5E));
+
+        private static readonly Brush CyanBrush = new SolidColorBrush(Color.FromRgb(0x60, 0xCD, 0xFF));
+        private static readonly Brush PurpleBrush = new SolidColorBrush(Color.FromRgb(0xA7, 0x8B, 0xFA));
+        private static readonly Brush OrangeBrush = new SolidColorBrush(Color.FromRgb(0xFF, 0x6B, 0x35));
+        private static readonly Brush GreenBrush = new SolidColorBrush(Color.FromRgb(0x4C, 0xC9, 0x5E));
+        private static readonly Brush GpuPurpleBrush = new SolidColorBrush(Color.FromRgb(0xAB, 0x7C, 0xFF));
+
         private readonly DispatcherTimer _sensorTimer;
 
         public MainViewModel()
@@ -67,6 +93,38 @@ namespace GHelper.WPF.ViewModels
 
             // Initialize Fans & Power
             FansPower.Initialize();
+
+            // Wire up badge strip updates from child ViewModels
+            Performance.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(Performance.SelectedModeIndex) ||
+                    e.PropertyName == nameof(Performance.ModeLabels))
+                    UpdatePerfBadge();
+            };
+            Gpu.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(Gpu.SelectedModeIndex) ||
+                    e.PropertyName == nameof(Gpu.ModeLabels) ||
+                    e.PropertyName == nameof(Gpu.ModeColors))
+                    UpdateGpuBadge();
+            };
+            Visual.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(Visual.SelectedFreqIndex) ||
+                    e.PropertyName == nameof(Visual.FrequencyLabels))
+                    UpdateDisplayBadge();
+            };
+            Extra.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(Extra.AsusServicesCount) ||
+                    e.PropertyName == nameof(Extra.AsusServicesText))
+                    UpdateServicesBadge();
+            };
+
+            UpdatePerfBadge();
+            UpdateGpuBadge();
+            UpdateDisplayBadge();
+            UpdateServicesBadge();
 
             // Sensor refresh timer on UI thread
             _sensorTimer = new DispatcherTimer
@@ -104,9 +162,29 @@ namespace GHelper.WPF.ViewModels
 
         private int _tickCount;
         private int _lastMode = -1;
+        private bool _readInProgress;
 
-        private void OnSensorTick(object? sender, EventArgs e)
+        private async void OnSensorTick(object? sender, EventArgs e)
         {
+            // Read hardware sensors on a background thread, then update UI.
+            // Skip if the previous read is still running so we never stack up.
+            if (!_readInProgress)
+            {
+                _readInProgress = true;
+                try
+                {
+                    await Task.Run(() =>
+                    {
+                        try { HardwareControl.ReadSensors(); }
+                        catch (Exception ex) { Logger.WriteLine("Sensor read error: " + ex.Message); }
+                    });
+                }
+                finally
+                {
+                    _readInProgress = false;
+                }
+            }
+
             try
             {
                 Performance.UpdateSensors();
@@ -147,6 +225,83 @@ namespace GHelper.WPF.ViewModels
             // Refresh current screen rate every 5 seconds (lightweight Win32 API call)
             if (++_tickCount % 5 == 0)
                 Visual.RefreshCurrentRate();
+        }
+
+        private void UpdatePerfBadge()
+        {
+            int idx = Performance.SelectedModeIndex;
+            var labels = Performance.ModeLabels;
+            if (idx < 0 || idx >= labels.Length) return;
+
+            string name = labels[idx];
+            PerfBadgeName = name;
+            PerfBadgeBrush = name switch
+            {
+                "Silent" => PurpleBrush,
+                "Turbo" => OrangeBrush,
+                _ => CyanBrush,
+            };
+            PerfBadgeIsWarning = name == "Turbo";
+            UpdateHeaderAccent();
+        }
+
+        private void UpdateGpuBadge()
+        {
+            int idx = Gpu.SelectedModeIndex;
+            var labels = Gpu.ModeLabels;
+            if (idx < 0 || idx >= labels.Length) return;
+
+            string name = labels[idx];
+            GpuBadgeName = name;
+            GpuBadgeBrush = name switch
+            {
+                "Eco" => GreenBrush,
+                "Ultimate" => OrangeBrush,
+                "Optimized" => GpuPurpleBrush,
+                _ => CyanBrush,
+            };
+            GpuBadgeIsWarning = name == "Ultimate";
+            UpdateHeaderAccent();
+        }
+
+        private void UpdateDisplayBadge()
+        {
+            int idx = Visual.SelectedFreqIndex;
+            var labels = Visual.FrequencyLabels;
+            if (idx < 0 || idx >= labels.Length)
+            {
+                DisplayBadgeName = "Auto";
+            }
+            else
+            {
+                DisplayBadgeName = labels[idx];
+            }
+            DisplayBadgeBrush = CyanBrush;
+        }
+
+        private void UpdateServicesBadge()
+        {
+            int count = Extra.AsusServicesCount;
+            if (count == 0)
+            {
+                ServicesBadgeName = "Healthy";
+                ServicesBadgeBrush = GreenBrush;
+                ServicesBadgeIsWarning = false;
+            }
+            else
+            {
+                ServicesBadgeName = count == 1 ? "1 Running" : $"{count} Running";
+                ServicesBadgeBrush = OrangeBrush;
+                ServicesBadgeIsWarning = true;
+            }
+            UpdateHeaderAccent();
+        }
+
+        private void UpdateHeaderAccent()
+        {
+            // Orange if any badge is in a warning state; else green.
+            bool anyWarning = ServicesBadgeIsWarning || PerfBadgeIsWarning || GpuBadgeIsWarning;
+            HeaderAccentBrush = anyWarning ? OrangeBrush : GreenBrush;
         }
     }
 }

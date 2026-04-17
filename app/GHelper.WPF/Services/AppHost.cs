@@ -18,15 +18,12 @@ namespace GHelper.WPF.Services
             Logger.WriteLine("------------");
             Logger.WriteLine("WPF App launched: " + AppConfig.GetModel());
 
-            // Initialize ACPI connection
+            // Initialize ACPI connection (fast — creates a COM-style handle)
             Program.acpi = new AsusACPI();
 
             // Initialize controllers (without SettingsForm — WPF uses ViewModels)
             Program.modeControl = new ModeControl();
             Program.gpuControl = new GPUModeControl();
-
-            HardwareControl.RecreateGpuControl();
-            // PawnIO replaces old RyzenControl — no explicit Init needed
 
             // Initialize toast (required by InputDispatcher actions that call Program.toast)
             Program.toast = new ToastForm();
@@ -34,6 +31,21 @@ namespace GHelper.WPF.Services
             // Initialize input dispatcher for special key handling
             Program.inputDispatcher = new InputDispatcher();
             Program.inputDispatcher.Init();
+
+            // Heavy GPU driver enumeration (NvAPI/AMD) — push to background so the window
+            // can render immediately. MainViewModel re-checks GPU state after this completes.
+            Task.Run(() =>
+            {
+                try
+                {
+                    HardwareControl.RecreateGpuControl();
+                    // PawnIO replaces old RyzenControl — no explicit Init needed
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine("Background GPU init error: " + ex.Message);
+                }
+            });
 
             // Wire up WPF callbacks for key actions that need UI
             InputDispatcher.OnCycleAura = (delta) =>
@@ -81,20 +93,8 @@ namespace GHelper.WPF.Services
                 });
             };
 
-            // Start sensor polling
-            _sensorTimer = new System.Timers.Timer(1000);
-            _sensorTimer.Elapsed += (s, e) =>
-            {
-                try
-                {
-                    HardwareControl.ReadSensors();
-                }
-                catch (Exception ex)
-                {
-                    Logger.WriteLine("Sensor read error: " + ex.Message);
-                }
-            };
-            _sensorTimer.Enabled = true;
+            // Sensor polling is driven by MainViewModel's DispatcherTimer tick
+            // (see OnSensorTick). One timer = one tick point.
         }
 
         public static void Shutdown()
@@ -102,6 +102,7 @@ namespace GHelper.WPF.Services
             Logger.WriteLine("AppHost shutting down");
             _sensorTimer?.Stop();
             _sensorTimer?.Dispose();
+            Logger.Shutdown();
         }
     }
 }

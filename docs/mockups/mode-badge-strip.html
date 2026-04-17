@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mode Badge Strip — G-Aether Design Exploration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-window: rgba(20, 20, 32, 0.94);
+  --bg-window-2: rgba(14, 14, 22, 0.94);
+  --border-glass: rgba(255, 255, 255, 0.06);
+  --border-glass-2: rgba(255, 255, 255, 0.10);
+  --text-primary: #f0f0f2;
+  --text-secondary: #a8a8b2;
+  --text-dim: #72727c;
+  --text-faint: #42424c;
+
+  --accent-cyan: #60CDFF;
+  --accent-orange: #FF6B35;
+  --accent-green: #4CC95E;
+  --accent-purple: #A78BFA;
+  --accent-purple-2: #AB7CFF;
+
+  --doc-bg: #07070c;
+  --doc-heading: #fafafa;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--doc-bg);
+  color: var(--text-primary);
+  font-family: 'Geist', -apple-system, sans-serif;
+  font-feature-settings: 'ss01', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.55;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ambient background */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 15% 0%, rgba(96, 205, 255, 0.035), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 100% 50%, rgba(167, 139, 250, 0.025), transparent 60%),
+    radial-gradient(ellipse 40% 60% at 50% 120%, rgba(76, 201, 94, 0.02), transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.page {
+  position: relative; z-index: 2;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 80px 56px 140px;
+}
+
+/* ==================== DOC HEADER ==================== */
+.doc-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 40px;
+  margin-bottom: 96px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--border-glass);
+  position: relative;
+}
+
+.doc-header::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: -1px;
+  width: 120px; height: 1px;
+  background: var(--accent-cyan);
+}
+
+.doc-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--accent-cyan);
+  margin-bottom: 24px;
+}
+.doc-eyebrow::before {
+  content: '';
+  width: 24px; height: 1px;
+  background: currentColor;
+}
+
+.doc-title {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(56px, 9vw, 96px);
+  letter-spacing: -0.03em;
+  line-height: 0.92;
+  color: var(--doc-heading);
+}
+
+.doc-title .light {
+  font-style: normal;
+  color: var(--text-dim);
+  display: block;
+  font-size: 0.4em;
+  letter-spacing: -0.01em;
+  margin-top: 12px;
+  font-family: 'Geist', sans-serif;
+  font-weight: 300;
+}
+
+.doc-meta {
+  text-align: right;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.9;
+  white-space: nowrap;
+}
+.doc-meta strong { color: var(--text-secondary); font-weight: 500; }
+.doc-meta .stamp {
+  display: inline-block;
+  padding: 3px 8px;
+  margin-top: 12px;
+  border: 1px solid var(--border-glass-2);
+  border-radius: 3px;
+  color: var(--text-secondary);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+/* ==================== VARIATION ==================== */
+.variation {
+  margin-bottom: 112px;
+  animation: slideIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.variation:nth-of-type(2) { animation-delay: 0.05s; }
+.variation:nth-of-type(3) { animation-delay: 0.1s; }
+.variation:nth-of-type(4) { animation-delay: 0.15s; }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.variation-header {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 40px;
+  align-items: baseline;
+  margin-bottom: 40px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-glass);
+  position: relative;
+}
+
+.variation-header::before {
+  content: '';
+  position: absolute;
+  left: 0; top: -1px;
+  width: 40px; height: 1px;
+  background: var(--text-secondary);
+}
+
+.variation-letter {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 88px;
+  color: var(--text-faint);
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  text-align: left;
+  padding-top: 20px;
+}
+
+.variation-info { padding-top: 28px; }
+
+.variation-name {
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--text-primary);
+  letter-spacing: -0.025em;
+  margin-bottom: 10px;
+  line-height: 1.15;
+}
+.variation-name em {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--text-dim);
+  margin-left: 8px;
+}
+
+.variation-philosophy {
+  font-size: 14px;
+  color: var(--text-secondary);
+  max-width: 560px;
+  line-height: 1.65;
+  font-weight: 300;
+}
+
+.variation-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 32px;
+  text-align: right;
+}
+.variation-tags span {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+}
+.variation-tags span::before {
+  content: '';
+  display: inline-block;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* ==================== WINDOWS GRID ==================== */
+.windows {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.window-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.state-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 2px;
+}
+.state-label .num {
+  display: inline-block;
+  width: 20px; height: 20px;
+  border: 1px solid var(--text-faint);
+  border-radius: 50%;
+  color: var(--text-dim);
+  text-align: center;
+  line-height: 18px;
+  font-size: 9px;
+}
+.state-label .line {
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--border-glass);
+}
+
+/* Window chrome */
+.window {
+  background: var(--bg-window);
+  border: 1px solid var(--border-glass-2);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 24px 60px -20px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.015),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.window:hover { transform: translateY(-2px); }
+
+.window::before {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 100% at 50% 0%, rgba(96,205,255,0.035), transparent 60%);
+}
+
+.title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  position: relative;
+  z-index: 1;
+}
+
+.title-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.app-logo {
+  width: 14px; height: 14px;
+  display: grid; place-items: center;
+  color: var(--accent-cyan);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.app-name {
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.app-name .tail {
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.title-right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-dim);
+}
+.title-right span {
+  width: 22px; height: 18px;
+  display: grid; place-items: center;
+  opacity: 0.55;
+  font-size: 11px;
+}
+
+/* Strip container */
+.strip-slot {
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.025);
+  position: relative;
+  z-index: 1;
+}
+
+/* Content preview */
+.content-preview {
+  padding: 12px 14px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.preview-card {
+  height: 36px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  opacity: 0.45;
+  position: relative;
+  overflow: hidden;
+}
+.preview-card::after {
+  content: '';
+  position: absolute;
+  left: 10px; right: 10px; bottom: 9px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+}
+.preview-card.w {
+  background: linear-gradient(90deg, rgba(96,205,255,0.04), transparent 60%);
+}
+
+/* ==================== VARIATION A: Pills ==================== */
+.strip-a {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px 4px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.012);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  letter-spacing: -0.005em;
+  user-select: none;
+}
+
+.pill .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor, 0 0 2px currentColor;
+}
+
+.pill .pill-label {
+  color: var(--text-dim);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.pill:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.pill.hovered {
+  background: rgba(96, 205, 255, 0.07);
+  border-color: rgba(96, 205, 255, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -8px rgba(96, 205, 255, 0.3), inset 0 0 0 1px rgba(96, 205, 255, 0.1);
+}
+.pill.hovered .pill-label { color: rgba(96, 205, 255, 0.6); }
+
+/* ==================== VARIATION B: Minimal tags ==================== */
+.strip-b {
+  display: flex;
+  gap: 28px;
+  padding: 4px 0;
+  flex-wrap: wrap;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 3px 2px;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+}
+
+.tag .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor, 0 0 2px currentColor;
+  flex: 0 0 auto;
+}
+
+.tag .tag-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-dim);
+  transition: color 0.25s;
+}
+
+.tag .tag-value {
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: -0.005em;
+  transition: color 0.25s;
+}
+
+.tag::after {
+  content: '';
+  position: absolute;
+  left: 16px; right: 0; bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0;
+  transform: scaleX(0.3);
+  transform-origin: left;
+  transition: opacity 0.3s, transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.tag:hover::after, .tag.hovered::after {
+  opacity: 0.35;
+  transform: scaleX(1);
+}
+.tag.hovered .tag-value { color: var(--accent-cyan); }
+.tag.hovered .tag-label { color: rgba(255,255,255,0.5); }
+
+/* ==================== VARIATION C: Segmented ==================== */
+.strip-c {
+  display: inline-flex;
+  align-items: stretch;
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 2px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 1px 0 rgba(0,0,0,0.15);
+}
+
+.segment {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  letter-spacing: -0.005em;
+  user-select: none;
+}
+
+.segment + .segment { margin-left: 1px; }
+.segment + .segment::before {
+  content: '';
+  position: absolute;
+  left: -1px; top: 22%; bottom: 22%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  transition: opacity 0.2s;
+}
+
+.segment:hover::before,
+.segment.hovered::before,
+.segment:hover + .segment::before,
+.segment.hovered + .segment::before { opacity: 0; }
+
+.segment .seg-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+  flex: 0 0 auto;
+}
+
+.segment .seg-name {
+  color: var(--text-dim);
+  font-size: 9.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-right: -2px;
+}
+
+.segment:hover { background: rgba(255, 255, 255, 0.045); }
+.segment.hovered {
+  background: linear-gradient(135deg, rgba(96,205,255,0.1), rgba(96,205,255,0.03));
+  color: var(--accent-cyan);
+  box-shadow: inset 0 0 0 1px rgba(96,205,255,0.2);
+}
+.segment.hovered .seg-name { color: rgba(96,205,255,0.7); }
+
+/* ==================== VARIATION D: Status bar ==================== */
+.strip-d {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 12px 5px 9px;
+  background: rgba(255, 255, 255, 0.015);
+  border-radius: 3px;
+  font-size: 11px;
+  cursor: pointer;
+  border-left: 2px solid currentColor;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+.status::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: currentColor;
+  opacity: 0.04;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.status::after {
+  content: '';
+  position: absolute;
+  left: -2px; top: 0; bottom: 0;
+  width: 2px;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+  opacity: 0.7;
+}
+
+.status .status-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.status .status-value {
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: -0.005em;
+}
+
+.status:hover::before,
+.status.hovered::before { opacity: 0.1; }
+
+.status:hover, .status.hovered {
+  transform: translateX(2px);
+  background: rgba(255, 255, 255, 0.028);
+}
+.status.hovered .status-value { color: currentColor; }
+.status.hovered .status-label { color: rgba(255,255,255,0.5); }
+
+/* ==================== VERDICT ==================== */
+.verdict {
+  margin-top: 100px;
+  padding: 56px 48px;
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, rgba(96,205,255,0.025), rgba(167,139,250,0.02) 40%, rgba(76,201,94,0.015) 80%, transparent),
+    rgba(10, 10, 18, 0.5);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.verdict::before {
+  content: 'A · B · C · D';
+  position: absolute;
+  top: 32px; right: 40px;
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 28px;
+  color: var(--text-faint);
+  letter-spacing: 0.3em;
+  opacity: 0.7;
+}
+.verdict::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0;
+  width: 100px; height: 1px;
+  background: linear-gradient(90deg, var(--accent-cyan), transparent);
+}
+
+.verdict h2 {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 40px;
+  font-weight: 400;
+  color: var(--doc-heading);
+  margin-bottom: 14px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.verdict p {
+  color: var(--text-secondary);
+  font-size: 15px;
+  max-width: 600px;
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+.verdict-criteria {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border-glass);
+  max-width: 720px;
+}
+.criterion {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+.criterion strong {
+  display: block;
+  color: var(--text-primary);
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.criterion strong::before {
+  content: '';
+  display: inline-block;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  margin-right: 8px;
+  vertical-align: middle;
+  box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1100px) {
+  .windows { grid-template-columns: 1fr; }
+  .variation-header { grid-template-columns: 60px 1fr; }
+  .variation-tags { display: none; }
+}
+@media (max-width: 640px) {
+  .page { padding: 40px 20px 80px; }
+  .doc-header { grid-template-columns: 1fr; }
+  .doc-meta { text-align: left; }
+  .variation-header { grid-template-columns: 1fr; }
+  .variation-letter { font-size: 60px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="doc-header">
+    <div>
+      <div class="doc-eyebrow">Design exploration · v0.4</div>
+      <h1 class="doc-title">
+        mode badge strip
+        <span class="light">Persistent at-a-glance mode indicators</span>
+      </h1>
+    </div>
+    <div class="doc-meta">
+      <strong>G-Aether</strong><br>
+      4 variations · dark ui<br>
+      Monitor · Perf · GPU · Display · Services
+      <div class="stamp">REVIEW</div>
+    </div>
+  </header>
+
+  <!-- ==================== VARIATION A: Pills ==================== -->
+  <section class="variation">
+    <div class="variation-header">
+      <div class="variation-letter">A</div>
+      <div class="variation-info">
+        <h2 class="variation-name">Soft Pills <em>— structured but airy</em></h2>
+        <p class="variation-philosophy">Rounded pill badges with subtle borders. Each carries a small dimmed category label next to the active mode value. Reads instantly, feels like a natural extension of the existing pill controls already in the app.</p>
+      </div>
+      <div class="variation-tags">
+        <span>Medium density</span>
+        <span>High legibility</span>
+        <span>Familiar pattern</span>
+      </div>
+    </div>
+
+    <div class="windows">
+      <!-- Default state -->
+      <div class="window-wrap">
+        <div class="state-label"><span class="num">1</span> Default <span class="line"></span></div>
+        <div class="window">
+          <div class="title-bar">
+            <div class="title-left">
+              <div class="app-logo">⚡</div>
+              <div class="app-name">G-<span class="tail">Aether</span></div>
+            </div>
+            <div class="title-right"><span>─</span><span>☐</span><span>✕</span></div>
+          </div>
+          <div class="strip-slot">
+            <div class="strip-a">
+              <div class="pill" style="color: var(--accent-cyan);">
+                <span class="dot"></span>
+                <span class="pill-label">Perf</span>
+                <span>Balanced</span>
+              </div>
+              <div class="pill" style="color: var(--accent-cyan);">
+                <span class="dot"></span>
+                <span class="pill-label">GPU</span>
+                <span>Standard</span>
+              </div>
+              <div class="pill" style="color: var(--accent-cyan);">
+                <span class="dot"></span>
+                <span class="pill-label">Display</span>
+                <span>240Hz</span>
+              </div>
+              <div class="pill" style="color: var(--accent-green);">
+                <span class="dot"></span>
+                <span class="pill-label">Services</span>
+                <span>Healthy</span>
+              </div>
+            </div>
+          </div>
+          <div class="content-preview">
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Warning state -->
+      <div class="window-wrap">
+        <div class="state-label"><span class="num">2</span> Warning <span class="line"></span></div>
+        <div class="window">
+          <div class="title-bar">
+            <div class="title-left">
+              <div class="app-logo">⚡</div>
+              <div class="app-name">G-<span class="tail">Aether</span></div>
+            </div>
+            <div class="title-right"><span>─</span><span>☐</span><span>✕</span></div>
+          </div>
+          <div class="strip-slot">
+            <div class="strip-a">
+              <div class="pill" style="color: var(--accent-orange);">
+                <span class="dot"></span>
+                <span class="pill-label">Perf</span>
+                <span>Turbo</span>
+              </div>
+              <div class="pill" style="color: var(--accent-green);">
+                <span class="dot"></span>
+                <span class="pill-label">GPU</span>
+                <span>Eco</span>
+              </div>
+              <div class="pill" style="color: var(--accent-cyan);">
+                <span class="dot"></span>
+                <span class="pill-label">Display</span>
+                <span>60Hz</span>
+              </div>
+              <div class="pill" style="color: var(--accent-orange);">
+                <span class="dot"></span>
+                <span class="pill-label">Services</span>
+                <span>3 Running</span>
+              </div>
+            </div>
+          </div>
+          <div class="content-preview">
+            <div class="preview-card w"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hover state -->
+      <div class="window-wrap">
+        <div class="state-label"><span class="num">3</span> Hover <span class="line"></span></div>
+        <div class="window">
+          <div class="title-bar">
+            <div class="title-left">
+              <div class="app-logo">⚡</div>
+              <div class="app-name">G-<span class="tail">Aether</span></div>
+            </div>
+            <div class="title-right"><span>─</span><span>☐</span><span>✕</span></div>
+          </div>
+          <div class="strip-slot">
+            <div class="strip-a">
+              <div class="pill" style="color: var(--accent-cyan);">
+                <span class="dot"></span>
+                <span class="pill-label">Perf</span>
+                <span>Balanced</span>
+              </div>
+              <div class="pill hovered" style="color: var(--accent-cyan);">
+                <span class="dot"></span>
+                <span class="pill-label">GPU</span>
+                <span>Standard</span>
+              </div>
+              <div class="pill" style="color: var(--accent-cyan);">
+                <span class="dot"></span>
+                <span class="pill-label">Display</span>
+                <span>240Hz</span>
+              </div>
+              <div class="pill" style="color: var(--accent-green);">
+                <span class="dot"></span>
+                <span class="pill-label">Services</span>
+                <span>Healthy</span>
+              </div>
+            </div>
+          </div>
+          <div class="content-preview">
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VARIATION B: Minimal tags ==================== -->
+  <section class="variation">
+    <div class="variation-header">
+      <div class="variation-letter">B</div>
+      <div class="variation-info">
+        <h2 class="variation-name">Minimal Tags <em>— invisible until useful</em></h2>
+        <p class="variation-philosophy">Just colored dots + small-caps labels and mode values. No containers, no borders. Disappears into the composition until a state becomes noteworthy. Most editorial. Least visual weight.</p>
+      </div>
+      <div class="variation-tags">
+        <span>Lowest density</span>
+        <span>Editorial feel</span>
+        <span>Scannable</span>
+      </div>
+    </div>
+
+    <div class="windows">
+      <div class="window-wrap">
+        <div class="state-label"><span class="num">1</span> Default <span class="line"></span></div>
+        <div class="window">
+          <div class="title-bar">
+            <div class="title-left">
+              <div class="app-logo">⚡</div>
+              <div class="app-name">G-<span class="tail">Aether</span></div>
+            </div>
+            <div class="title-right"><span>─</span><span>☐</span><span>✕</span></div>
+          </div>
+          <div class="strip-slot">
+            <div class="strip-b">
+              <div class="tag" style="color: var(--accent-cyan);">
+                <span class="dot"></span>
+                <span class="tag-label">Perf</span>
+                <span class="tag-value">Balanced</span>
+              </div>
+              <div class="tag" style="color: var(--accent-cyan);">
+                <span class="dot"></span>
+                <span class="tag-label">GPU</span>
+                <span class="tag-value">Standard</span>
+              </div>
+              <div class="tag" style="color: var(--accent-cyan);">
+                <span class="dot"></span>
+                <span class="tag-label">Display</span>
+                <span class="tag-value">240Hz</span>
+              </div>
+              <div class="tag" style="color: var(--accent-green);">
+                <span class="dot"></span>
+                <span class="tag-label">Services</span>
+                <span class="tag-value">Healthy</span>
+              </div>
+            </div>
+          </div>
+          <div class="content-preview">
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="window-wrap">
+        <div class="state-label"><span class="num">2</span> Warning <span class="line"></span></div>
+        <div class="window">
+          <div class="title-bar">
+            <div class="title-left">
+              <div class="app-logo">⚡</div>
+              <div class="app-name">G-<span class="tail">Aether</span></div>
+            </div>
+            <div class="title-right"><span>─</span><span>☐</span><span>✕</span></div>
+          </div>
+          <div class="strip-slot">
+            <div class="strip-b">
+              <div class="tag" style="color: var(--accent-orange);">
+                <span class="dot"></span>
+                <span class="tag-label">Perf</span>
+                <span class="tag-value">Turbo</span>
+              </div>
+              <div class="tag" style="color: var(--accent-green);">
+                <span class="dot"></span>
+                <span class="tag-label">GPU</span>
+                <span class="tag-value">Eco</span>
+              </div>
+              <div class="tag" style="color: var(--accent-cyan);">
+                <span class="dot"></span>
+                <span class="tag-label">Display</span>
+                <span class="tag-value">60Hz</span>
+              </div>
+              <div class="tag" style="color: var(--accent-orange);">
+                <span class="dot"></span>
+                <span class="tag-label">Services</span>
+                <span class="tag-value">3 Running</span>
+              </div>
+            </div>
+          </div>
+          <div class="content-preview">
+            <div class="preview-card w"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="window-wrap">
+        <div class="state-label"><span class="num">3</span> Hover <span class="line"></span></div>
+        <div class="window">
+          <div class="title-bar">
+            <div class="title-left">
+              <div class="app-logo">⚡</div>
+              <div class="app-name">G-<span class="tail">Aether</span></div>
+            </div>
+            <div class="title-right"><span>─</span><span>☐</span><span>✕</span></div>
+          </div>
+          <div class="strip-slot">
+            <div class="strip-b">
+              <div class="tag" style="color: var(--accent-cyan);">
+                <span class="dot"></span>
+                <span class="tag-label">Perf</span>
+                <span class="tag-value">Balanced</span>
+              </div>
+              <div class="tag" style="color: var(--accent-cyan);">
+                <span class="dot"></span>
+                <span class="tag-label">GPU</span>
+                <span class="tag-value">Standard</span>
+              </div>
+              <div class="tag hovered" style="color: var(--accent-cyan);">
+                <span class="dot"></span>
+                <span class="tag-label">Display</span>
+                <span class="tag-value">240Hz</span>
+              </div>
+              <div class="tag" style="color: var(--accent-green);">
+                <span class="dot"></span>
+                <span class="tag-label">Services</span>
+                <span class="tag-value">Healthy</span>
+              </div>
+            </div>
+          </div>
+          <div class="content-preview">
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VARIATION C: Segmented ==================== -->
+  <section class="variation">
+    <div class="variation-header">
+      <div class="variation-letter">C</div>
+      <div class="variation-info">
+        <h2 class="variation-name">Unified Segmented <em>— single instrument panel</em></h2>
+        <p class="variation-philosophy">All four modes live inside one glass container with thin dividers between segments. Feels like a dashboard status bar or a cockpit readout — more "systems check" than "menu."</p>
+      </div>
+      <div class="variation-tags">
+        <span>Highest density</span>
+        <span>Technical feel</span>
+        <span>Single gesture</span>
+      </div>
+    </div>
+
+    <div class="windows">
+      <div class="window-wrap">
+        <div class="state-label"><span class="num">1</span> Default <span class="line"></span></div>
+        <div class="window">
+          <div class="title-bar">
+            <div class="title-left">
+              <div class="app-logo">⚡</div>
+              <div class="app-name">G-<span class="tail">Aether</span></div>
+            </div>
+            <div class="title-right"><span>─</span><span>☐</span><span>✕</span></div>
+          </div>
+          <div class="strip-slot">
+            <div class="strip-c">
+              <div class="segment" style="color: var(--accent-cyan);">
+                <span class="seg-icon"></span>
+                <span class="seg-name">Perf</span>
+                <span>Balanced</span>
+              </div>
+              <div class="segment" style="color: var(--accent-cyan);">
+                <span class="seg-icon"></span>
+                <span class="seg-name">GPU</span>
+                <span>Standard</span>
+              </div>
+              <div class="segment" style="color: var(--accent-cyan);">
+                <span class="seg-icon"></span>
+                <span class="seg-name">Display</span>
+                <span>240Hz</span>
+              </div>
+              <div class="segment" style="color: var(--accent-green);">
+                <span class="seg-icon"></span>
+                <span class="seg-name">Services</span>
+                <span>Healthy</span>
+              </div>
+            </div>
+          </div>
+          <div class="content-preview">
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="window-wrap">
+        <div class="state-label"><span class="num">2</span> Warning <span class="line"></span></div>
+        <div class="window">
+          <div class="title-bar">
+            <div class="title-left">
+              <div class="app-logo">⚡</div>
+              <div class="app-name">G-<span class="tail">Aether</span></div>
+            </div>
+            <div class="title-right"><span>─</span><span>☐</span><span>✕</span></div>
+          </div>
+          <div class="strip-slot">
+            <div class="strip-c">
+              <div class="segment" style="color: var(--accent-orange);">
+                <span class="seg-icon"></span>
+                <span class="seg-name">Perf</span>
+                <span>Turbo</span>
+              </div>
+              <div class="segment" style="color: var(--accent-green);">
+                <span class="seg-icon"></span>
+                <span class="seg-name">GPU</span>
+                <span>Eco</span>
+              </div>
+              <div class="segment" style="color: var(--accent-cyan);">
+                <span class="seg-icon"></span>
+                <span class="seg-name">Display</span>
+                <span>60Hz</span>
+              </div>
+              <div class="segment" style="color: var(--accent-orange);">
+                <span class="seg-icon"></span>
+                <span class="seg-name">Services</span>
+                <span>3 Running</span>
+              </div>
+            </div>
+          </div>
+          <div class="content-preview">
+            <div class="preview-card w"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="window-wrap">
+        <div class="state-label"><span class="num">3</span> Hover <span class="line"></span></div>
+        <div class="window">
+          <div class="title-bar">
+            <div class="title-left">
+              <div class="app-logo">⚡</div>
+              <div class="app-name">G-<span class="tail">Aether</span></div>
+            </div>
+            <div class="title-right"><span>─</span><span>☐</span><span>✕</span></div>
+          </div>
+          <div class="strip-slot">
+            <div class="strip-c">
+              <div class="segment hovered" style="color: var(--accent-cyan);">
+                <span class="seg-icon"></span>
+                <span class="seg-name">Perf</span>
+                <span>Balanced</span>
+              </div>
+              <div class="segment" style="color: var(--accent-cyan);">
+                <span class="seg-icon"></span>
+                <span class="seg-name">GPU</span>
+                <span>Standard</span>
+              </div>
+              <div class="segment" style="color: var(--accent-cyan);">
+                <span class="seg-icon"></span>
+                <span class="seg-name">Display</span>
+                <span>240Hz</span>
+              </div>
+              <div class="segment" style="color: var(--accent-green);">
+                <span class="seg-icon"></span>
+                <span class="seg-name">Services</span>
+                <span>Healthy</span>
+              </div>
+            </div>
+          </div>
+          <div class="content-preview">
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VARIATION D: Status bar ==================== -->
+  <section class="variation">
+    <div class="variation-header">
+      <div class="variation-letter">D</div>
+      <div class="variation-info">
+        <h2 class="variation-name">Active Status <em>— ops dashboard</em></h2>
+        <p class="variation-philosophy">Each badge has a glowing colored left edge — reads like a severity indicator in a monitoring console. The color bar makes current state scannable from peripheral vision. Most "technical" of the four.</p>
+      </div>
+      <div class="variation-tags">
+        <span>Medium density</span>
+        <span>Peripheral-scannable</span>
+        <span>Console aesthetic</span>
+      </div>
+    </div>
+
+    <div class="windows">
+      <div class="window-wrap">
+        <div class="state-label"><span class="num">1</span> Default <span class="line"></span></div>
+        <div class="window">
+          <div class="title-bar">
+            <div class="title-left">
+              <div class="app-logo">⚡</div>
+              <div class="app-name">G-<span class="tail">Aether</span></div>
+            </div>
+            <div class="title-right"><span>─</span><span>☐</span><span>✕</span></div>
+          </div>
+          <div class="strip-slot">
+            <div class="strip-d">
+              <div class="status" style="color: var(--accent-cyan);">
+                <span class="status-label">Perf</span>
+                <span class="status-value">Balanced</span>
+              </div>
+              <div class="status" style="color: var(--accent-cyan);">
+                <span class="status-label">GPU</span>
+                <span class="status-value">Standard</span>
+              </div>
+              <div class="status" style="color: var(--accent-cyan);">
+                <span class="status-label">Display</span>
+                <span class="status-value">240Hz</span>
+              </div>
+              <div class="status" style="color: var(--accent-green);">
+                <span class="status-label">Services</span>
+                <span class="status-value">Healthy</span>
+              </div>
+            </div>
+          </div>
+          <div class="content-preview">
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="window-wrap">
+        <div class="state-label"><span class="num">2</span> Warning <span class="line"></span></div>
+        <div class="window">
+          <div class="title-bar">
+            <div class="title-left">
+              <div class="app-logo">⚡</div>
+              <div class="app-name">G-<span class="tail">Aether</span></div>
+            </div>
+            <div class="title-right"><span>─</span><span>☐</span><span>✕</span></div>
+          </div>
+          <div class="strip-slot">
+            <div class="strip-d">
+              <div class="status" style="color: var(--accent-orange);">
+                <span class="status-label">Perf</span>
+                <span class="status-value">Turbo</span>
+              </div>
+              <div class="status" style="color: var(--accent-green);">
+                <span class="status-label">GPU</span>
+                <span class="status-value">Eco</span>
+              </div>
+              <div class="status" style="color: var(--accent-cyan);">
+                <span class="status-label">Display</span>
+                <span class="status-value">60Hz</span>
+              </div>
+              <div class="status" style="color: var(--accent-orange);">
+                <span class="status-label">Services</span>
+                <span class="status-value">3 Running</span>
+              </div>
+            </div>
+          </div>
+          <div class="content-preview">
+            <div class="preview-card w"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="window-wrap">
+        <div class="state-label"><span class="num">3</span> Hover <span class="line"></span></div>
+        <div class="window">
+          <div class="title-bar">
+            <div class="title-left">
+              <div class="app-logo">⚡</div>
+              <div class="app-name">G-<span class="tail">Aether</span></div>
+            </div>
+            <div class="title-right"><span>─</span><span>☐</span><span>✕</span></div>
+          </div>
+          <div class="strip-slot">
+            <div class="strip-d">
+              <div class="status" style="color: var(--accent-cyan);">
+                <span class="status-label">Perf</span>
+                <span class="status-value">Balanced</span>
+              </div>
+              <div class="status" style="color: var(--accent-cyan);">
+                <span class="status-label">GPU</span>
+                <span class="status-value">Standard</span>
+              </div>
+              <div class="status" style="color: var(--accent-cyan);">
+                <span class="status-label">Display</span>
+                <span class="status-value">240Hz</span>
+              </div>
+              <div class="status hovered" style="color: var(--accent-green);">
+                <span class="status-label">Services</span>
+                <span class="status-value">Healthy</span>
+              </div>
+            </div>
+          </div>
+          <div class="content-preview">
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+            <div class="preview-card"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== VERDICT ==================== -->
+  <div class="verdict">
+    <h2>Which one feels right?</h2>
+    <p>Each variation trades differently across density, personality, and visual weight. The winner is whichever you can see yourself looking at every time the app opens — without it ever becoming noise.</p>
+
+    <div class="verdict-criteria">
+      <div class="criterion">
+        <strong>Readability</strong>
+        Can you read the current state without thinking? At peripheral vision from 2 feet away?
+      </div>
+      <div class="criterion">
+        <strong>Pressure</strong>
+        Does it compete with the sensor cards below, or sit quietly as a frame?
+      </div>
+      <div class="criterion">
+        <strong>Warning surfacing</strong>
+        When services are running or you're on Turbo on battery, does your eye catch it immediately?
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

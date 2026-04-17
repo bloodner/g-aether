@@ -78,35 +78,46 @@ namespace GHelper.WPF.ViewModels
             bool plugged = power.PowerLineStatus == PowerLineStatus.Online;
             PowerStatusText = plugged ? "Charging" : "On Battery";
 
-            // Refresh battery health/cycles at most every 15 minutes (WMI queries are expensive)
+            // Refresh battery health/cycles at most every 15 minutes (WMI queries are expensive).
+            // Run on background thread so we never block the UI — even the first call.
             if (DateTime.UtcNow - _lastHealthRefresh > HealthRefreshInterval)
             {
                 _lastHealthRefresh = DateTime.UtcNow;
-
-                try
-                {
-                    HardwareControl.RefreshBatteryHealth();
-                    HealthText = HardwareControl.batteryHealth >= 0
-                        ? Math.Round(HardwareControl.batteryHealth, 1) + "%"
-                        : "--";
-                }
-                catch (Exception ex)
-                {
-                    Logger.WriteLine("Battery health error: " + ex.Message);
-                    HealthText = "--";
-                }
-
-                try
-                {
-                    int cycles = GetBatteryCycleCount();
-                    CyclesText = cycles >= 0 ? cycles.ToString() : "--";
-                }
-                catch (Exception ex)
-                {
-                    Logger.WriteLine("Battery cycles error: " + ex.Message);
-                    CyclesText = "--";
-                }
+                Task.Run(RefreshHealthBackground);
             }
+        }
+
+        private void RefreshHealthBackground()
+        {
+            string healthText = "--";
+            string cyclesText = "--";
+
+            try
+            {
+                HardwareControl.RefreshBatteryHealth();
+                if (HardwareControl.batteryHealth >= 0)
+                    healthText = Math.Round(HardwareControl.batteryHealth, 1) + "%";
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteLine("Battery health error: " + ex.Message);
+            }
+
+            try
+            {
+                int cycles = GetBatteryCycleCount();
+                if (cycles >= 0) cyclesText = cycles.ToString();
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteLine("Battery cycles error: " + ex.Message);
+            }
+
+            System.Windows.Application.Current?.Dispatcher.Invoke(() =>
+            {
+                HealthText = healthText;
+                CyclesText = cyclesText;
+            });
         }
 
         private static int GetBatteryCycleCount()

@@ -193,17 +193,15 @@ namespace GHelper.WPF.ViewModels
             {
                 ScreenAuto = AppConfig.Is("screen_auto");
                 RefreshCurrentRate();
-                BuildFrequencyLabels();
 
                 // Color temp
                 int colorTemp = AppConfig.Get("color_temp", VisualControl.DefaultColorTemp);
                 ColorTempIndex = FindClosestTempIndex(colorTemp);
 
-                // Gamut modes
+                // Gamut modes (fast — reads hardware capability)
                 var modes = VisualControl.GetGamutModes();
                 if (modes.Count > 0)
                 {
-                    // Strip redundant "Gamut: " prefix since the section heading already says Color Gamut
                     GamutOptions = modes.Values.Select(v =>
                         v.StartsWith("Gamut: ", StringComparison.OrdinalIgnoreCase) ? v.Substring(7) : v).ToArray();
                     int currentGamut = AppConfig.Get("gamut");
@@ -218,6 +216,79 @@ namespace GHelper.WPF.ViewModels
             finally
             {
                 _ignoreChange = false;
+            }
+
+            // Heavy: EnumDisplaySettings loop to list all refresh rates.
+            // Run enumeration on background thread, marshal results back to UI.
+            Task.Run(() => LoadFrequencyLabelsBackground());
+        }
+
+        private void LoadFrequencyLabelsBackground()
+        {
+            try
+            {
+                var current = new NativeDevMode();
+                current.dmSize = (short)System.Runtime.InteropServices.Marshal.SizeOf(typeof(NativeDevMode));
+                if (!EnumDisplaySettings(null, -1, ref current)) return;
+
+                int curWidth = current.dmPelsWidth;
+                int curHeight = current.dmPelsHeight;
+
+                var rates = new SortedSet<int>();
+                var mode = new NativeDevMode();
+                mode.dmSize = (short)System.Runtime.InteropServices.Marshal.SizeOf(typeof(NativeDevMode));
+
+                for (int i = 0; EnumDisplaySettings(null, i, ref mode); i++)
+                {
+                    if (mode.dmPelsWidth == curWidth && mode.dmPelsHeight == curHeight && mode.dmDisplayFrequency > 0)
+                        rates.Add(mode.dmDisplayFrequency);
+                }
+
+                if (rates.Count == 0) return;
+
+                var labels = new List<string> { "Auto" };
+                foreach (int rate in rates)
+                    labels.Add($"{rate}Hz");
+
+                int currentRate = ScreenFrequency > 0 ? ScreenFrequency : current.dmDisplayFrequency;
+                bool screenAuto = ScreenAuto;
+
+                System.Windows.Application.Current?.Dispatcher.Invoke(() =>
+                {
+                    _ignoreChange = true;
+                    try
+                    {
+                        FrequencyLabels = labels.ToArray();
+                        if (screenAuto)
+                        {
+                            SelectedFreqIndex = 0;
+                            IsAutoFreqMode = true;
+                        }
+                        else
+                        {
+                            int bestIdx = 1;
+                            for (int i = 1; i < labels.Count; i++)
+                            {
+                                string label = labels[i].Replace("Hz", "").Trim();
+                                if (int.TryParse(label, out int hz) && hz == currentRate)
+                                {
+                                    bestIdx = i;
+                                    break;
+                                }
+                            }
+                            SelectedFreqIndex = bestIdx;
+                            IsAutoFreqMode = false;
+                        }
+                    }
+                    finally
+                    {
+                        _ignoreChange = false;
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteLine("Frequency labels background load error: " + ex.Message);
             }
         }
 

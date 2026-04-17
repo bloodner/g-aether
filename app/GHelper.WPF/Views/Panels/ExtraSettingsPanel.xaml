@@ -433,6 +433,12 @@
                         </TextBlock>
                     </StackPanel>
 
+                    <!-- Changelog link -->
+                    <Button Content="View Changelog"
+                            Command="{Binding ShowChangelogCommand}"
+                            Style="{StaticResource LinkButtonStyle}"
+                            Margin="0,2,0,0" />
+
                     <TextBlock Style="{StaticResource DimTextStyle}"
                                FontSize="9"
                                HorizontalAlignment="Center"

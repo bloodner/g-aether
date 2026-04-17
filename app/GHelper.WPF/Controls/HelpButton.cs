@@ -21,13 +21,13 @@ namespace GHelper.WPF.Controls
 
         private Popup? _popup;
         private bool _isOpen;
+        private bool _hoveringPopup;
 
         public HelpButton()
         {
             Width = 18;
             Height = 18;
-            Cursor = Cursors.Hand;
-            ToolTip = "Click for help";
+            Cursor = Cursors.Help;
             Focusable = true;
         }
 
@@ -60,23 +60,17 @@ namespace GHelper.WPF.Controls
         protected override void OnMouseEnter(MouseEventArgs e)
         {
             base.OnMouseEnter(e);
+            OpenPopup();
             InvalidateVisual();
         }
 
         protected override void OnMouseLeave(MouseEventArgs e)
         {
             base.OnMouseLeave(e);
-            if (!_isOpen) InvalidateVisual();
-        }
-
-        protected override void OnMouseDown(MouseButtonEventArgs e)
-        {
-            base.OnMouseDown(e);
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                if (_isOpen) ClosePopup();
-                else OpenPopup();
-            }
+            // Delay close slightly so user can move to the popup
+            if (!_hoveringPopup)
+                ClosePopup();
+            InvalidateVisual();
         }
 
         private void OpenPopup()
@@ -124,6 +118,14 @@ namespace GHelper.WPF.Controls
                 }
             };
 
+            // Keep popup open while hovering over it
+            border.MouseEnter += (s, e) => _hoveringPopup = true;
+            border.MouseLeave += (s, e) =>
+            {
+                _hoveringPopup = false;
+                if (!IsMouseOver) ClosePopup();
+            };
+
             _popup = new Popup
             {
                 Child = border,
@@ -131,15 +133,9 @@ namespace GHelper.WPF.Controls
                 Placement = PlacementMode.Left,
                 HorizontalOffset = -8,
                 VerticalOffset = -4,
-                StaysOpen = false,
+                StaysOpen = true,
                 AllowsTransparency = true,
                 PopupAnimation = PopupAnimation.Fade,
-            };
-
-            _popup.Closed += (s, e) =>
-            {
-                _isOpen = false;
-                InvalidateVisual();
             };
 
             _popup.IsOpen = true;

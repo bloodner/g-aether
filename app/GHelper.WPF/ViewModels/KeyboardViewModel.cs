@@ -250,8 +250,13 @@ namespace GHelper.WPF.ViewModels
                 BacklightBrightness = brightness;
 
                 // Apply brightness to hardware so backlight flag is set
-                // (needed for software-driven modes like Heatmap to work)
-                Aura.ApplyBrightness(brightness, "Init");
+                // (needed for software-driven modes like Heatmap to work).
+                // Off UI thread — this is a USB HID write that can take 100ms+.
+                Task.Run(() =>
+                {
+                    try { Aura.ApplyBrightness(brightness, "Init"); }
+                    catch (Exception ex) { Logger.WriteLine("Keyboard brightness init error: " + ex.Message); }
+                });
 
                 // Aura modes (device-dependent)
                 var modes = Aura.GetModes();
