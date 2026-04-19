@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using GHelper.WPF.Services;
 
 namespace GHelper.WPF.Controls
 {
@@ -83,7 +84,10 @@ namespace GHelper.WPF.Controls
             return new Size(w, Math.Max(140, h));
         }
 
-        private static readonly Color AutoGreen = Color.FromRgb(0x4C, 0xC9, 0x5E);
+        // "Auto" means "let the system decide" — same semantic as GPU Optimized mode,
+        // so we reuse its magenta. Any "system-adaptive" surface in the app reads as
+        // magenta, creating a learnable palette rule.
+        private static Color AutoAccent => ThemeService.ColorOptimized;
 
         protected override void OnRender(DrawingContext dc)
         {
@@ -113,7 +117,7 @@ namespace GHelper.WPF.Controls
             _cx = w / 2;
             _cy = topPad + usableH * 0.45;
 
-            Color accent = autoMode ? AutoGreen : AccentColor;
+            Color accent = autoMode ? AutoAccent : AccentColor;
             Color dimTrack = Color.FromArgb(40, 255, 255, 255);
             Color dimText = Color.FromArgb(120, 255, 255, 255);
             Color dimmedLabel = Color.FromArgb(60, 255, 255, 255); // extra dim for auto mode manual labels

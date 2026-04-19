@@ -3,120 +3,136 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:GHelper.WPF.Controls">
 
-    <Grid Margin="0,0,0,8">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="8" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+    <Border Style="{StaticResource CardStyle}" Padding="14" VerticalAlignment="Stretch">
+        <Grid VerticalAlignment="Top">
+            <Grid.RowDefinitions>
+                <!-- Header row — standardizes the page with the rest of the app -->
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="14" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <!-- Row 0: CPU Temp + Power Draw (always visible) -->
-        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardStyle}">
-            <controls:SparklineChart Height="70"
+            <!-- Page header: Icon | Title | Tooltip.
+                 Monitor is the one dashboard page — everything below is read-only data,
+                 so we keep it as a single unified card (not multiple sections like the
+                 other pages) but still give it the standard header treatment. -->
+            <StackPanel Grid.Row="0" Grid.ColumnSpan="3"
+                        Orientation="Horizontal">
+                <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                           Foreground="{DynamicResource AccentBrush}"
+                           VerticalAlignment="Center" Margin="0,0,8,0" />
+                <TextBlock Text="Live Telemetry"
+                           Style="{StaticResource CardTitleStyle}"
+                           VerticalAlignment="Center" />
+                <controls:HelpButton HelpKey="monitor_telemetry" VerticalAlignment="Center" Margin="8,0,0,0" />
+            </StackPanel>
+
+            <!-- Row 2: CPU Temp + Power Draw (always visible).
+                 SparklineChart now draws its own card background (fill, border,
+                 halo, left stripe) so it drops straight into the grid — no outer
+                 TileStyle wrapper. -->
+            <controls:SparklineChart Grid.Row="2" Grid.Column="0" Height="92"
                 Label="CPU Temp"
                 CurrentText="{Binding CpuTempText}"
                 Values="{Binding CpuTempValues}"
                 MaxValue="105"
                 ValueFontSize="16"
                 StrokeColor="#FF6B6B" />
-        </Border>
-        <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource CardStyle}">
-            <controls:SparklineChart Height="70"
+            <controls:SparklineChart Grid.Row="2" Grid.Column="2" Height="92"
                 Label="Power Draw"
                 CurrentText="{Binding BatteryRateText}"
                 Values="{Binding BatteryRateValues}"
                 MaxValue="100"
                 ValueFontSize="16"
                 StrokeColor="#6BCB77" />
-        </Border>
 
-        <!-- Row 1: GPU Temp + GPU Usage (when active) OR dGPU Idle banner (when Eco) -->
-        <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource CardStyle}"
-                Visibility="{Binding IsGpuActive, Converter={StaticResource BoolToVisibility}}">
-            <controls:SparklineChart Height="70"
+            <!-- Row 4: GPU Temp + GPU Usage (when active) OR dGPU Idle banner (when Eco) -->
+            <controls:SparklineChart Grid.Row="4" Grid.Column="0" Height="92"
                 Label="GPU Temp"
                 CurrentText="{Binding GpuTempText}"
                 Values="{Binding GpuTempValues}"
                 MaxValue="95"
                 ValueFontSize="16"
-                StrokeColor="#FFB347" />
-        </Border>
-        <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource CardStyle}"
-                Visibility="{Binding IsGpuActive, Converter={StaticResource BoolToVisibility}}">
-            <controls:SparklineChart Height="70"
+                StrokeColor="#FFB347"
+                Visibility="{Binding IsGpuActive, Converter={StaticResource BoolToVisibility}}" />
+            <controls:SparklineChart Grid.Row="4" Grid.Column="2" Height="92"
                 Label="GPU Usage"
                 CurrentText="{Binding GpuUseText}"
                 Values="{Binding GpuUseValues}"
                 MaxValue="100"
                 ValueFontSize="16"
-                StrokeColor="#60CDFF" />
-        </Border>
-        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
-                Style="{StaticResource CardStyle}"
-                Visibility="{Binding IsGpuActive, Converter={StaticResource InverseBoolToVisibility}}"
-                Padding="14,8">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <TextBlock Text="&#xE7F4;" FontFamily="Segoe MDL2 Assets" FontSize="14"
-                           Foreground="{DynamicResource ForeDimBrush}"
-                           VerticalAlignment="Center" Margin="0,0,8,0" />
-                <TextBlock Text="dGPU Off — Eco Mode"
-                           Style="{StaticResource DimTextStyle}"
-                           FontSize="12"
-                           VerticalAlignment="Center" />
-            </StackPanel>
-        </Border>
+                StrokeColor="#60CDFF"
+                Visibility="{Binding IsGpuActive, Converter={StaticResource BoolToVisibility}}" />
+            <Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"
+                    Style="{StaticResource TileStyle}"
+                    Visibility="{Binding IsGpuActive, Converter={StaticResource InverseBoolToVisibility}}"
+                    Padding="14,10">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="&#xE7F4;" FontFamily="Segoe MDL2 Assets" FontSize="14"
+                               Foreground="{DynamicResource ForeDimBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="dGPU Off — Eco Mode"
+                               Style="{StaticResource DimTextStyle}"
+                               FontSize="12"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
 
-        <!-- Row 2: CPU Fan / GPU Fan -->
-        <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource CardStyle}">
-            <controls:SparklineChart Height="70"
+            <!-- Row 6: CPU Fan / GPU Fan -->
+            <controls:SparklineChart Grid.Row="6" Grid.Column="0" Height="92"
                 Label="CPU Fan"
                 CurrentText="{Binding CpuFanCurrentText}"
                 Values="{Binding CpuFanValues}"
                 MaxValue="7000"
                 ValueFontSize="13"
                 StrokeColor="#C084FC" />
-        </Border>
-        <Border Grid.Row="2" Grid.Column="2" Style="{StaticResource CardStyle}">
-            <controls:SparklineChart Height="70"
+            <controls:SparklineChart Grid.Row="6" Grid.Column="2" Height="92"
                 Label="GPU Fan"
                 CurrentText="{Binding GpuFanCurrentText}"
                 Values="{Binding GpuFanValues}"
                 MaxValue="7000"
                 ValueFontSize="13"
                 StrokeColor="#F472B6" />
-        </Border>
 
-        <!-- Row 3: Battery Status (full width) -->
-        <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Style="{StaticResource CardStyle}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <!-- Row 8: Battery Status (full width) — halo color tracks BatteryBrush
+                 (green when charging/healthy, amber/orange/red as charge drops). -->
+            <Grid Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3">
+                <controls:AccentHaloBackground AccentColor="{Binding BatteryAccentColor}" />
+                <Grid Margin="18,12,16,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
-                    <TextBlock Text="{Binding BatteryPercentText}"
-                               FontSize="22" FontWeight="SemiBold"
-                               Foreground="{Binding BatteryBrush}"
-                               HorizontalAlignment="Center" />
-                    <TextBlock Text="{Binding PowerStatusText}"
-                               Style="{StaticResource DimTextStyle}"
-                               FontSize="10"
-                               HorizontalAlignment="Center" />
-                </StackPanel>
+                    <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                        <TextBlock Text="{Binding BatteryPercentText}"
+                                   FontSize="22" FontWeight="SemiBold"
+                                   Foreground="{Binding BatteryBrush}"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding PowerStatusText}"
+                                   Style="{StaticResource DimTextStyle}"
+                                   FontSize="10"
+                                   HorizontalAlignment="Center" />
+                    </StackPanel>
 
-                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                    <TextBlock Style="{StaticResource DimTextStyle}" Text="Battery" Margin="0,0,0,2" />
-                    <TextBlock Style="{StaticResource BodyTextStyle}"
-                               Text="{Binding BatteryRateText}" />
-                </StackPanel>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource DimTextStyle}" Text="Battery" Margin="0,0,0,2" />
+                        <TextBlock Style="{StaticResource BodyTextStyle}"
+                                   Text="{Binding BatteryRateText}" />
+                    </StackPanel>
+                </Grid>
             </Grid>
-        </Border>
-    </Grid>
+        </Grid>
+    </Border>
 </UserControl>

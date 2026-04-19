@@ -7,7 +7,7 @@
       }
 
       .cls-2 {
-        fill: #38BDF8;
+        fill: #34D399;
       }
 
       .cls-3 {
@@ -15,16 +15,16 @@
       }
     </style>
     <linearGradient id="linear-gradient" x1="-464.05" y1="163.56" x2="-995.26" y2="196.35" gradientTransform="translate(735.13 120.95) scale(.75)" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#1E1B4B"/>
-      <stop offset=".25" stop-color="#7C3AED"/>
-      <stop offset=".55" stop-color="#EC4899"/>
-      <stop offset=".8" stop-color="#F59E0B"/>
-      <stop offset="1" stop-color="#FCD34D"/>
+      <stop offset="0" stop-color="#4C1D95"/>
+      <stop offset=".3" stop-color="#1E40AF"/>
+      <stop offset=".55" stop-color="#06B6D4"/>
+      <stop offset=".8" stop-color="#34D399"/>
+      <stop offset="1" stop-color="#A7F3D0"/>
     </linearGradient>
     <linearGradient id="linear-gradient-2" x1="-866.3" y1="-2.33" x2="-688.43" y2="177.61" gradientTransform="translate(735.13 120.95) scale(.75)" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#7DD3FC"/>
-      <stop offset=".5" stop-color="#38BDF8"/>
-      <stop offset="1" stop-color="#1E1B4B"/>
+      <stop offset="0" stop-color="#A7F3D0"/>
+      <stop offset=".5" stop-color="#06B6D4"/>
+      <stop offset="1" stop-color="#4C1D95"/>
     </linearGradient>
   </defs>
   <g id="Layer_1-2" data-name="Layer 1">

@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using GHelper.WPF.Services;
 
 namespace GHelper.WPF.Controls
 {
@@ -31,13 +32,17 @@ namespace GHelper.WPF.Controls
             set => SetValue(ItemsProperty, value);
         }
 
-        // Mode colors: Silent=purple, Balanced=green, Turbo=orange
-        private static readonly Color[] ModeColors =
-        [
-            Color.FromRgb(0xA7, 0x8B, 0xFA), // Silent - purple
-            Color.FromRgb(0x60, 0xCD, 0xFF), // Balanced - blue
-            Color.FromRgb(0xFF, 0x6B, 0x35),  // Turbo - orange
-        ];
+        // System accent — pulled from the app's dynamic resource so the arc follows
+        // the Windows accent color and stays consistent with the rest of the chrome.
+        public static readonly DependencyProperty AccentColorProperty =
+            DependencyProperty.Register(nameof(AccentColor), typeof(Color), typeof(PerformanceModeArc),
+                new FrameworkPropertyMetadata(Color.FromRgb(0x60, 0xCD, 0xFF), FrameworkPropertyMetadataOptions.AffectsRender));
+
+        public Color AccentColor
+        {
+            get => (Color)GetValue(AccentColorProperty);
+            set => SetValue(AccentColorProperty, value);
+        }
 
         private double _cx, _cy, _arcRadius;
         private readonly List<Rect> _hitAreas = new();
@@ -82,7 +87,9 @@ namespace GHelper.WPF.Controls
             _cx = w / 2;
             _cy = topPad + usableH * 0.45;
 
-            Color accent = GetModeColor(selIdx);
+            // Selected mode drives the accent for this render — matches the color
+            // shown in the status bar and tray icon so the visual chain is consistent.
+            Color accent = GetModeColor(items[selIdx]);
             Color dimTrack = Color.FromArgb(40, 255, 255, 255);
             Color dimText = Color.FromArgb(120, 255, 255, 255);
             Color brightText = Color.FromRgb(0xF0, 0xF0, 0xF0);
@@ -90,25 +97,11 @@ namespace GHelper.WPF.Controls
             // Background track arc
             DrawArc(dc, _cx, _cy, _arcRadius, 225, 270, penWidth, dimTrack);
 
-            // Filled arc — draw sub-segments with interpolated gradient color
-            // Each sub-segment covers ~3° of arc, all starting from gauge angle 225 (Silent)
-            // and progressing toward the selected mode position
+            // Filled arc — solid accent from Silent up to the selected mode dot.
             if (count > 1 && selIdx > 0)
             {
-                double totalFillSweep = 270.0 * selIdx / (count - 1);
-                int subSegments = Math.Max(1, (int)(totalFillSweep / 3));
-                double subSweep = totalFillSweep / subSegments;
-
-                for (int s = 0; s < subSegments; s++)
-                {
-                    double t = (s + 0.5) / subSegments;
-                    Color segColor = GetGradientColor(t, selIdx, count);
-                    // GetAngleForIndex goes from 225° down, so sub-segments go from
-                    // math angle 225 decreasing. In gauge coords, start = 225 - offset.
-                    double gaugeStart = 225 - s * subSweep;
-                    // Draw a small arc segment at this position
-                    DrawArcSegment(dc, _cx, _cy, _arcRadius, gaugeStart, subSweep + 0.5, penWidth, segColor);
-                }
+                double fillSweep = 270.0 * selIdx / (count - 1);
+                DrawArc(dc, _cx, _cy, _arcRadius, 225, fillSweep, penWidth, accent);
             }
             else if (count == 1)
             {
@@ -127,14 +120,13 @@ namespace GHelper.WPF.Controls
                 double rad = angle * Math.PI / 180;
                 var center = new Point(_cx + _arcRadius * Math.Cos(rad), _cy - _arcRadius * Math.Sin(rad));
                 bool selected = (i == selIdx);
-                Color modeColor = GetModeColor(i);
 
                 if (selected)
                 {
                     double thumbR = dotR * 1.3;
-                    dc.DrawEllipse(new SolidColorBrush(Color.FromArgb(50, modeColor.R, modeColor.G, modeColor.B)),
+                    dc.DrawEllipse(new SolidColorBrush(Color.FromArgb(50, accent.R, accent.G, accent.B)),
                         null, center, thumbR * 2, thumbR * 2);
-                    dc.DrawEllipse(new SolidColorBrush(modeColor), null, center, thumbR, thumbR);
+                    dc.DrawEllipse(new SolidColorBrush(accent), null, center, thumbR, thumbR);
                     dc.DrawEllipse(Brushes.White, null, center, thumbR * 0.55, thumbR * 0.55);
                 }
                 else
@@ -149,7 +141,7 @@ namespace GHelper.WPF.Controls
                 double labelRadius = _arcRadius + penWidth * 1.5 + 14;
                 var labelPos = new Point(_cx + labelRadius * Math.Cos(rad), _cy - labelRadius * Math.Sin(rad));
 
-                Color lColor = selected ? modeColor : dimText;
+                Color lColor = selected ? accent : dimText;
                 Typeface face = selected ? labelFaceBold : labelFace;
                 double fontSize = selected ? 11.5 : 10.5;
 
@@ -180,37 +172,13 @@ namespace GHelper.WPF.Controls
             dc.DrawText(subFt, new Point(_cx - subFt.Width / 2, _cy + nameFt.Height * 0.25));
         }
 
-        /// <summary>
-        /// Get interpolated gradient color along the filled arc.
-        /// t is 0..1 within the filled portion, selIdx is the selected mode index.
-        /// </summary>
-        private static Color GetGradientColor(double t, int selIdx, int count)
+        private Color GetModeColor(string label) => label switch
         {
-            if (selIdx == 0) return ModeColors[0];
-
-            // Map t (0..1 of filled arc) to position across mode color stops 0..selIdx
-            double pos = t * selIdx; // e.g., for Turbo(2): 0..2
-            int lo = Math.Clamp((int)pos, 0, ModeColors.Length - 2);
-            int hi = Math.Min(lo + 1, ModeColors.Length - 1);
-            double frac = pos - lo;
-            return Lerp(ModeColors[lo], ModeColors[hi], frac);
-        }
-
-        private static Color GetModeColor(int index)
-        {
-            if (index < 0) return ModeColors[0];
-            if (index >= ModeColors.Length) return ModeColors[^1];
-            return ModeColors[index];
-        }
-
-        private static Color Lerp(Color a, Color b, double t)
-        {
-            t = Math.Clamp(t, 0, 1);
-            return Color.FromRgb(
-                (byte)(a.R + (b.R - a.R) * t),
-                (byte)(a.G + (b.G - a.G) * t),
-                (byte)(a.B + (b.B - a.B) * t));
-        }
+            "Silent" => ThemeService.ColorSilent,
+            "Turbo" => ThemeService.ColorTurbo,
+            "Balanced" => ThemeService.ColorBalanced,
+            _ => AccentColor,
+        };
 
         private static double GetAngleForIndex(int index, int count)
         {
@@ -240,39 +208,6 @@ namespace GHelper.WPF.Controls
             var endPt = new Point(cx + radius * Math.Cos(endRad), cy + radius * Math.Sin(endRad));
 
             bool isLargeArc = sweepAngleDeg > 180;
-
-            var geo = new StreamGeometry();
-            using (var ctx = geo.Open())
-            {
-                ctx.BeginFigure(startPt, false, false);
-                ctx.ArcTo(endPt, new Size(radius, radius), 0, isLargeArc, SweepDirection.Clockwise, true, false);
-            }
-            geo.Freeze();
-
-            var pen = new Pen(new SolidColorBrush(color), thickness)
-            {
-                StartLineCap = PenLineCap.Round,
-                EndLineCap = PenLineCap.Round
-            };
-            dc.DrawGeometry(null, pen, geo);
-        }
-
-        /// <summary>
-        /// Draw a fill sub-segment. mathStartAngle is in math coords (225=bottom-left),
-        /// sweeps CW (decreasing math angle) by sweepDeg degrees.
-        /// </summary>
-        private static void DrawArcSegment(DrawingContext dc, double cx, double cy, double radius,
-            double mathStartAngle, double sweepDeg, double thickness, Color color)
-        {
-            double mathEnd = mathStartAngle - sweepDeg;
-
-            double startRad = -mathStartAngle * Math.PI / 180;
-            double endRad = -mathEnd * Math.PI / 180;
-
-            var startPt = new Point(cx + radius * Math.Cos(startRad), cy + radius * Math.Sin(startRad));
-            var endPt = new Point(cx + radius * Math.Cos(endRad), cy + radius * Math.Sin(endRad));
-
-            bool isLargeArc = sweepDeg > 180;
 
             var geo = new StreamGeometry();
             using (var ctx = geo.Open())

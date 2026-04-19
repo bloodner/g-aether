@@ -55,6 +55,17 @@ namespace GHelper.WPF.Services
 
             ["charge_limit"] = new("Battery Charge Limit",
                 "Limits the maximum battery charge to extend long-term battery health. Lithium batteries degrade faster when kept at 100%. Set to 80% for daily use, or 100% only when you need full capacity for travel."),
+
+            ["battery_health"] = new("Battery Health",
+                "The ratio of your battery's current maximum capacity to its original design capacity. A new battery is 100%.\n\n" +
+                "As the battery ages, this percentage drops — each full charge holds slightly less energy than the previous one. Below about 80%, you'll notice battery life per charge is meaningfully shorter than when the laptop was new.\n\n" +
+                "Keeping the charge limit under 100% (see above) is the single biggest thing you can do to slow this decline."),
+
+            ["monitor_telemetry"] = new("Live Telemetry",
+                "Real-time readings straight from the hardware sensors. Values refresh every 2 seconds; sparkline charts show the last ~30 seconds of history so you can spot spikes and trends at a glance."),
+
+            ["live_sensors"] = new("Live Sensors",
+                "Current CPU and GPU temperatures and fan RPM. These reflect the hardware's actual running state — useful for checking that a mode change or fan curve is producing the behavior you expect."),
         };
 
         public static HelpEntry? Get(string key) =>

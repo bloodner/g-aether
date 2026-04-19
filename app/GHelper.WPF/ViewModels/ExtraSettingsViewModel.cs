@@ -4,8 +4,10 @@ using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GHelper.Helpers;
+using GHelper.Mode;
 using GHelper.USB;
 using GHelper.WPF.Services;
+using GHelper.WPF.Views;
 
 namespace GHelper.WPF.ViewModels
 {
@@ -53,6 +55,9 @@ namespace GHelper.WPF.ViewModels
         private bool _stopArmoryCrate;
 
         [ObservableProperty]
+        private double _windowOpacity = 0.92;
+
+        [ObservableProperty]
         private bool _servicesExpanded;
 
         [ObservableProperty]
@@ -91,12 +96,41 @@ namespace GHelper.WPF.ViewModels
         [ObservableProperty]
         private int _optimizeChangeCount;
 
-        private string? _updateDownloadUrl;
-        private string? _updateReleaseUrl;
-        private string? _updateReleaseBody;
-        private string? _updateLatestVersion;
+        [ObservableProperty]
+        private bool _optimizeApplyVisible;
+
+        [ObservableProperty]
+        private string _optimizeApplyButtonText = "Apply Changes";
+
+        [ObservableProperty]
+        private bool _optimizeApplyEnabled = true;
+
+        private UpdateCheckResult? _pendingUpdate;
 
         private bool _ignoreChange;
+
+        public ExtraSettingsViewModel()
+        {
+            // Pick up background-discovered updates, even if discovery happened before
+            // the user opened this panel.
+            if (UpdateNotifier.Latest is { Status: UpdateStatus.UpdateAvailable } cached)
+                ApplyDiscoveredUpdate(cached);
+
+            UpdateNotifier.UpdateDiscovered += OnUpdateDiscovered;
+        }
+
+        private void OnUpdateDiscovered(UpdateCheckResult result)
+        {
+            Application.Current?.Dispatcher.Invoke(() => ApplyDiscoveredUpdate(result));
+        }
+
+        private void ApplyDiscoveredUpdate(UpdateCheckResult result)
+        {
+            _pendingUpdate = result;
+            UpdateAvailable = true;
+            UpdateStatusText = $"Update available: {result.LatestVersion}";
+            UpdateButtonText = $"Install {result.LatestVersion}";
+        }
 
         partial void OnRunOnStartupChanged(bool value)
         {
@@ -178,6 +212,10 @@ namespace GHelper.WPF.ViewModels
         {
             if (_ignoreChange) return;
             AppConfig.Set("bw_icon", value ? 1 : 0);
+            // Force tray icon to repaint with new color mode
+            int perf = Modes.GetCurrent();
+            int gpu = AppConfig.Get("gpu_mode");
+            TrayIconService.Instance?.UpdateIcon(perf, gpu);
         }
 
         partial void OnAdvancedRgbChanged(bool value)
@@ -192,6 +230,41 @@ namespace GHelper.WPF.ViewModels
             if (_ignoreChange) return;
             AppConfig.Set("stop_ac", value ? 1 : 0);
             RefreshAsusServices();
+        }
+
+        partial void OnWindowOpacityChanged(double value)
+        {
+            if (_ignoreChange) return;
+            // Clamp + persist (stored as 0–100 for readability in config)
+            double clamped = Math.Clamp(value, 0.60, 1.00);
+            AppConfig.Set("window_opacity", (int)(clamped * 100));
+            ApplyWindowOpacity(clamped);
+        }
+
+        private static void ApplyWindowOpacity(double opacity)
+        {
+            Application.Current?.Dispatcher.Invoke(() =>
+            {
+                try
+                {
+                    var app = Application.Current;
+                    if (app == null) return;
+
+                    byte alpha = (byte)Math.Clamp((int)(opacity * 255), 0x60, 0xFF);
+                    // Neutral near-OLED black — matches WindowBackgroundBrush in Theme.xaml.
+                    // If you change the color there, change it here too.
+                    var color = System.Windows.Media.Color.FromArgb(alpha, 0x08, 0x08, 0x08);
+
+                    // Replace the whole brush — XAML resources may be frozen, so we can't
+                    // mutate .Color in place. Replacing the dictionary entry forces
+                    // DynamicResource subscribers to re-resolve.
+                    app.Resources["WindowBackgroundBrush"] = new System.Windows.Media.SolidColorBrush(color);
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine("Window opacity apply error: " + ex.Message);
+                }
+            });
         }
 
         [RelayCommand]
@@ -251,10 +324,10 @@ namespace GHelper.WPF.ViewModels
         [RelayCommand]
         private async Task CheckForUpdates()
         {
-            // If an update is already known, show the changelog dialog
-            if (UpdateAvailable && !string.IsNullOrEmpty(_updateReleaseUrl))
+            // Known update (background or previous click): go straight to the dialog.
+            if (_pendingUpdate != null)
             {
-                ShowPendingUpdateDialog();
+                ShowPendingUpdateDialog(_pendingUpdate);
                 return;
             }
 
@@ -263,6 +336,7 @@ namespace GHelper.WPF.ViewModels
             UpdateStatusText = "";
 
             var result = await UpdateService.CheckAsync();
+            UpdateNotifier.MarkChecked();
 
             switch (result.Status)
             {
@@ -273,14 +347,9 @@ namespace GHelper.WPF.ViewModels
                     break;
 
                 case UpdateStatus.UpdateAvailable:
-                    UpdateStatusText = $"Update available: {result.LatestVersion}";
-                    UpdateButtonText = $"View {result.LatestVersion}";
-                    UpdateAvailable = true;
-                    _updateDownloadUrl = result.DownloadUrl;
-                    _updateReleaseUrl = result.ReleaseUrl;
-                    _updateReleaseBody = result.ReleaseBody;
-                    _updateLatestVersion = result.LatestVersion;
-                    ToastService.Show($"G-Aether {result.LatestVersion} available", ToastType.Info);
+                    // User asked, so we surface immediately — ignore any "skipped" preference.
+                    ApplyDiscoveredUpdate(result);
+                    ShowPendingUpdateDialog(result);
                     break;
 
                 case UpdateStatus.CheckFailed:
@@ -302,54 +371,26 @@ namespace GHelper.WPF.ViewModels
             });
         }
 
-        private void ShowPendingUpdateDialog()
+        private void ShowPendingUpdateDialog(UpdateCheckResult update)
         {
             Application.Current?.Dispatcher.Invoke(() =>
             {
-                Views.ChangelogWindow.ShowPendingUpdate(
-                    Application.Current?.MainWindow,
-                    _updateLatestVersion ?? "new version",
-                    _updateReleaseBody ?? "No release notes available.",
-                    _updateReleaseUrl ?? "");
+                var outcome = Views.ChangelogWindow.ShowPendingUpdate(Application.Current?.MainWindow, update);
+                if (outcome == UpdateDialogOutcome.Skipped)
+                {
+                    UpdateNotifier.SetSkippedVersion(update.LatestVersion);
+                    _pendingUpdate = null;
+                    UpdateAvailable = false;
+                    UpdateStatusText = $"Skipped {update.LatestVersion}";
+                    UpdateButtonText = "Check for Updates";
+                }
             });
         }
 
         [RelayCommand]
         private async Task OptimizeForMe()
         {
-            // Second click: apply recommendations
-            if (OptimizeResultVisible && OptimizeChangeCount > 0)
-            {
-                OptimizeButtonEnabled = false;
-                OptimizeButtonText = "Applying...";
-
-                await Task.Run(() =>
-                {
-                    foreach (var rec in OptimizeRecommendations.Where(r => r.IsChange))
-                    {
-                        try
-                        {
-                            rec.Apply();
-                            Logger.WriteLine($"AutoConfig applied: {rec.SettingName} → {rec.RecommendedValue}");
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.WriteLine($"AutoConfig failed: {rec.SettingName} — {ex.Message}");
-                        }
-                    }
-                });
-
-                OptimizeButtonText = "Done!";
-                ToastService.Show($"Settings optimized: {OptimizeProfileName}", ToastType.Success);
-
-                await Task.Delay(2000);
-                OptimizeButtonText = "Optimize for Me";
-                OptimizeButtonEnabled = true;
-                OptimizeResultVisible = false;
-                return;
-            }
-
-            // First click: analyze
+            // Always just runs analysis — apply is a separate action inside the card
             OptimizeButtonEnabled = false;
             OptimizeButtonText = "Analyzing...";
             OptimizeResultVisible = false;
@@ -364,17 +405,62 @@ namespace GHelper.WPF.ViewModels
 
             if (result.ChangeCount > 0)
             {
-                OptimizeButtonText = $"Apply {result.ChangeCount} Change{(result.ChangeCount == 1 ? "" : "s")}";
-                OptimizeButtonEnabled = true;
+                OptimizeButtonText = "Re-analyze";
+                OptimizeApplyButtonText = $"Apply {result.ChangeCount} Change{(result.ChangeCount == 1 ? "" : "s")}";
+                OptimizeApplyVisible = true;
             }
             else
             {
-                OptimizeButtonText = "Already Optimal";
-                await Task.Delay(3000);
-                OptimizeButtonText = "Optimize for Me";
-                OptimizeButtonEnabled = true;
-                OptimizeResultVisible = false;
+                OptimizeButtonText = "Re-analyze";
+                OptimizeApplyButtonText = "Already Optimal";
+                OptimizeApplyVisible = false;
             }
+
+            OptimizeButtonEnabled = true;
+        }
+
+        [RelayCommand]
+        private async Task ApplyOptimize()
+        {
+            if (OptimizeChangeCount <= 0) return;
+
+            OptimizeApplyEnabled = false;
+            OptimizeApplyButtonText = "Applying...";
+
+            await Task.Run(() =>
+            {
+                foreach (var rec in OptimizeRecommendations.Where(r => r.IsChange))
+                {
+                    try
+                    {
+                        rec.Apply();
+                        Logger.WriteLine($"AutoConfig applied: {rec.SettingName} → {rec.RecommendedValue}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.WriteLine($"AutoConfig failed: {rec.SettingName} — {ex.Message}");
+                    }
+                }
+            });
+
+            ToastService.Show($"{OptimizeProfileName} preset applied", ToastType.Success);
+
+            OptimizeApplyButtonText = "Applied!";
+            await Task.Delay(1500);
+
+            // Reset card
+            OptimizeResultVisible = false;
+            OptimizeApplyVisible = false;
+            OptimizeApplyEnabled = true;
+            OptimizeButtonText = "Optimize for Me";
+        }
+
+        [RelayCommand]
+        private void DismissOptimize()
+        {
+            OptimizeResultVisible = false;
+            OptimizeApplyVisible = false;
+            OptimizeButtonText = "Optimize for Me";
         }
 
         private static void OpenUrl(string url)
@@ -403,6 +489,11 @@ namespace GHelper.WPF.ViewModels
                 BwTrayIcon = AppConfig.Is("bw_icon");
                 AdvancedRgb = AppConfig.Is("advanced_rgb");
                 StopArmoryCrate = AppConfig.IsStopAC();
+
+                int savedOpacity = AppConfig.Get("window_opacity", 92);
+                if (savedOpacity < 60 || savedOpacity > 100) savedOpacity = 92;
+                WindowOpacity = savedOpacity / 100.0;
+                ApplyWindowOpacity(WindowOpacity);
             }
             finally
             {

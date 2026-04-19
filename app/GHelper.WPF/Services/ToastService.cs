@@ -408,14 +408,14 @@ namespace GHelper.WPF.Services
         /// </summary>
         public static void ShowPerformanceMode(int mode, string modeName)
         {
-            // ACPI base: 0=Balanced, 1=Turbo, 2=Silent
-            // Colors synced with PerformanceModeArc and TrayIconService
+            // ACPI base: 0=Balanced, 1=Turbo, 2=Silent. Colors come from ThemeService
+            // so the toast icon matches what the tray and status bar are showing.
             var (icon, color) = mode switch
             {
-                0 => ("\uE9E9", Color.FromRgb(0x60, 0xCD, 0xFF)),   // Speed gauge, Balanced blue
-                1 => ("\uE945", Color.FromRgb(0xFF, 0x6B, 0x35)),   // Lightning bolt, Turbo orange
-                2 => ("\uE8BE", Color.FromRgb(0xA7, 0x8B, 0xFA)),   // Leaf, Silent purple
-                _ => ("\uE945", Color.FromRgb(0x60, 0xCD, 0xFF)),   // Bolt fallback, accent blue
+                0 => ("\uE9E9", ThemeService.ColorBalanced),
+                1 => ("\uE945", ThemeService.ColorTurbo),
+                2 => ("\uE8BE", ThemeService.ColorSilent),
+                _ => ("\uE945", ThemeService.ColorBalanced),
             };
 
             ShowOsdOnly(modeName, icon, color);

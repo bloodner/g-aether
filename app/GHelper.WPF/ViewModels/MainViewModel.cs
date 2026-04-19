@@ -56,11 +56,10 @@ namespace GHelper.WPF.ViewModels
         // Header accent hairline — reflects overall system health
         [ObservableProperty] private Brush _headerAccentBrush = new SolidColorBrush(Color.FromRgb(0x4C, 0xC9, 0x5E));
 
-        private static readonly Brush CyanBrush = new SolidColorBrush(Color.FromRgb(0x60, 0xCD, 0xFF));
-        private static readonly Brush PurpleBrush = new SolidColorBrush(Color.FromRgb(0xA7, 0x8B, 0xFA));
-        private static readonly Brush OrangeBrush = new SolidColorBrush(Color.FromRgb(0xFF, 0x6B, 0x35));
-        private static readonly Brush GreenBrush = new SolidColorBrush(Color.FromRgb(0x4C, 0xC9, 0x5E));
-        private static readonly Brush GpuPurpleBrush = new SolidColorBrush(Color.FromRgb(0xAB, 0x7C, 0xFF));
+        // Mode-color brushes all source from ThemeService so the palette is defined
+        // in one place. Recreating on each Update*Badge() call is cheap and lets
+        // Balanced/Standard track the live Windows accent.
+        private static Brush ModeBrush(Color c) => new SolidColorBrush(c);
 
         private readonly DispatcherTimer _sensorTimer;
 
@@ -111,7 +110,8 @@ namespace GHelper.WPF.ViewModels
             Visual.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(Visual.SelectedFreqIndex) ||
-                    e.PropertyName == nameof(Visual.FrequencyLabels))
+                    e.PropertyName == nameof(Visual.FrequencyLabels) ||
+                    e.PropertyName == nameof(Visual.IsAutoFreqMode))
                     UpdateDisplayBadge();
             };
             Extra.PropertyChanged += (s, e) =>
@@ -237,9 +237,9 @@ namespace GHelper.WPF.ViewModels
             PerfBadgeName = name;
             PerfBadgeBrush = name switch
             {
-                "Silent" => PurpleBrush,
-                "Turbo" => OrangeBrush,
-                _ => CyanBrush,
+                "Silent" => ModeBrush(ThemeService.ColorSilent),
+                "Turbo" => ModeBrush(ThemeService.ColorTurbo),
+                _ => ModeBrush(ThemeService.ColorBalanced),
             };
             PerfBadgeIsWarning = name == "Turbo";
             UpdateHeaderAccent();
@@ -255,10 +255,10 @@ namespace GHelper.WPF.ViewModels
             GpuBadgeName = name;
             GpuBadgeBrush = name switch
             {
-                "Eco" => GreenBrush,
-                "Ultimate" => OrangeBrush,
-                "Optimized" => GpuPurpleBrush,
-                _ => CyanBrush,
+                "Eco" => ModeBrush(ThemeService.ColorEco),
+                "Ultimate" => ModeBrush(ThemeService.ColorUltimate),
+                "Optimized" => ModeBrush(ThemeService.ColorOptimized),
+                _ => ModeBrush(ThemeService.ColorStandard),
             };
             GpuBadgeIsWarning = name == "Ultimate";
             UpdateHeaderAccent();
@@ -276,7 +276,11 @@ namespace GHelper.WPF.ViewModels
             {
                 DisplayBadgeName = labels[idx];
             }
-            DisplayBadgeBrush = CyanBrush;
+            // Auto refresh rate means "system decides" — same semantic as GPU Optimized,
+            // so it uses the same magenta. Any fixed rate uses the plain accent.
+            DisplayBadgeBrush = Visual.IsAutoFreqMode
+                ? ModeBrush(ThemeService.ColorOptimized)
+                : ModeBrush(ThemeService.AccentColor);
         }
 
         private void UpdateServicesBadge()
@@ -285,13 +289,13 @@ namespace GHelper.WPF.ViewModels
             if (count == 0)
             {
                 ServicesBadgeName = "Healthy";
-                ServicesBadgeBrush = GreenBrush;
+                ServicesBadgeBrush = ModeBrush(ThemeService.ColorEco);
                 ServicesBadgeIsWarning = false;
             }
             else
             {
                 ServicesBadgeName = count == 1 ? "1 Running" : $"{count} Running";
-                ServicesBadgeBrush = OrangeBrush;
+                ServicesBadgeBrush = ModeBrush(ThemeService.ColorTurbo);
                 ServicesBadgeIsWarning = true;
             }
             UpdateHeaderAccent();
@@ -301,7 +305,7 @@ namespace GHelper.WPF.ViewModels
         {
             // Orange if any badge is in a warning state; else green.
             bool anyWarning = ServicesBadgeIsWarning || PerfBadgeIsWarning || GpuBadgeIsWarning;
-            HeaderAccentBrush = anyWarning ? OrangeBrush : GreenBrush;
+            HeaderAccentBrush = anyWarning ? ModeBrush(ThemeService.ColorTurbo) : ModeBrush(ThemeService.ColorEco);
         }
     }
 }

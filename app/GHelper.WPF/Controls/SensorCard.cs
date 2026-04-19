@@ -59,7 +59,7 @@ namespace GHelper.WPF.Controls
         protected override Size MeasureOverride(Size availableSize)
         {
             double w = double.IsInfinity(availableSize.Width) ? 200 : availableSize.Width;
-            return new Size(w, 88);
+            return new Size(w, 92);
         }
 
         protected override void OnRender(DrawingContext dc)
@@ -70,65 +70,97 @@ namespace GHelper.WPF.Controls
             double h = ActualHeight;
             double dpi = VisualTreeHelper.GetDpi(this).PixelsPerDip;
             double cornerRadius = 10;
-            double padding = 12;
+            double padding = 14;
 
-            // Card background
-            var bgBrush = new SolidColorBrush(Color.FromArgb(25, 255, 255, 255));
-            var borderPen = new Pen(new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)), 1);
-            var cardRect = new Rect(0, 0, w, h);
-            var cardGeo = CreateRoundedRect(cardRect, cornerRadius);
-            dc.DrawGeometry(bgBrush, borderPen, cardGeo);
-
-            // Temperature-based accent color
             Color accentColor = GetTempColor(Temperature);
             var accentBrush = new SolidColorBrush(accentColor);
+            accentBrush.Freeze();
 
-            // Top accent bar (2px)
-            var accentBarRect = new Rect(1, 1, w - 2, 2.5);
-            var accentBarGeo = CreateTopRoundedRect(accentBarRect, cornerRadius - 1);
-            dc.DrawGeometry(accentBrush, null, accentBarGeo);
+            var cardRect = new Rect(0, 0, w, h);
+            var cardGeo = CreateRoundedRect(cardRect, cornerRadius);
+
+            // Fill: sits one luminance step above the deep window background — matches
+            // TileStyle so every tiled surface in the app reads with the same hierarchy.
+            var bgBrush = new SolidColorBrush(Color.FromRgb(0x13, 0x14, 0x1B));
+            bgBrush.Freeze();
+            dc.DrawGeometry(bgBrush, null, cardGeo);
+
+            // Soft temperature-colored halo tucked behind the hero value.
+            if (Temperature > 0)
+            {
+                var halo = new RadialGradientBrush
+                {
+                    GradientOrigin = new Point(0.92, 0.08),
+                    Center = new Point(0.92, 0.08),
+                    RadiusX = 0.95,
+                    RadiusY = 1.4
+                };
+                halo.GradientStops.Add(new GradientStop(Color.FromArgb(0x32, accentColor.R, accentColor.G, accentColor.B), 0.0));
+                halo.GradientStops.Add(new GradientStop(Color.FromArgb(0x00, accentColor.R, accentColor.G, accentColor.B), 0.60));
+                halo.Freeze();
+                dc.DrawGeometry(halo, null, cardGeo);
+            }
+
+            // Hairline border for edge definition — matches TileStyle.
+            var borderPen = new Pen(new SolidColorBrush(Color.FromRgb(0x22, 0x25, 0x2E)), 1);
+            dc.DrawGeometry(null, borderPen, cardGeo);
+
+            // Left vertical accent stripe — slim status indicator in the temperature color.
+            var stripeRect = new Rect(0, 12, 3, h - 24);
+            dc.DrawRoundedRectangle(accentBrush, null, stripeRect, 1.5, 1.5);
 
             var uiTypeface = new Typeface(new FontFamily("Segoe UI Variable"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-            var uiBoldTypeface = new Typeface(new FontFamily("Segoe UI Variable"), FontStyles.Normal, FontWeights.SemiBold, FontStretches.Normal);
+            var uiMedium = new Typeface(new FontFamily("Segoe UI Variable"), FontStyles.Normal, FontWeights.Medium, FontStretches.Normal);
+            var uiBold = new Typeface(new FontFamily("Segoe UI Variable"), FontStyles.Normal, FontWeights.SemiBold, FontStretches.Normal);
             var iconTypeface = new Typeface(new FontFamily("Segoe MDL2 Assets"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-            var dimBrush = new SolidColorBrush(Color.FromArgb(140, 255, 255, 255));
 
-            double y = padding + 2; // below accent bar
+            var dimBrush = new SolidColorBrush(Color.FromArgb(0x7A, 0xFF, 0xFF, 0xFF));
+            var midBrush = new SolidColorBrush(Color.FromArgb(0xC8, 0xFF, 0xFF, 0xFF));
+            var white = new SolidColorBrush(Color.FromArgb(0xF0, 0xFF, 0xFF, 0xFF));
 
-            // Row 1: Icon + Label + Temperature (hero)
+            double leftX = padding + 4; // clear the stripe
+            double top = padding - 2;
+
+            // Row 1: icon + uppercase label (micro).
             var iconFt = new FormattedText(IconGlyph, CultureInfo.CurrentUICulture,
-                System.Windows.FlowDirection.LeftToRight, iconTypeface, 13, dimBrush, dpi);
-            dc.DrawText(iconFt, new Point(padding, y + 1));
+                System.Windows.FlowDirection.LeftToRight, iconTypeface, 11, dimBrush, dpi);
+            dc.DrawText(iconFt, new Point(leftX, top + 2));
 
-            var labelFt = new FormattedText(Label, CultureInfo.CurrentUICulture,
-                System.Windows.FlowDirection.LeftToRight, uiBoldTypeface, 11.5, dimBrush, dpi);
-            dc.DrawText(labelFt, new Point(padding + iconFt.Width + 5, y + 1));
+            var labelFt = new FormattedText(Label.ToUpperInvariant(), CultureInfo.CurrentUICulture,
+                System.Windows.FlowDirection.LeftToRight, uiMedium, 10, dimBrush, dpi);
+            dc.DrawText(labelFt, new Point(leftX + iconFt.Width + 6, top + 3));
 
-            // Temperature - right-aligned, hero size, colored
-            string tempStr = Temperature > 0 ? $"{Temperature:0}°C" : "--";
-            var tempFt = new FormattedText(tempStr, CultureInfo.CurrentUICulture,
-                System.Windows.FlowDirection.LeftToRight, uiBoldTypeface, 20, accentBrush, dpi);
-            dc.DrawText(tempFt, new Point(w - padding - tempFt.Width, y - 3));
+            // Hero temperature, right-aligned, with a smaller °C unit beside it.
+            string tempNum = Temperature > 0 ? $"{Temperature:0}" : "--";
+            var tempFt = new FormattedText(tempNum, CultureInfo.CurrentUICulture,
+                System.Windows.FlowDirection.LeftToRight, uiBold, 28, accentBrush, dpi);
+            var unitFt = new FormattedText("°C", CultureInfo.CurrentUICulture,
+                System.Windows.FlowDirection.LeftToRight, uiMedium, 12, accentBrush, dpi);
+            double tempRight = w - padding;
+            dc.DrawText(unitFt, new Point(tempRight - unitFt.Width, top + 6));
+            dc.DrawText(tempFt, new Point(tempRight - unitFt.Width - tempFt.Width - 2, top - 6));
 
-            // Row 2: Fan speed (current)
-            y += 28;
+            // Row 2: fan speed (current) — main readout.
+            double fanY = h - padding - 18;
             var fanIconFt = new FormattedText("\uE9CA", CultureInfo.CurrentUICulture,
-                System.Windows.FlowDirection.LeftToRight, iconTypeface, 11, accentBrush, dpi);
-            dc.DrawText(fanIconFt, new Point(padding, y + 2));
+                System.Windows.FlowDirection.LeftToRight, iconTypeface, 11, midBrush, dpi);
+            dc.DrawText(fanIconFt, new Point(leftX, fanY + 3));
 
             var fanFt = new FormattedText(FanSpeed, CultureInfo.CurrentUICulture,
-                System.Windows.FlowDirection.LeftToRight, uiBoldTypeface, 13,
-                new SolidColorBrush(Colors.White), dpi);
-            dc.DrawText(fanFt, new Point(padding + fanIconFt.Width + 5, y));
+                System.Windows.FlowDirection.LeftToRight, uiBold, 14, white, dpi);
+            dc.DrawText(fanFt, new Point(leftX + fanIconFt.Width + 6, fanY));
 
-            // Row 3: Target/max speed
-            y += 22;
-            string targetStr = !string.IsNullOrEmpty(TargetSpeed) ? TargetSpeed : "";
-            if (!string.IsNullOrEmpty(targetStr))
+            // Row 3: target (only when populated).
+            if (!string.IsNullOrEmpty(TargetSpeed))
             {
-                var targetFt = new FormattedText(targetStr, CultureInfo.CurrentUICulture,
-                    System.Windows.FlowDirection.LeftToRight, uiTypeface, 10, dimBrush, dpi);
-                dc.DrawText(targetFt, new Point(padding, y));
+                var targetLabelFt = new FormattedText("target", CultureInfo.CurrentUICulture,
+                    System.Windows.FlowDirection.LeftToRight, uiTypeface, 9.5,
+                    new SolidColorBrush(Color.FromArgb(0x64, 0xFF, 0xFF, 0xFF)), dpi);
+                var targetFt = new FormattedText(TargetSpeed, CultureInfo.CurrentUICulture,
+                    System.Windows.FlowDirection.LeftToRight, uiMedium, 10, dimBrush, dpi);
+                double tY = fanY + 20;
+                dc.DrawText(targetLabelFt, new Point(leftX, tY));
+                dc.DrawText(targetFt, new Point(leftX + targetLabelFt.Width + 4, tY));
             }
         }
 
@@ -170,24 +202,6 @@ namespace GHelper.WPF.Controls
                 ctx.ArcTo(new Point(rect.Right - r, rect.Bottom), new Size(r, r), 0, false, SweepDirection.Clockwise, true, false);
                 ctx.LineTo(new Point(rect.Left + r, rect.Bottom), true, false);
                 ctx.ArcTo(new Point(rect.Left, rect.Bottom - r), new Size(r, r), 0, false, SweepDirection.Clockwise, true, false);
-                ctx.LineTo(new Point(rect.Left, rect.Top + r), true, false);
-                ctx.ArcTo(new Point(rect.Left + r, rect.Top), new Size(r, r), 0, false, SweepDirection.Clockwise, true, false);
-            }
-            geo.Freeze();
-            return geo;
-        }
-
-        private static Geometry CreateTopRoundedRect(Rect rect, double r)
-        {
-            var geo = new StreamGeometry();
-            using (var ctx = geo.Open())
-            {
-                r = Math.Min(r, Math.Min(rect.Height * 2, rect.Width) / 2);
-                ctx.BeginFigure(new Point(rect.Left + r, rect.Top), true, true);
-                ctx.LineTo(new Point(rect.Right - r, rect.Top), true, false);
-                ctx.ArcTo(new Point(rect.Right, rect.Top + r), new Size(r, r), 0, false, SweepDirection.Clockwise, true, false);
-                ctx.LineTo(new Point(rect.Right, rect.Bottom), true, false);
-                ctx.LineTo(new Point(rect.Left, rect.Bottom), true, false);
                 ctx.LineTo(new Point(rect.Left, rect.Top + r), true, false);
                 ctx.ArcTo(new Point(rect.Left + r, rect.Top), new Size(r, r), 0, false, SweepDirection.Clockwise, true, false);
             }

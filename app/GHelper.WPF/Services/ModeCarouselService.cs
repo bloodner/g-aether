@@ -138,6 +138,11 @@ namespace GHelper.WPF.Services
                 RenderTransformOrigin = new Point(0.5, 0.5),
             };
 
+            // Re-center after every render pass — catches the first-show case where
+            // ActualWidth/Height aren't yet accurate when Show() returns.
+            _window.ContentRendered += (_, _) => PositionWindow();
+            _window.SizeChanged += (_, _) => PositionWindow();
+
             _windowBorder = new Border
             {
                 Background = new SolidColorBrush(Color.FromArgb(210, 16, 16, 26)),
@@ -435,10 +440,10 @@ namespace GHelper.WPF.Services
                 int baseMode = GHelper.Mode.Modes.GetBase(mode);
                 var (icon, color) = baseMode switch
                 {
-                    AsusACPI.PerformanceSilent   => ("\uE8BE", Color.FromRgb(0xA7, 0x8B, 0xFA)),
-                    AsusACPI.PerformanceBalanced  => ("\uE9E9", Color.FromRgb(0x60, 0xCD, 0xFF)),
-                    AsusACPI.PerformanceTurbo     => ("\uE945", Color.FromRgb(0xFF, 0x6B, 0x35)),
-                    _ => ("\uE9E9", Color.FromRgb(0x60, 0xCD, 0xFF)),
+                    AsusACPI.PerformanceSilent   => ("\uE8BE", ThemeService.ColorSilent),
+                    AsusACPI.PerformanceBalanced  => ("\uE9E9", ThemeService.ColorBalanced),
+                    AsusACPI.PerformanceTurbo     => ("\uE945", ThemeService.ColorTurbo),
+                    _ => ("\uE9E9", ThemeService.ColorBalanced),
                 };
 
                 items.Add(new ModeCarouselItem
@@ -461,9 +466,9 @@ namespace GHelper.WPF.Services
 
             var items = new List<ModeCarouselItem>
             {
-                new() { Label = "Eco",       Icon = "\uE8BE", AccentColor = Color.FromRgb(0x4C, 0xC9, 0x5E) },
-                new() { Label = "Standard",  Icon = "\uE9E9", AccentColor = Color.FromRgb(0x60, 0xCD, 0xFF) },
-                new() { Label = "Optimized", Icon = "\uEA8A", AccentColor = Color.FromRgb(0x60, 0xCD, 0xFF) },
+                new() { Label = "Eco",       Icon = "\uE8BE", AccentColor = ThemeService.ColorEco },
+                new() { Label = "Standard",  Icon = "\uE9E9", AccentColor = ThemeService.ColorStandard },
+                new() { Label = "Optimized", Icon = "\uEA8A", AccentColor = ThemeService.ColorOptimized },
             };
 
             // Determine selected index
@@ -485,7 +490,7 @@ namespace GHelper.WPF.Services
         public static void ShowAuraModes(string[] labels, string[] icons, int selectedIndex)
         {
             var items = new List<ModeCarouselItem>();
-            var accent = Color.FromRgb(0x60, 0xCD, 0xFF); // default accent blue
+            var accent = ThemeService.AccentColor;
 
             for (int i = 0; i < labels.Length; i++)
             {

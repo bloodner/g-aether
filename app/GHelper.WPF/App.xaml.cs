@@ -15,6 +15,14 @@ namespace GHelper.WPF
         {
             base.OnStartup(e);
 
+            // Install-over handshake runs before any other init. If we were launched to
+            // replace the old exe, copy ourselves over the target and relaunch from there.
+            if (UpdaterService.TryPerformInstallOver(e.Args))
+            {
+                Shutdown();
+                return;
+            }
+
             DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
             AppDomain.CurrentDomain.ProcessExit += OnProcessExit;

@@ -86,7 +86,7 @@ namespace GHelper.WPF.Services
             {
                 UsageProfile.LightMobile => "Battery Saver",
                 UsageProfile.HeavyMobile => "Mobile Performance",
-                UsageProfile.DesktopCasual => "Quiet Desktop",
+                UsageProfile.DesktopCasual => "Productivity",
                 UsageProfile.DesktopGaming => "Maximum Performance",
                 UsageProfile.Mixed => "Balanced",
                 _ => "Balanced"

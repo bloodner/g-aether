@@ -53,15 +53,9 @@ namespace GHelper.WPF.Controls
 
             double dpiScale = VisualTreeHelper.GetDpi(this).PixelsPerDip;
 
-            // Mode-specific accent colors
-            Color accent;
-            switch (ActiveMode)
-            {
-                case 0: accent = Color.FromRgb(0x4C, 0xC9, 0x5E); break;  // Eco: green
-                case 1: accent = AccentColor; break;                        // Standard: system accent
-                case 2: accent = Color.FromRgb(0xFF, 0x6B, 0x35); break;  // Ultimate: orange
-                default: accent = Color.FromRgb(0xAB, 0x7C, 0xFF); break; // Optimized: purple
-            }
+            // Always draw with the system accent — active vs idle is conveyed by
+            // segment brightness (dim grey vs accent), not by recoloring every mode.
+            Color accent = AccentColor;
             Color dimLine = Color.FromArgb(35, 255, 255, 255);
             Color dimText = Color.FromArgb(90, 200, 200, 200);
             Color activeText = Color.FromRgb(240, 240, 240);

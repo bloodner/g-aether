@@ -46,7 +46,16 @@
                     <!-- Fn+Numpad Enter -->
                     <TextBlock Text="Fn + Numpad Enter" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
                     <ComboBox ItemsSource="{Binding Actions}"
-                              SelectedIndex="{Binding FnEnterIndex, Mode=TwoWay}" />
+                              SelectedIndex="{Binding FnEnterIndex, Mode=TwoWay}"
+                              Margin="0,0,0,12" />
+
+                    <!-- Copilot key -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                        <TextBlock Text="Copilot Key" Style="{StaticResource BodyTextStyle}" />
+                        <TextBlock Text="  (Win+Shift+F23)" Style="{StaticResource DimTextStyle}" FontSize="10" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <ComboBox ItemsSource="{Binding Actions}"
+                              SelectedIndex="{Binding CopilotKeyIndex, Mode=TwoWay}" />
                 </StackPanel>
             </Border>
         </StackPanel>

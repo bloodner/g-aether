@@ -1,6 +1,7 @@
 using System.Drawing;
 using System.Windows;
 using GHelper.WPF.ViewModels;
+using GHelper.WPF.Views;
 
 namespace GHelper.WPF.Services
 {
@@ -12,113 +13,70 @@ namespace GHelper.WPF.Services
         public static TrayIconService? Instance { get; private set; }
 
         private System.Windows.Forms.NotifyIcon? _trayIcon;
-        private System.Windows.Forms.ContextMenuStrip? _contextMenu;
-
-        // Menu items that need checked-state updates
-        private System.Windows.Forms.ToolStripMenuItem? _menuSilent;
-        private System.Windows.Forms.ToolStripMenuItem? _menuBalanced;
-        private System.Windows.Forms.ToolStripMenuItem? _menuTurbo;
-        private System.Windows.Forms.ToolStripMenuItem? _menuEco;
-        private System.Windows.Forms.ToolStripMenuItem? _menuStandard;
-        private System.Windows.Forms.ToolStripMenuItem? _menuOptimized;
+        private TrayMenuWindow? _menuWindow;
 
         public void Initialize()
         {
             Instance = this;
-            _contextMenu = new System.Windows.Forms.ContextMenuStrip();
-            _contextMenu.ShowCheckMargin = false;
-            _contextMenu.ShowImageMargin = false;
-
-            var itemFont = new Font("Segoe UI Variable", 9.5f);
-            var headerFont = new Font("Segoe UI Variable", 8f, System.Drawing.FontStyle.Bold);
-
-            // Performance modes (ACPI: 0=Balanced, 1=Turbo, 2=Silent)
-            var perfHeader = new System.Windows.Forms.ToolStripLabel("PERFORMANCE") { Font = headerFont, ForeColor = System.Drawing.Color.FromArgb(110, 110, 120) };
-            perfHeader.Padding = new System.Windows.Forms.Padding(8, 6, 0, 2);
-            _contextMenu.Items.Add(perfHeader);
-
-            _menuSilent = new System.Windows.Forms.ToolStripMenuItem("  Silent", null, (s, e) => SetPerformanceMode(2)) { Font = itemFont };
-            _menuBalanced = new System.Windows.Forms.ToolStripMenuItem("  Balanced", null, (s, e) => SetPerformanceMode(0)) { Font = itemFont };
-            _menuTurbo = new System.Windows.Forms.ToolStripMenuItem("  Turbo", null, (s, e) => SetPerformanceMode(1)) { Font = itemFont };
-            _contextMenu.Items.Add(_menuSilent);
-            _contextMenu.Items.Add(_menuBalanced);
-            _contextMenu.Items.Add(_menuTurbo);
-
-            _contextMenu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
-
-            // GPU modes
-            var gpuHeader = new System.Windows.Forms.ToolStripLabel("GPU MODE") { Font = headerFont, ForeColor = System.Drawing.Color.FromArgb(110, 110, 120) };
-            gpuHeader.Padding = new System.Windows.Forms.Padding(8, 4, 0, 2);
-            _contextMenu.Items.Add(gpuHeader);
-
-            _menuEco = new System.Windows.Forms.ToolStripMenuItem("  Eco", null, (s, e) => SetGpuMode(AsusACPI.GPUModeEco)) { Font = itemFont };
-            _menuStandard = new System.Windows.Forms.ToolStripMenuItem("  Standard", null, (s, e) => SetGpuMode(AsusACPI.GPUModeStandard)) { Font = itemFont };
-            _menuOptimized = new System.Windows.Forms.ToolStripMenuItem("  Optimized", null, (s, e) => SetGpuMode(AsusACPI.GPUModeStandard, auto: true)) { Font = itemFont };
-            _contextMenu.Items.Add(_menuEco);
-            _contextMenu.Items.Add(_menuStandard);
-            _contextMenu.Items.Add(_menuOptimized);
-
-            _contextMenu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
-            var quitItem = new System.Windows.Forms.ToolStripMenuItem("  Quit", null, (s, e) => QuitApplication()) { Font = itemFont };
-            _contextMenu.Items.Add(quitItem);
-
-            // Update checks when menu opens
-            _contextMenu.Opening += (s, e) => RefreshMenuChecks();
-
-            // Style
-            _contextMenu.BackColor = System.Drawing.Color.FromArgb(24, 24, 30);
-            _contextMenu.ForeColor = System.Drawing.Color.White;
-            _contextMenu.Padding = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            _contextMenu.Renderer = new DarkMenuRenderer();
 
             _trayIcon = new System.Windows.Forms.NotifyIcon
             {
                 Text = "G-Aether",
                 Icon = CreateDefaultIcon(),
                 Visible = true,
-                ContextMenuStrip = _contextMenu
+                // No ContextMenuStrip — we handle right-click ourselves via MouseUp
             };
 
-            _trayIcon.MouseClick += OnTrayClick;
+            _trayIcon.MouseUp += OnTrayMouseUp;
         }
 
-        private void RefreshMenuChecks()
-        {
-            int perfMode = AppConfig.Get("performance_mode");
-            int gpuMode = AppConfig.Get("gpu_mode");
-            bool gpuAuto = AppConfig.Is("gpu_auto");
-
-            // Performance: ACPI 0=Balanced, 1=Turbo, 2=Silent
-            if (_menuSilent != null) _menuSilent.Checked = perfMode == 2;
-            if (_menuBalanced != null) _menuBalanced.Checked = perfMode == 0;
-            if (_menuTurbo != null) _menuTurbo.Checked = perfMode == 1;
-
-            // GPU
-            if (_menuEco != null) _menuEco.Checked = gpuMode == AsusACPI.GPUModeEco;
-            if (_menuStandard != null) _menuStandard.Checked = gpuMode == AsusACPI.GPUModeStandard && !gpuAuto;
-            if (_menuOptimized != null) _menuOptimized.Checked = gpuMode == AsusACPI.GPUModeStandard && gpuAuto;
-        }
-
-        private void OnTrayClick(object? sender, System.Windows.Forms.MouseEventArgs e)
+        private void OnTrayMouseUp(object? sender, System.Windows.Forms.MouseEventArgs e)
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
-                var mainWindow = Application.Current?.MainWindow;
-                if (mainWindow != null)
-                {
-                    if (mainWindow.IsVisible)
-                    {
-                        mainWindow.Hide();
-                    }
-                    else
-                    {
-                        mainWindow.Show();
-                        mainWindow.Activate();
-                        if (mainWindow.WindowState == WindowState.Minimized)
-                            mainWindow.WindowState = WindowState.Normal;
-                    }
-                }
+                ToggleMainWindow();
             }
+            else if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                ShowContextMenu(System.Windows.Forms.Cursor.Position);
+            }
+        }
+
+        private void ToggleMainWindow()
+        {
+            var mainWindow = Application.Current?.MainWindow;
+            if (mainWindow == null) return;
+            if (mainWindow.IsVisible)
+            {
+                mainWindow.Hide();
+            }
+            else
+            {
+                mainWindow.Show();
+                mainWindow.Activate();
+                if (mainWindow.WindowState == WindowState.Minimized)
+                    mainWindow.WindowState = WindowState.Normal;
+            }
+        }
+
+        private void ShowContextMenu(System.Drawing.Point cursorPhysicalPx)
+        {
+            Application.Current?.Dispatcher.Invoke(() =>
+            {
+                if (_menuWindow == null)
+                {
+                    _menuWindow = new TrayMenuWindow();
+                    _menuWindow.PerfSelected += SetPerformanceMode;
+                    _menuWindow.GpuSelected += (mode, auto) => SetGpuMode(mode, auto);
+                    _menuWindow.QuitSelected += QuitApplication;
+                }
+
+                int perfMode = AppConfig.Get("performance_mode");
+                int gpuMode = AppConfig.Get("gpu_mode");
+                bool gpuAuto = AppConfig.Is("gpu_auto");
+                _menuWindow.Rebuild(perfMode, gpuMode, gpuAuto);
+                _menuWindow.OpenAt(cursorPhysicalPx);
+            });
         }
 
         private void SetPerformanceMode(int mode)
@@ -163,27 +121,40 @@ namespace GHelper.WPF.Services
             });
         }
 
-        // Performance mode colors indexed by ACPI base: 0=Balanced, 1=Turbo, 2=Silent
-        private static readonly System.Drawing.Color[] PerfColors =
-        [
-            System.Drawing.Color.FromArgb(96, 205, 255),    // 0: Balanced - blue
-            System.Drawing.Color.FromArgb(255, 107, 53),   // 1: Turbo - orange
-            System.Drawing.Color.FromArgb(167, 139, 250),  // 2: Silent - purple
-        ];
+        // All tray-icon colors pull from ThemeService so the icon, status bar, toasts,
+        // and tray menu share one palette (Balanced/Standard follow the Windows accent).
+        private static System.Drawing.Color ToDrawing(System.Windows.Media.Color c)
+            => System.Drawing.Color.FromArgb(c.A, c.R, c.G, c.B);
 
-        // GPU mode colors: Eco(green), Standard(blue), Ultimate(orange), Optimized(purple)
-        private static readonly Dictionary<int, System.Drawing.Color> GpuColors = new()
+        // ACPI base: 0=Balanced, 1=Turbo, 2=Silent
+        private static System.Drawing.Color PerfColor(int mode) => mode switch
         {
-            { AsusACPI.GPUModeEco,      System.Drawing.Color.FromArgb(76, 201, 94) },    // Eco: green
-            { AsusACPI.GPUModeStandard, System.Drawing.Color.FromArgb(96, 205, 255) },   // Standard: blue
-            { AsusACPI.GPUModeUltimate, System.Drawing.Color.FromArgb(255, 107, 53) },   // Ultimate: orange
+            1 => ToDrawing(ThemeService.ColorTurbo),
+            2 => ToDrawing(ThemeService.ColorSilent),
+            _ => ToDrawing(ThemeService.ColorBalanced),
+        };
+
+        private static System.Drawing.Color GpuColor(int mode) => mode switch
+        {
+            AsusACPI.GPUModeEco => ToDrawing(ThemeService.ColorEco),
+            AsusACPI.GPUModeUltimate => ToDrawing(ThemeService.ColorUltimate),
+            _ => ToDrawing(ThemeService.ColorStandard),
         };
 
         private int _lastPerfMode = -1;
         private int _lastGpuMode = -1;
         private bool _lastGpuAuto;
+        private bool _lastBw;
 
-        private static readonly System.Drawing.Color OptimizedColor = System.Drawing.Color.FromArgb(171, 124, 255); // purple
+        private static System.Drawing.Color ToGrayscale(System.Drawing.Color c)
+        {
+            // Luminosity formula; shift toward slightly brighter so the icon reads on dark taskbars
+            int luma = (int)(0.2126 * c.R + 0.7152 * c.G + 0.0722 * c.B);
+            int v = Math.Clamp(luma + 60, 0, 255);
+            return System.Drawing.Color.FromArgb(c.A, v, v, v);
+        }
+
+        private static System.Drawing.Color OptimizedColor => ToDrawing(ThemeService.ColorOptimized);
 
         /// <summary>
         /// Update the tray icon to reflect current performance and GPU modes.
@@ -194,24 +165,28 @@ namespace GHelper.WPF.Services
             if (_trayIcon == null) return;
 
             bool isAuto = AppConfig.Is("gpu_auto");
+            bool bw = AppConfig.Is("bw_icon");
 
             // Skip if nothing changed
-            if (perfMode == _lastPerfMode && gpuMode == _lastGpuMode && isAuto == _lastGpuAuto) return;
+            if (perfMode == _lastPerfMode && gpuMode == _lastGpuMode && isAuto == _lastGpuAuto && bw == _lastBw) return;
             _lastPerfMode = perfMode;
             _lastGpuMode = gpuMode;
             _lastGpuAuto = isAuto;
+            _lastBw = bw;
 
-            var perfColor = perfMode >= 0 && perfMode < PerfColors.Length
-                ? PerfColors[perfMode]
-                : PerfColors[0];
+            var perfColor = PerfColor(perfMode);
 
             System.Drawing.Color gpuColor;
             if (isAuto && gpuMode == AsusACPI.GPUModeStandard)
                 gpuColor = OptimizedColor;
-            else if (GpuColors.TryGetValue(gpuMode, out var gc))
-                gpuColor = gc;
             else
-                gpuColor = System.Drawing.Color.FromArgb(96, 205, 255);
+                gpuColor = GpuColor(gpuMode);
+
+            if (bw)
+            {
+                perfColor = ToGrayscale(perfColor);
+                gpuColor = ToGrayscale(gpuColor);
+            }
 
             var newIcon = CreateIcon(perfColor, gpuColor);
             var oldIcon = _trayIcon.Icon;
@@ -230,33 +205,91 @@ namespace GHelper.WPF.Services
             _trayIcon.Text = $"G-Aether — {perfName} / {gpuName}";
         }
 
+        // Outer swoosh + tail accent (colored by perf mode); inner "A" arrowhead (colored by GPU mode).
+        private static readonly Lazy<Bitmap?> _perfMask = new(() => LoadMask("app-mask-perf.png"));
+        private static readonly Lazy<Bitmap?> _gpuMask = new(() => LoadMask("app-mask-gpu.png"));
+
+        private static Bitmap? LoadMask(string name)
+        {
+            try
+            {
+                var uri = new Uri($"pack://application:,,,/Resources/{name}");
+                using var stream = Application.GetResourceStream(uri)?.Stream;
+                if (stream == null) return null;
+                return new Bitmap(stream);
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteLine($"Tray mask load error ({name}): " + ex.Message);
+                return null;
+            }
+        }
+
+        // Recolor every non-transparent pixel to `color`, preserving the alpha channel
+        // so antialiased edges stay smooth. Returns a new Bitmap owned by the caller.
+        private static Bitmap TintMask(Bitmap src, System.Drawing.Color color)
+        {
+            var rect = new Rectangle(0, 0, src.Width, src.Height);
+            var dst = new Bitmap(src.Width, src.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var srcData = src.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var dstData = dst.LockBits(rect, System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            try
+            {
+                int bytes = Math.Abs(srcData.Stride) * src.Height;
+                byte[] buf = new byte[bytes];
+                System.Runtime.InteropServices.Marshal.Copy(srcData.Scan0, buf, 0, bytes);
+                // Format32bppArgb byte order is B, G, R, A. The mask may have premultiplied RGB
+                // from resvg, so write premultiplied (color * a / 255) to match.
+                for (int i = 0; i < bytes; i += 4)
+                {
+                    byte a = buf[i + 3];
+                    if (a == 0) { buf[i] = buf[i + 1] = buf[i + 2] = 0; continue; }
+                    buf[i]     = (byte)(color.B * a / 255);
+                    buf[i + 1] = (byte)(color.G * a / 255);
+                    buf[i + 2] = (byte)(color.R * a / 255);
+                }
+                System.Runtime.InteropServices.Marshal.Copy(buf, 0, dstData.Scan0, bytes);
+            }
+            finally
+            {
+                src.UnlockBits(srcData);
+                dst.UnlockBits(dstData);
+            }
+            return dst;
+        }
+
         private static Icon CreateIcon(System.Drawing.Color perfColor, System.Drawing.Color gpuColor)
         {
             int size = 32;
-            using var bmp = new Bitmap(size, size);
+            using var bmp = new Bitmap(size, size, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             using (var g = Graphics.FromImage(bmp))
             {
                 g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
                 g.Clear(System.Drawing.Color.Transparent);
 
-                int mid = size / 2;
+                var perf = _perfMask.Value;
+                var gpu = _gpuMask.Value;
 
-                // Left half — Performance mode
-                g.SetClip(new Rectangle(0, 0, mid, size));
-                using (var leftBrush = new SolidBrush(perfColor))
-                    g.FillEllipse(leftBrush, 0, 0, size - 1, size - 1);
-
-                // Right half — GPU mode
-                g.SetClip(new Rectangle(mid, 0, size - mid, size));
-                using (var rightBrush = new SolidBrush(gpuColor))
-                    g.FillEllipse(rightBrush, 0, 0, size - 1, size - 1);
-
-                // Subtle divider line when colors differ
-                g.ResetClip();
-                if (perfColor != gpuColor)
+                if (perf != null && gpu != null)
                 {
-                    using var pen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(80, 0, 0, 0), 1f);
-                    g.DrawLine(pen, mid, 3, mid, size - 4);
+                    // Z-order matches the source SVG: outer swoosh behind, inner A in front.
+                    using var tintedPerf = TintMask(perf, perfColor);
+                    using var tintedGpu = TintMask(gpu, gpuColor);
+                    var rect = new Rectangle(0, 0, size, size);
+                    g.DrawImage(tintedPerf, rect);
+                    g.DrawImage(tintedGpu, rect);
+                }
+                else
+                {
+                    // Fallback if resources are missing: original half-circle design
+                    int mid = size / 2;
+                    g.SetClip(new Rectangle(0, 0, mid, size));
+                    using (var l = new SolidBrush(perfColor)) g.FillEllipse(l, 0, 0, size - 1, size - 1);
+                    g.SetClip(new Rectangle(mid, 0, size - mid, size));
+                    using (var r = new SolidBrush(gpuColor)) g.FillEllipse(r, 0, 0, size - 1, size - 1);
+                    g.ResetClip();
                 }
             }
             var hIcon = bmp.GetHicon();
@@ -282,128 +315,8 @@ namespace GHelper.WPF.Services
                 _trayIcon.Dispose();
                 _trayIcon = null;
             }
-            _contextMenu?.Dispose();
-            _contextMenu = null;
+            _menuWindow?.Close();
+            _menuWindow = null;
         }
-    }
-
-    internal class DarkMenuRenderer : System.Windows.Forms.ToolStripProfessionalRenderer
-    {
-        // Accent colors for checked items by name
-        private static readonly Dictionary<string, System.Drawing.Color> AccentMap = new()
-        {
-            { "Silent", System.Drawing.Color.FromArgb(167, 139, 250) },
-            { "Balanced", System.Drawing.Color.FromArgb(96, 205, 255) },
-            { "Turbo", System.Drawing.Color.FromArgb(255, 107, 53) },
-            { "Eco", System.Drawing.Color.FromArgb(76, 201, 94) },
-            { "Standard", System.Drawing.Color.FromArgb(96, 205, 255) },
-            { "Optimized", System.Drawing.Color.FromArgb(171, 124, 255) },
-        };
-
-        public DarkMenuRenderer() : base(new DarkMenuColors()) { }
-
-        protected override void OnRenderItemText(System.Windows.Forms.ToolStripItemTextRenderEventArgs e)
-        {
-            if (e.Item is System.Windows.Forms.ToolStripMenuItem mi && mi.Checked)
-            {
-                string key = mi.Text.Trim();
-                e.TextColor = AccentMap.TryGetValue(key, out var c) ? c : System.Drawing.Color.FromArgb(96, 205, 255);
-            }
-            else
-            {
-                e.TextColor = e.Item is System.Windows.Forms.ToolStripLabel
-                    ? System.Drawing.Color.FromArgb(110, 110, 120)
-                    : System.Drawing.Color.FromArgb(210, 210, 215);
-            }
-            base.OnRenderItemText(e);
-        }
-
-        protected override void OnRenderMenuItemBackground(System.Windows.Forms.ToolStripItemRenderEventArgs e)
-        {
-            var rect = new System.Drawing.Rectangle(4, 1, e.Item.Width - 8, e.Item.Height - 2);
-
-            if (e.Item.Selected && e.Item.Enabled)
-            {
-                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                using var path = RoundedRect(rect, 6);
-                using var brush = new SolidBrush(System.Drawing.Color.FromArgb(35, 255, 255, 255));
-                e.Graphics.FillPath(brush, path);
-            }
-        }
-
-        protected override void OnRenderSeparator(System.Windows.Forms.ToolStripSeparatorRenderEventArgs e)
-        {
-            int y = e.Item.Height / 2;
-            using var pen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(40, 255, 255, 255));
-            e.Graphics.DrawLine(pen, 12, y, e.Item.Width - 12, y);
-        }
-
-        protected override void OnRenderToolStripBorder(System.Windows.Forms.ToolStripRenderEventArgs e)
-        {
-            // Draw rounded border
-            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            using var path = RoundedRect(new System.Drawing.Rectangle(0, 0, e.ToolStrip.Width - 1, e.ToolStrip.Height - 1), 10);
-            using var pen = new System.Drawing.Pen(System.Drawing.Color.FromArgb(50, 255, 255, 255));
-            e.Graphics.DrawPath(pen, path);
-        }
-
-        protected override void OnRenderToolStripBackground(System.Windows.Forms.ToolStripRenderEventArgs e)
-        {
-            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            using var path = RoundedRect(new System.Drawing.Rectangle(0, 0, e.ToolStrip.Width, e.ToolStrip.Height), 10);
-            using var brush = new SolidBrush(System.Drawing.Color.FromArgb(24, 24, 30));
-            e.Graphics.FillPath(brush, path);
-        }
-
-        protected override void OnRenderItemCheck(System.Windows.Forms.ToolStripItemImageRenderEventArgs e)
-        {
-            // Draw colored dot instead of checkmark
-            if (e.Item is System.Windows.Forms.ToolStripMenuItem mi)
-            {
-                string key = mi.Text.Trim();
-                var color = AccentMap.TryGetValue(key, out var c) ? c : System.Drawing.Color.FromArgb(96, 205, 255);
-
-                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                int dotSize = 7;
-                int x = e.ImageRectangle.X + (e.ImageRectangle.Width - dotSize) / 2 + 6;
-                int y = e.ImageRectangle.Y + (e.ImageRectangle.Height - dotSize) / 2;
-                using var brush = new SolidBrush(color);
-                e.Graphics.FillEllipse(brush, x, y, dotSize, dotSize);
-            }
-        }
-
-        private static System.Drawing.Drawing2D.GraphicsPath RoundedRect(System.Drawing.Rectangle bounds, int radius)
-        {
-            int d = radius * 2;
-            var path = new System.Drawing.Drawing2D.GraphicsPath();
-            path.AddArc(bounds.X, bounds.Y, d, d, 180, 90);
-            path.AddArc(bounds.Right - d, bounds.Y, d, d, 270, 90);
-            path.AddArc(bounds.Right - d, bounds.Bottom - d, d, d, 0, 90);
-            path.AddArc(bounds.X, bounds.Bottom - d, d, d, 90, 90);
-            path.CloseFigure();
-            return path;
-        }
-    }
-
-    internal class DarkMenuColors : System.Windows.Forms.ProfessionalColorTable
-    {
-        public override System.Drawing.Color MenuBorder => System.Drawing.Color.FromArgb(50, 50, 55);
-        public override System.Drawing.Color MenuItemBorder => System.Drawing.Color.Transparent;
-        public override System.Drawing.Color MenuItemSelected => System.Drawing.Color.Transparent;
-        public override System.Drawing.Color MenuStripGradientBegin => System.Drawing.Color.FromArgb(24, 24, 30);
-        public override System.Drawing.Color MenuStripGradientEnd => System.Drawing.Color.FromArgb(24, 24, 30);
-        public override System.Drawing.Color MenuItemSelectedGradientBegin => System.Drawing.Color.Transparent;
-        public override System.Drawing.Color MenuItemSelectedGradientEnd => System.Drawing.Color.Transparent;
-        public override System.Drawing.Color MenuItemPressedGradientBegin => System.Drawing.Color.FromArgb(40, 40, 48);
-        public override System.Drawing.Color MenuItemPressedGradientEnd => System.Drawing.Color.FromArgb(40, 40, 48);
-        public override System.Drawing.Color ToolStripDropDownBackground => System.Drawing.Color.FromArgb(24, 24, 30);
-        public override System.Drawing.Color ImageMarginGradientBegin => System.Drawing.Color.FromArgb(24, 24, 30);
-        public override System.Drawing.Color ImageMarginGradientMiddle => System.Drawing.Color.FromArgb(24, 24, 30);
-        public override System.Drawing.Color ImageMarginGradientEnd => System.Drawing.Color.FromArgb(24, 24, 30);
-        public override System.Drawing.Color SeparatorDark => System.Drawing.Color.Transparent;
-        public override System.Drawing.Color SeparatorLight => System.Drawing.Color.Transparent;
-        public override System.Drawing.Color CheckBackground => System.Drawing.Color.Transparent;
-        public override System.Drawing.Color CheckPressedBackground => System.Drawing.Color.Transparent;
-        public override System.Drawing.Color CheckSelectedBackground => System.Drawing.Color.Transparent;
     }
 }

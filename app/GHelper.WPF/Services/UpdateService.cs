@@ -1,3 +1,4 @@
+using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Text.Json;
@@ -18,7 +19,15 @@ namespace GHelper.WPF.Services
         public string? LatestVersion { get; init; }
         public string? ReleaseUrl { get; init; }
         public string? DownloadUrl { get; init; }
+        public long DownloadSize { get; init; }
         public string? ReleaseBody { get; init; }
+        public string? ErrorMessage { get; init; }
+    }
+
+    public class DownloadResult
+    {
+        public bool Success { get; init; }
+        public string? FilePath { get; init; }
         public string? ErrorMessage { get; init; }
     }
 
@@ -51,6 +60,7 @@ namespace GHelper.WPF.Services
                 string body = release.TryGetProperty("body", out var bodyEl) ? bodyEl.GetString() ?? "" : "";
 
                 string? downloadUrl = null;
+                long downloadSize = 0;
                 if (release.TryGetProperty("assets", out var assets) && assets.ValueKind == JsonValueKind.Array)
                 {
                     for (int i = 0; i < assets.GetArrayLength(); i++)
@@ -59,6 +69,8 @@ namespace GHelper.WPF.Services
                         if (assetUrl.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
                         {
                             downloadUrl = assetUrl;
+                            if (assets[i].TryGetProperty("size", out var sizeEl) && sizeEl.ValueKind == JsonValueKind.Number)
+                                downloadSize = sizeEl.GetInt64();
                             break;
                         }
                     }
@@ -73,6 +85,7 @@ namespace GHelper.WPF.Services
                     LatestVersion = tag,
                     ReleaseUrl = releaseUrl,
                     DownloadUrl = downloadUrl,
+                    DownloadSize = downloadSize,
                     ReleaseBody = body,
                 };
             }
@@ -130,6 +143,85 @@ namespace GHelper.WPF.Services
                 Logger.WriteLine("Changelog fetch failed: " + ex.Message);
             }
             return results;
+        }
+
+        /// <summary>
+        /// Streams a release asset to <paramref name="destinationPath"/> and reports
+        /// progress as a value in [0.0, 1.0]. Verifies final size against
+        /// <paramref name="expectedSize"/> when provided (>0).
+        /// </summary>
+        public static async Task<DownloadResult> DownloadAsync(
+            string url,
+            string destinationPath,
+            long expectedSize,
+            IProgress<double>? progress,
+            CancellationToken ct)
+        {
+            try
+            {
+                // Use a separate client — the check client has a 10s timeout which isn't enough for a multi-MB download.
+                using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
+                client.DefaultRequestHeaders.Add("User-Agent", "G-Aether");
+
+                using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);
+                response.EnsureSuccessStatusCode();
+
+                long contentLength = response.Content.Headers.ContentLength ?? expectedSize;
+                long totalForProgress = contentLength > 0 ? contentLength : expectedSize;
+
+                Directory.CreateDirectory(Path.GetDirectoryName(destinationPath)!);
+
+                using (var input = await response.Content.ReadAsStreamAsync(ct))
+                using (var output = File.Create(destinationPath))
+                {
+                    var buffer = new byte[81920];
+                    long totalRead = 0;
+                    int read;
+                    double lastReported = -1.0;
+                    while ((read = await input.ReadAsync(buffer, ct)) > 0)
+                    {
+                        await output.WriteAsync(buffer.AsMemory(0, read), ct);
+                        totalRead += read;
+                        if (progress != null && totalForProgress > 0)
+                        {
+                            double pct = (double)totalRead / totalForProgress;
+                            // Report only on meaningful change to avoid UI thrash.
+                            if (pct - lastReported >= 0.01 || pct >= 1.0)
+                            {
+                                progress.Report(Math.Min(pct, 1.0));
+                                lastReported = pct;
+                            }
+                        }
+                    }
+                }
+
+                if (expectedSize > 0)
+                {
+                    var actual = new FileInfo(destinationPath).Length;
+                    if (actual != expectedSize)
+                    {
+                        try { File.Delete(destinationPath); } catch { }
+                        return new DownloadResult
+                        {
+                            Success = false,
+                            ErrorMessage = $"Size mismatch: expected {expectedSize} bytes, got {actual}",
+                        };
+                    }
+                }
+
+                return new DownloadResult { Success = true, FilePath = destinationPath };
+            }
+            catch (OperationCanceledException)
+            {
+                try { File.Delete(destinationPath); } catch { }
+                return new DownloadResult { Success = false, ErrorMessage = "Download cancelled" };
+            }
+            catch (Exception ex)
+            {
+                try { File.Delete(destinationPath); } catch { }
+                Logger.WriteLine("Update download failed: " + ex.Message);
+                return new DownloadResult { Success = false, ErrorMessage = ex.Message };
+            }
         }
 
         private static HttpClient CreateClient()

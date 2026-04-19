@@ -39,12 +39,16 @@
                 AccentColor="{DynamicResource AccentColor}"
                 Margin="0,0,0,28" />
 
-            <!-- Mode Selector Pills with Icons -->
+            <!-- Mode Selector Pills with Icons.
+                 ItemColors passes the canonical mode palette so the selected pill fills
+                 with its mode color — the same color that appears in the status bar and
+                 tray icon, making the visual chain legible. -->
             <controls:PillSelector
                 Height="34"
                 Items="{Binding ModeLabels}"
                 Icons="{Binding ModeIcons}"
                 ItemColors="{Binding ModeColors}"
+                AccentColor="{DynamicResource AccentColor}"
                 SelectedIndex="{Binding SelectedModeIndex, Mode=TwoWay}" />
         </StackPanel>
     </Border>

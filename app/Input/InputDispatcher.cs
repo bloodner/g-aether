@@ -99,6 +99,17 @@ namespace GHelper.Input
         {
             if (listener is not null) listener.Dispose();
 
+            // Optional diagnostic: enable with key_debug=1 in config.json to log every keystroke.
+            // Useful for identifying what combo a hardware button (e.g. the Copilot key) actually sends.
+            if (AppConfig.Is("key_debug"))
+                KeyDiagnosticHook.Start();
+
+            // Intercept the Copilot key at the LL-hook layer to prevent Windows 11's built-in
+            // "Customize Copilot key" shell handler from firing on rapid presses.
+            bool copilotDisabled = AppConfig.Exists("copilot") && AppConfig.GetString("copilot").Length == 0;
+            if (!copilotDisabled)
+                CopilotKeyHook.Start();
+
             Program.acpi.DeviceInit();
 
             if (!AsusService.IsAsusOptimizationRunning())
@@ -151,6 +162,17 @@ namespace GHelper.Input
 
             string actionM1 = AppConfig.GetString("m1");
             string actionM2 = AppConfig.GetString("m2");
+
+            // Windows Copilot key. Hardware emits BOTH Win+Shift+F23 and Win+Shift+LaunchApp1
+            // within ~1ms; register both so we capture regardless of firmware variant.
+            // Skip only when the user has explicitly picked "Disabled" (config present, empty).
+            // Missing config = first-run default (handled by "ghelper" fallback in KeyProcess).
+            bool copilotDisabled = AppConfig.Exists("copilot") && AppConfig.GetString("copilot").Length == 0;
+            if (!copilotDisabled)
+            {
+                hook.RegisterHotKey(ModifierKeys.Win | ModifierKeys.Shift, Keys.F23);
+                hook.RegisterHotKey(ModifierKeys.Win | ModifierKeys.Shift, Keys.LaunchApplication1);
+            }
 
             if (keyProfile != Keys.None)
             {
@@ -551,7 +573,22 @@ namespace GHelper.Input
                         break;
                 }
             }
+
+            // Windows Copilot key — fires as Win+Shift+F23 AND/OR Win+Shift+LaunchApp1.
+            // Debounce so we only trigger the action once per press (both arrive within ~1ms).
+            if (e.Modifier == (ModifierKeys.Win | ModifierKeys.Shift) &&
+                (e.Key == Keys.F23 || e.Key == Keys.LaunchApplication1))
+            {
+                long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                if (now - _lastCopilotPress > 250)
+                {
+                    _lastCopilotPress = now;
+                    KeyProcess("copilot");
+                }
+            }
         }
+
+        private static long _lastCopilotPress;
 
 
         public static void KeyProcess(string name = "m3")
@@ -586,6 +623,8 @@ namespace GHelper.Input
                     action = "visual";
                 if (name == "fne")
                     action = "calculator";
+                if (name == "copilot")
+                    action = "ghelper";
             }
 
             switch (action)

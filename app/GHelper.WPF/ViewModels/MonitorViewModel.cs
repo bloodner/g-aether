@@ -82,7 +82,11 @@ namespace GHelper.WPF.ViewModels
         private string _powerStatusText = "";
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(BatteryAccentColor))]
         private System.Windows.Media.SolidColorBrush _batteryBrush = GreenBrush;
+
+        /// <summary>Underlying Color of BatteryBrush — used by the halo on the Monitor battery tile.</summary>
+        public System.Windows.Media.Color BatteryAccentColor => BatteryBrush?.Color ?? GreenBrush.Color;
 
         public void UpdateSensors()
         {

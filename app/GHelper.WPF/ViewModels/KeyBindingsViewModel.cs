@@ -67,6 +67,10 @@ namespace GHelper.WPF.ViewModels
         [ObservableProperty]
         private int _fnEnterIndex;
 
+        // Copilot key (Win + Shift + F23)
+        [ObservableProperty]
+        private int _copilotKeyIndex;
+
         private bool _ignoreChange;
 
         partial void OnRogKeyIndexChanged(int value)
@@ -97,6 +101,12 @@ namespace GHelper.WPF.ViewModels
         {
             if (_ignoreChange) return;
             SaveKey("fne", value);
+        }
+
+        partial void OnCopilotKeyIndexChanged(int value)
+        {
+            if (_ignoreChange) return;
+            SaveKey("copilot", value);
         }
 
         private void SaveKey(string configKey, int index)
@@ -134,6 +144,7 @@ namespace GHelper.WPF.ViewModels
                 FnF4Index = FindActionIndex("fnf4", "micmute");
                 FnVIndex = FindActionIndex("fnv", "visual");
                 FnEnterIndex = FindActionIndex("fne", "calculator");
+                CopilotKeyIndex = FindActionIndex("copilot", "ghelper");
             }
             finally
             {

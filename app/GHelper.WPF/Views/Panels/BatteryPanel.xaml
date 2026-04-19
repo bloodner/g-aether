@@ -3,82 +3,115 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:GHelper.WPF.Controls">
 
-    <Border Style="{StaticResource CardStyle}">
-        <StackPanel>
-            <!-- Header -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                <TextBlock Text="&#xE83F;" FontFamily="Segoe MDL2 Assets" FontSize="16"
-                           Foreground="{DynamicResource AccentBrush}"
-                           VerticalAlignment="Center" Margin="0,0,8,0" />
-                <TextBlock Text="Charging &amp; Health"
-                           Style="{StaticResource CardTitleStyle}"
-                           VerticalAlignment="Center" />
+    <StackPanel>
+
+        <!-- ========================================================== -->
+        <!-- CHARGING — live status + charge limit slider                -->
+        <!-- ========================================================== -->
+        <Border Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="&#xE83F;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="Charging"
+                               Style="{StaticResource CardTitleStyle}"
+                               VerticalAlignment="Center" />
+                    <controls:HelpButton HelpKey="charge_limit" VerticalAlignment="Center" Margin="8,0,0,0" />
+                </StackPanel>
+
+                <!-- Gauge + live status -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <controls:CircularGauge
+                        Width="110" Height="110"
+                        Value="{Binding ChargePercentage}"
+                        HealthText="{Binding HealthText}"
+                        CyclesText="{Binding CyclesText}" />
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,0,0">
+                        <TextBlock Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4">
+                            <Run Text="Status: " Foreground="{DynamicResource ForeDimBrush}" />
+                            <Run Text="{Binding PowerStatusText}" />
+                        </TextBlock>
+
+                        <TextBlock Style="{StaticResource DimTextStyle}" Text="Charge Limit" Margin="0,8,0,4" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Slider Minimum="40" Maximum="100" Value="{Binding ChargeLimit, Mode=TwoWay}"
+                                    TickFrequency="5" IsSnapToTickEnabled="True"
+                                    VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="{Binding ChargeLimitText}"
+                                       Style="{StaticResource BodyTextStyle}"
+                                       VerticalAlignment="Center" Margin="8,0,0,0"
+                                       MinWidth="32" TextAlignment="Right" />
+                        </Grid>
+                    </StackPanel>
+                </Grid>
             </StackPanel>
+        </Border>
 
-            <!-- Gauge + Info Row -->
-            <Grid Margin="0,0,0,4">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <!-- Circular Gauge -->
-                <controls:CircularGauge
-                    Width="110" Height="110"
-                    Value="{Binding ChargePercentage}"
-                    HealthText="{Binding HealthText}"
-                    CyclesText="{Binding CyclesText}" />
-
-                <!-- Info & Controls -->
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,0,0">
-                    <TextBlock Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4">
-                        <Run Text="Status: " Foreground="{DynamicResource ForeDimBrush}" />
-                        <Run Text="{Binding PowerStatusText}" />
-                    </TextBlock>
-
-                    <!-- Charge Limit -->
-                    <TextBlock Style="{StaticResource DimTextStyle}" Text="Charge Limit" Margin="0,8,0,4" />
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Slider Minimum="40" Maximum="100" Value="{Binding ChargeLimit, Mode=TwoWay}"
-                                TickFrequency="5" IsSnapToTickEnabled="True"
-                                VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="1" Text="{Binding ChargeLimitText}"
-                                   Style="{StaticResource BodyTextStyle}"
-                                   VerticalAlignment="Center" Margin="8,0,0,0"
-                                   MinWidth="32" TextAlignment="Right" />
-                    </Grid>
+        <!-- ========================================================== -->
+        <!-- BATTERY HEALTH — long-term stats + Windows battery report   -->
+        <!-- ========================================================== -->
+        <Border Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="&#xE946;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="Battery Health"
+                               Style="{StaticResource CardTitleStyle}"
+                               VerticalAlignment="Center" />
                 </StackPanel>
-            </Grid>
 
-            <!-- Battery Details -->
-            <Border Margin="0,12,0,0" BorderBrush="#10FFFFFF" BorderThickness="0,1,0,0" Padding="0,10,0,0">
-                <StackPanel>
-                    <Grid Margin="0,0,0,8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel>
-                            <TextBlock Text="Health" Style="{StaticResource DimTextStyle}" FontSize="10" />
-                            <TextBlock Text="{Binding HealthText}" Style="{StaticResource BodyTextStyle}" FontSize="13" />
+                <!-- Stats row -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Health" Style="{StaticResource DimTextStyle}" FontSize="10"
+                                       VerticalAlignment="Center" />
+                            <controls:HelpButton HelpKey="battery_health" VerticalAlignment="Center" Margin="6,0,0,0" />
                         </StackPanel>
-                        <StackPanel Grid.Column="1">
-                            <TextBlock Text="Cycles" Style="{StaticResource DimTextStyle}" FontSize="10" />
-                            <TextBlock Text="{Binding CyclesText}" Style="{StaticResource BodyTextStyle}" FontSize="13" />
-                        </StackPanel>
-                    </Grid>
+                        <TextBlock Text="{Binding HealthText}" Style="{StaticResource BodyTextStyle}" FontSize="14" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Cycles" Style="{StaticResource DimTextStyle}" FontSize="10" />
+                        <TextBlock Text="{Binding CyclesText}" Style="{StaticResource BodyTextStyle}" FontSize="14" />
+                    </StackPanel>
+                </Grid>
 
-                    <!-- Battery Report -->
-                    <Button Content="Generate Battery Report"
+                <!-- Generate battery report: explainer + short primary button -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                        <TextBlock Text="Battery Report" Style="{StaticResource BodyTextStyle}" />
+                        <TextBlock Text="Ask Windows for a full HTML report of your battery's capacity history and recent usage."
+                                   Style="{StaticResource DimTextStyle}" FontSize="10"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Content="Generate"
                             Command="{Binding BatteryReportCommand}"
-                            Style="{StaticResource LinkButtonStyle}"
-                            Margin="0,10,0,0" />
-                </StackPanel>
-            </Border>
-        </StackPanel>
-    </Border>
+                            Style="{StaticResource SecondaryActionButtonStyle}"
+                            VerticalAlignment="Center" />
+                </Grid>
+            </StackPanel>
+        </Border>
+
+    </StackPanel>
 </UserControl>

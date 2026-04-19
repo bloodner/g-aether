@@ -3,102 +3,146 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:GHelper.WPF.Controls">
 
-    <Border Style="{StaticResource CardStyle}">
-        <StackPanel>
-            <!-- Header -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                <TextBlock Text="&#xE793;" FontFamily="Segoe MDL2 Assets" FontSize="16"
-                           Foreground="{DynamicResource AccentBrush}"
-                           VerticalAlignment="Center" Margin="0,0,8,0" />
-                <TextBlock Text="Visual Mode"
-                           Style="{StaticResource CardTitleStyle}"
-                           VerticalAlignment="Center" />
-            </StackPanel>
+    <StackPanel>
 
-            <!-- Screen Refresh Rate Arc -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,4"
-                        Visibility="{Binding IsScreenEnabled, Converter={StaticResource BoolToVisibility}}">
-                <TextBlock Text="Refresh Rate" Style="{StaticResource DimTextStyle}" />
-                <controls:HelpButton HelpKey="refresh_rate" VerticalAlignment="Center" Margin="8,0,0,0" />
-            </StackPanel>
-            <controls:RefreshRateArc
-                Height="180"
-                Items="{Binding FrequencyLabels}"
-                SelectedIndex="{Binding SelectedFreqIndex, Mode=TwoWay}"
-                IsAutoMode="{Binding IsAutoFreqMode}"
-                CurrentRateText="{Binding CurrentRateText}"
-                Margin="0,0,0,30"
-                Visibility="{Binding IsScreenEnabled, Converter={StaticResource BoolToVisibility}}" />
-
-            <!-- Color Temperature Slider -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                <TextBlock Text="Color Temperature" Style="{StaticResource DimTextStyle}" />
-                <controls:HelpButton HelpKey="color_temp" VerticalAlignment="Center" Margin="8,0,0,0" />
-            </StackPanel>
-            <controls:GradientModeSlider
-                Height="70"
-                ModeCount="7"
-                SelectedIndex="{Binding ColorTempIndex, Mode=TwoWay}"
-                Labels="{Binding ColorTempLabels}">
-                <controls:GradientModeSlider.GradientStops>
-                    <GradientStopCollection>
-                        <GradientStop Color="#FF8844" Offset="0.0" />
-                        <GradientStop Color="#FFCC88" Offset="0.25" />
-                        <GradientStop Color="#FFFFFF" Offset="0.5" />
-                        <GradientStop Color="#88BBFF" Offset="0.75" />
-                        <GradientStop Color="#4488FF" Offset="1.0" />
-                    </GradientStopCollection>
-                </controls:GradientModeSlider.GradientStops>
-            </controls:GradientModeSlider>
-
-            <!-- Gamut Selection -->
-            <StackPanel Orientation="Horizontal" Margin="0,8,0,6">
-                <TextBlock Text="Color Gamut" Style="{StaticResource DimTextStyle}" />
-                <controls:HelpButton HelpKey="gamut" VerticalAlignment="Center" Margin="8,0,0,0" />
-            </StackPanel>
-            <controls:PillSelector
-                                   Items="{Binding GamutOptions}"
-                                   SelectedIndex="{Binding SelectedGamutIndex, Mode=TwoWay}" />
-
-            <!-- Advanced Display Options -->
-            <Border Margin="0,12,0,0" BorderBrush="#10FFFFFF" BorderThickness="0,1,0,0" Padding="0,10,0,0">
-                <StackPanel>
-                    <!-- Overdrive Toggle -->
-                    <Grid Margin="0,0,0,6"
-                          Visibility="{Binding HasOverdrive, Converter={StaticResource BoolToVisibility}}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Overdrive" Style="{StaticResource BodyTextStyle}" />
-                                <controls:HelpButton HelpKey="overdrive" VerticalAlignment="Center" Margin="6,0,0,0" />
-                            </StackPanel>
-                            <TextBlock Text="Reduces ghosting at high refresh rates"
-                                       Style="{StaticResource DimTextStyle}" FontSize="10" />
-                        </StackPanel>
-                        <controls:ToggleSwitch Grid.Column="1"
-                                               IsChecked="{Binding IsOverdriveToggle, Mode=TwoWay}"
-                                               Width="44" Height="22"
-                                               VerticalAlignment="Center" />
-                    </Grid>
-
-                    <!-- MiniLED -->
-                    <Grid Margin="0,4,0,0"
-                          Visibility="{Binding HasMiniled, Converter={StaticResource BoolToVisibility}}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="MiniLED Backlight" Style="{StaticResource BodyTextStyle}"
-                                   VerticalAlignment="Center" />
-                        <controls:PillSelector Grid.Column="1" Width="120"
-                                               Items="{Binding MiniledLabels}"
-                                               SelectedIndex="{Binding SelectedMiniledIndex, Mode=TwoWay}" />
-                    </Grid>
+        <!-- ========================================================== -->
+        <!-- REFRESH RATE                                                -->
+        <!-- ========================================================== -->
+        <Border Style="{StaticResource CardStyle}"
+                Visibility="{Binding IsScreenEnabled, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="&#xE895;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="Refresh Rate"
+                               Style="{StaticResource CardTitleStyle}"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text=":" Style="{StaticResource CardTitleStyle}"
+                               Margin="0,0,6,0" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding CurrentRateText}"
+                               Style="{StaticResource CardTitleStyle}"
+                               Foreground="{DynamicResource ForeDimBrush}"
+                               VerticalAlignment="Center" />
+                    <controls:HelpButton HelpKey="refresh_rate" VerticalAlignment="Center" Margin="8,0,0,0" />
                 </StackPanel>
-            </Border>
-        </StackPanel>
-    </Border>
+
+                <controls:RefreshRateArc
+                    Height="180"
+                    Items="{Binding FrequencyLabels}"
+                    SelectedIndex="{Binding SelectedFreqIndex, Mode=TwoWay}"
+                    IsAutoMode="{Binding IsAutoFreqMode}"
+                    CurrentRateText="{Binding CurrentRateText}" />
+            </StackPanel>
+        </Border>
+
+        <!-- ========================================================== -->
+        <!-- COLOR TEMPERATURE                                           -->
+        <!-- ========================================================== -->
+        <Border Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="&#xE706;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="Color Temperature"
+                               Style="{StaticResource CardTitleStyle}"
+                               VerticalAlignment="Center" />
+                    <controls:HelpButton HelpKey="color_temp" VerticalAlignment="Center" Margin="8,0,0,0" />
+                </StackPanel>
+
+                <controls:GradientModeSlider
+                    Height="70"
+                    ModeCount="7"
+                    SelectedIndex="{Binding ColorTempIndex, Mode=TwoWay}"
+                    Labels="{Binding ColorTempLabels}">
+                    <controls:GradientModeSlider.GradientStops>
+                        <GradientStopCollection>
+                            <GradientStop Color="#FF8844" Offset="0.0" />
+                            <GradientStop Color="#FFCC88" Offset="0.25" />
+                            <GradientStop Color="#FFFFFF" Offset="0.5" />
+                            <GradientStop Color="#88BBFF" Offset="0.75" />
+                            <GradientStop Color="#4488FF" Offset="1.0" />
+                        </GradientStopCollection>
+                    </controls:GradientModeSlider.GradientStops>
+                </controls:GradientModeSlider>
+            </StackPanel>
+        </Border>
+
+        <!-- ========================================================== -->
+        <!-- COLOR GAMUT                                                 -->
+        <!-- ========================================================== -->
+        <Border Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="&#xE790;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="Color Gamut"
+                               Style="{StaticResource CardTitleStyle}"
+                               VerticalAlignment="Center" />
+                    <controls:HelpButton HelpKey="gamut" VerticalAlignment="Center" Margin="8,0,0,0" />
+                </StackPanel>
+
+                <controls:PillSelector
+                    Items="{Binding GamutOptions}"
+                    SelectedIndex="{Binding SelectedGamutIndex, Mode=TwoWay}"
+                    AccentColor="{DynamicResource AccentColor}" />
+            </StackPanel>
+        </Border>
+
+        <!-- ========================================================== -->
+        <!-- ADVANCED DISPLAY — Overdrive + MiniLED (if supported)       -->
+        <!-- ========================================================== -->
+        <Border Style="{StaticResource CardStyle}"
+                Visibility="{Binding ShowAdvancedDisplay, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="&#xE713;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="Advanced Display"
+                               Style="{StaticResource CardTitleStyle}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Overdrive Toggle -->
+                <Grid Margin="0,0,0,6"
+                      Visibility="{Binding HasOverdrive, Converter={StaticResource BoolToVisibility}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Overdrive" Style="{StaticResource BodyTextStyle}" />
+                            <controls:HelpButton HelpKey="overdrive" VerticalAlignment="Center" Margin="6,0,0,0" />
+                        </StackPanel>
+                        <TextBlock Text="Reduces ghosting at high refresh rates"
+                                   Style="{StaticResource DimTextStyle}" FontSize="10" />
+                    </StackPanel>
+                    <controls:ToggleSwitch Grid.Column="1"
+                                           IsChecked="{Binding IsOverdriveToggle, Mode=TwoWay}"
+                                           Width="44" Height="22"
+                                           VerticalAlignment="Center" />
+                </Grid>
+
+                <!-- MiniLED -->
+                <Grid Margin="0,4,0,0"
+                      Visibility="{Binding HasMiniled, Converter={StaticResource BoolToVisibility}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="MiniLED Backlight" Style="{StaticResource BodyTextStyle}"
+                               VerticalAlignment="Center" />
+                    <controls:PillSelector Grid.Column="1" Width="120"
+                                           Items="{Binding MiniledLabels}"
+                                           SelectedIndex="{Binding SelectedMiniledIndex, Mode=TwoWay}"
+                                           AccentColor="{DynamicResource AccentColor}" />
+                </Grid>
+            </StackPanel>
+        </Border>
+
+    </StackPanel>
 </UserControl>

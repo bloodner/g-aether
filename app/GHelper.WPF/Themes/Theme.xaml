@@ -1,6 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:converters="clr-namespace:GHelper.WPF.Converters">
+                    xmlns:converters="clr-namespace:GHelper.WPF.Converters"
+                    xmlns:local="clr-namespace:GHelper.WPF.Views">
 
     <!-- Colors - refined for glass-first dark theme -->
     <Color x:Key="AccentColor">#60CDFF</Color>
@@ -26,6 +27,22 @@
     <SolidColorBrush x:Key="WarnOrangeBrush" Color="{StaticResource WarnOrange}" />
     <SolidColorBrush x:Key="DangerRedBrush" Color="{StaticResource DangerRed}" />
 
+    <!-- Window background brush — mutable so the transparency slider can adjust the alpha.
+         Chromatically neutral near-OLED black (R=G=B) so the glass never contributes its
+         own hue to whatever's showing through. Any tint the user sees at high transparency
+         is coming from their wallpaper, not from us. -->
+    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#EB080808" />
+
+    <!-- Section header inside a card — small uppercase label with a subtle accent underline -->
+    <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI Variable" />
+        <Setter Property="FontSize" Value="9.5" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="#7C7C86" />
+        <Setter Property="Margin" Value="0,14,0,6" />
+        <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+    </Style>
+
     <!-- Converters -->
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     <converters:BoolToOpacityConverter x:Key="BoolToOpacity" />
@@ -39,6 +56,17 @@
         <Setter Property="CornerRadius" Value="10" />
         <Setter Property="Padding" Value="20,16" />
         <Setter Property="Margin" Value="0,0,0,8" />
+    </Style>
+
+    <!-- Tile Style - a gently raised surface that sits on top of the deep window bg.
+         Mirrors the SensorCard fill/border so every tiled surface in the app reads the
+         same way. The subtle luminance lift + border is what gives the page hierarchy. -->
+    <Style x:Key="TileStyle" TargetType="Border">
+        <Setter Property="Background" Value="#13141B" />
+        <Setter Property="BorderBrush" Value="#22252E" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="16,12" />
     </Style>
 
     <!-- Title Text Style -->
@@ -148,6 +176,24 @@
     <!-- Settings Row Style (label + control) -->
     <Style x:Key="SettingsRowStyle" TargetType="Grid">
         <Setter Property="Margin" Value="0,6,0,0" />
+    </Style>
+
+    <!-- Caution Banner Style — inline warning strip for risky controls -->
+    <Style x:Key="CautionBannerStyle" TargetType="Border">
+        <Setter Property="Background" Value="#1AFFB347" />
+        <Setter Property="BorderBrush" Value="#40FFB347" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="10,7" />
+        <Setter Property="Margin" Value="0,0,0,10" />
+    </Style>
+
+    <Style x:Key="CautionBannerTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="#E8D9B6" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
     <!-- Temp Pill Style -->
@@ -481,16 +527,111 @@
         <Setter Property="Margin" Value="0,0,7,0" />
     </Style>
 
+    <!-- Secondary action button — glass pill with readable hover -->
+    <Style x:Key="SecondaryActionButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="#18FFFFFF" />
+        <Setter Property="Foreground" Value="#E8E8EC" />
+        <Setter Property="BorderBrush" Value="#20FFFFFF" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="16,5" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          TextBlock.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#28FFFFFF" />
+                            <Setter TargetName="Bg" Property="BorderBrush" Value="#40FFFFFF" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#34FFFFFF" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.55" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Primary apply button — green accent, prominent -->
+    <Style x:Key="PrimaryApplyButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="#4CC95E" />
+        <Setter Property="Foreground" Value="#08120C" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="22,6" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="6"
+                            Padding="{TemplateBinding Padding}">
+                        <Border.Effect>
+                            <DropShadowEffect Color="#4CC95E" BlurRadius="14" ShadowDepth="0" Opacity="0.35" />
+                        </Border.Effect>
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          TextBlock.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#5FD773" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#3FBB52" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.55" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="ModeBadgeStyle" TargetType="Button">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="6,5,8,5" />
+        <Setter Property="Padding" Value="8,3,10,3" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Grid>
+                        <!-- Accent-tinted fill — shown only when the pill's panel is active -->
+                        <Border x:Name="ActiveFill"
+                                Background="{TemplateBinding BorderBrush}"
+                                CornerRadius="6"
+                                Opacity="0" />
+                        <!-- Accent-colored border outline — shown only when active -->
+                        <Border x:Name="ActiveStroke"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Opacity="0" />
+                        <!-- Hover/press overlay — neutral white tint -->
                         <Border x:Name="Bg"
                                 Background="Transparent"
                                 CornerRadius="6"
@@ -498,33 +639,53 @@
                             <ContentPresenter VerticalAlignment="Center"
                                               HorizontalAlignment="Center" />
                         </Border>
-                        <!-- Accent underline on hover (uses BorderBrush as the accent) -->
-                        <Border x:Name="Underline"
-                                Height="2"
-                                Width="24"
-                                VerticalAlignment="Bottom"
-                                HorizontalAlignment="Center"
-                                Background="{TemplateBinding BorderBrush}"
-                                CornerRadius="1"
-                                Opacity="0"
-                                Margin="0,0,0,1">
-                            <Border.Effect>
-                                <DropShadowEffect BlurRadius="4" ShadowDepth="0" Opacity="0.8" />
-                            </Border.Effect>
-                        </Border>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="local:ModeBadgeProps.IsActive" Value="True">
+                            <Setter TargetName="ActiveFill" Property="Opacity" Value="0.15" />
+                            <Setter TargetName="ActiveStroke" Property="Opacity" Value="0.55" />
+                        </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="#10FFFFFF" />
-                            <Setter TargetName="Underline" Property="Opacity" Value="1" />
+                            <Setter TargetName="Bg" Property="Background" Value="#1CFFFFFF" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="#18FFFFFF" />
+                            <Setter TargetName="Bg" Property="Background" Value="#28FFFFFF" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- Category prefix that sits to the right of the icon: small dim label + middle dot -->
+    <Style x:Key="ModeBadgeCategoryStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe UI Variable" />
+        <Setter Property="FontSize" Value="10.5" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Foreground" Value="#8A8A94" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0,1,6,0" />
+    </Style>
+
+    <!-- Icon variant that gently pulses when IsEnabled=true (bound to the badge's warning flag) -->
+    <Style x:Key="ModeBadgePulseIconStyle" TargetType="TextBlock" BasedOn="{StaticResource ModeBadgeIconStyle}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="True">
+                <DataTrigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                             From="1.0" To="0.55"
+                                             Duration="0:0:1.4">
+                                <DoubleAnimation.EasingFunction>
+                                    <SineEase EasingMode="EaseInOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </DataTrigger.EnterActions>
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Pulsing storyboard for warning-state dots -->

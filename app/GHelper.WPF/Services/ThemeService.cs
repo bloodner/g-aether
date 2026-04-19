@@ -9,13 +9,27 @@ namespace GHelper.WPF.Services
     {
         public static Color AccentColor { get; private set; } = Color.FromRgb(0x00, 0x78, 0xD4);
 
-        // Mode colors matching the WinForms RForm static colors
-        public static Color ColorSilent { get; } = Color.FromRgb(0x4B, 0xD8, 0xC8);   // Cyan
-        public static Color ColorBalanced { get; } = Color.FromRgb(0x4B, 0xD8, 0x4B);  // Green
-        public static Color ColorTurbo { get; } = Color.FromRgb(0xFF, 0xD8, 0x00);     // Yellow
+        // ===== Canonical mode-color palette =====
+        // Any surface that needs to communicate "which mode am I in" at a glance
+        // (tray icon, status bar badges, mode-change toasts) pulls from here so
+        // we define the meaning once and every channel stays in sync.
+        //
+        // Chrome surfaces (section headers, selected pills, mode arcs) should keep
+        // using AccentBrush — mode colors are for at-a-glance identity, not decoration.
+
+        // Performance modes
+        public static Color ColorSilent { get; } = Color.FromRgb(0x4B, 0xD8, 0xC8);  // cool cyan-teal — quiet
+        public static Color ColorBalanced => AccentColor;                              // default → Windows accent
+        public static Color ColorTurbo { get; } = Color.FromRgb(0xFF, 0x6B, 0x35);   // hot orange
+
+        // GPU modes
+        public static Color ColorEco { get; } = Color.FromRgb(0x4C, 0xC9, 0x5E);     // power-saving green
+        public static Color ColorStandard => AccentColor;                              // default → Windows accent
+        public static Color ColorUltimate { get; } = Color.FromRgb(0xFF, 0x6B, 0x35); // same hot as Turbo (both = max perf)
+        public static Color ColorOptimized { get; } = Color.FromRgb(0xC6, 0x78, 0xF0); // adaptive magenta-violet
+
+        // Status / warnings
         public static Color ColorFansPower { get; } = Color.FromRgb(0xFF, 0x44, 0x44); // Red
-        public static Color ColorEco { get; } = Color.FromRgb(0x4B, 0xD8, 0x4B);
-        public static Color ColorStandard { get; } = Color.FromRgb(0x4B, 0xC8, 0xFF);
 
         public static void Initialize()
         {

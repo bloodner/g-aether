@@ -10,7 +10,7 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <RootNamespace>GHelper.WPF</RootNamespace>
     <AssemblyName>G-Aether</AssemblyName>
-    <Version>0.4.0</Version>
+    <Version>0.5.0</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Resources\app.ico</ApplicationIcon>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
@@ -31,6 +31,8 @@
   <ItemGroup>
     <Resource Include="Resources\icon.png" />
     <Resource Include="Resources\app.ico" />
+    <Resource Include="Resources\app-mask-perf.png" />
+    <Resource Include="Resources\app-mask-gpu.png" />
   </ItemGroup>
 
 </Project>

@@ -36,10 +36,10 @@ namespace GHelper.WPF.ViewModels
 
         [ObservableProperty]
         private Color[] _modeColors = [
-            Color.FromRgb(0x4C, 0xC9, 0x5E), // Eco: green
-            Color.FromRgb(0x60, 0xCD, 0xFF), // Standard: blue (accent)
-            Color.FromRgb(0xFF, 0x6B, 0x35), // Ultimate: orange
-            Color.FromRgb(0xAB, 0x7C, 0xFF), // Optimized: purple
+            ThemeService.ColorEco,
+            ThemeService.ColorStandard,
+            ThemeService.ColorUltimate,
+            ThemeService.ColorOptimized,
         ];
 
         private bool _ignoreChange;
@@ -119,7 +119,7 @@ namespace GHelper.WPF.ViewModels
                 0 => "GPU Mode: iGPU Only (Eco)",
                 1 => "GPU Mode: iGPU + dGPU",
                 2 => "GPU Mode: dGPU Direct",
-                3 => "GPU Mode: Auto Optimized",
+                3 => "GPU Mode: iGPU + dGPU (Auto)",
                 _ => "GPU Mode"
             };
         }
@@ -129,10 +129,10 @@ namespace GHelper.WPF.ViewModels
             HasEco = hasEco;
             HasMux = hasMux;
 
-            Color eco = Color.FromRgb(0x4C, 0xC9, 0x5E);
-            Color std = Color.FromRgb(0x60, 0xCD, 0xFF);
-            Color ult = Color.FromRgb(0xFF, 0x6B, 0x35);
-            Color opt = Color.FromRgb(0xAB, 0x7C, 0xFF);
+            Color eco = ThemeService.ColorEco;
+            Color std = ThemeService.ColorStandard;
+            Color ult = ThemeService.ColorUltimate;
+            Color opt = ThemeService.ColorOptimized;
 
             if (!hasEco && !hasMux)
             {

@@ -218,12 +218,16 @@ namespace GHelper.WPF.Controls
                 bool selected = (i == SelectedIndex);
                 bool hovered = (i == _hoverIndex && !selected);
 
+                // When ItemColors are provided, the selected pill fills with its item's
+                // mode-color — so the color the user sees on the pill matches what shows up
+                // in the status bar and tray icon. Without ItemColors, fall back to accent
+                // (for generic non-mode pill selectors like Fan Control or Color Gamut).
                 var itemColors = ItemColors;
-                Color pillAccent = (itemColors != null && i < itemColors.Length) ? itemColors[i] : AccentColor;
+                Color pillFill = (itemColors != null && i < itemColors.Length) ? itemColors[i] : AccentColor;
 
                 Brush bg;
                 if (selected)
-                    bg = new SolidColorBrush(Color.FromArgb(200, pillAccent.R, pillAccent.G, pillAccent.B));
+                    bg = new SolidColorBrush(Color.FromArgb(200, pillFill.R, pillFill.G, pillFill.B));
                 else if (hovered)
                     bg = new SolidColorBrush(Color.FromArgb(50, 255, 255, 255));
                 else

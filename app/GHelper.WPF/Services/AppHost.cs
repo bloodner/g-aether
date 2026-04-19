@@ -47,6 +47,17 @@ namespace GHelper.WPF.Services
                 }
             });
 
+            // Refresh the "Run on Startup" scheduled task if its stored path or version
+            // is stale relative to the running exe — covers the in-place update case.
+            Task.Run(() =>
+            {
+                try { Startup.StartupCheck(); }
+                catch (Exception ex) { Logger.WriteLine("StartupCheck error: " + ex.Message); }
+            });
+
+            // Background update check — throttled internally to run at most once per 24h.
+            Task.Run(UpdateBackgroundCheck.RunAsync);
+
             // Wire up WPF callbacks for key actions that need UI
             InputDispatcher.OnCycleAura = (delta) =>
             {

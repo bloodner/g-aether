@@ -4,48 +4,47 @@
              xmlns:controls="clr-namespace:GHelper.WPF.Controls">
 
     <StackPanel>
-        <!-- Main Performance Card -->
+
+        <!-- ========================================================== -->
+        <!-- PERFORMANCE MODE — Silent / Balanced / Turbo arc selector   -->
+        <!-- ========================================================== -->
         <Border Style="{StaticResource CardStyle}">
             <StackPanel>
-                <!-- Title Row -->
-                <Grid Margin="0,0,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                    <TextBlock Text="&#xE945;" FontFamily="Segoe MDL2 Assets" FontSize="16"
                                Foreground="{DynamicResource AccentBrush}"
                                VerticalAlignment="Center" Margin="0,0,8,0" />
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Style="{StaticResource CardTitleStyle}" VerticalAlignment="Center">
-                            <Run Text="Mode: " />
-                            <Run Text="{Binding ModeSummaryLabel}" />
-                        </TextBlock>
-                        <controls:HelpButton HelpKey="perf_mode" VerticalAlignment="Center" Margin="8,0,0,0" />
-                    </StackPanel>
-                </Grid>
+                    <TextBlock Style="{StaticResource CardTitleStyle}" VerticalAlignment="Center">
+                        <Run Text="Mode: " />
+                        <Run Text="{Binding ModeSummaryLabel}" />
+                    </TextBlock>
+                    <controls:HelpButton HelpKey="perf_mode" VerticalAlignment="Center" Margin="8,0,0,0" />
+                </StackPanel>
 
-                <!-- Performance Mode Arc (Silent / Balanced / Turbo) -->
                 <controls:PerformanceModeArc
                     Height="180"
                     SelectedIndex="{Binding SelectedModeIndex, Mode=TwoWay}"
-                    Items="{Binding ModeLabels}" />
+                    Items="{Binding ModeLabels}"
+                    AccentColor="{DynamicResource AccentColor}" />
+            </StackPanel>
+        </Border>
 
-                <!-- Apply Strategy Selector -->
-                <StackPanel Orientation="Horizontal" Margin="0,4,0,6">
-                    <TextBlock Text="Fan &amp; Power Control"
-                               Style="{StaticResource DimTextStyle}"
-                               FontSize="10" />
-                    <controls:HelpButton HelpKey="fan_control" VerticalAlignment="Center" Margin="8,0,0,0" />
+        <!-- ========================================================== -->
+        <!-- LIVE SENSORS — current CPU / GPU state                      -->
+        <!-- ========================================================== -->
+        <Border Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="&#xE950;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="Live Sensors"
+                               Style="{StaticResource CardTitleStyle}"
+                               VerticalAlignment="Center" />
+                    <controls:HelpButton HelpKey="live_sensors" VerticalAlignment="Center" Margin="8,0,0,0" />
                 </StackPanel>
-                <controls:PillSelector
-                    Items="{Binding ApplyStrategyLabels}"
-                    SelectedIndex="{Binding ApplyStrategyIndex, Mode=TwoWay}"
-                    Height="32" />
 
-                <!-- Sensor Cards: CPU + GPU side by side -->
-                <Grid Margin="0,14,0,0">
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="8" />
@@ -71,20 +70,65 @@
             </StackPanel>
         </Border>
 
-        <!-- Fan Curves Section (visible when Custom Fans or Both selected) -->
+        <!-- ========================================================== -->
+        <!-- FAN & POWER CONTROL — strategy selector                     -->
+        <!-- ========================================================== -->
+        <Border Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="&#xE9CA;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="Fan &amp; Power Control"
+                               Style="{StaticResource CardTitleStyle}"
+                               VerticalAlignment="Center" />
+                    <controls:HelpButton HelpKey="fan_control" VerticalAlignment="Center" Margin="8,0,0,0" />
+                </StackPanel>
+
+                <controls:PillSelector
+                    Items="{Binding ApplyStrategyLabels}"
+                    SelectedIndex="{Binding ApplyStrategyIndex, Mode=TwoWay}"
+                    AccentColor="{DynamicResource AccentColor}"
+                    Height="32" />
+            </StackPanel>
+        </Border>
+
+        <!-- ========================================================== -->
+        <!-- FAN CURVES — only visible when Manual Fans / Both selected  -->
+        <!-- ========================================================== -->
         <Border Style="{StaticResource CardStyle}"
                 Visibility="{Binding DataContext.ShowFanCurves, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"
                 DataContext="{Binding FansPower}">
             <StackPanel>
-                <Grid Margin="0,0,0,8">
-                    <TextBlock Style="{StaticResource CardTitleStyle}">
-                        <Run Text="&#xE9CA;" FontFamily="Segoe MDL2 Assets" FontSize="14" />
-                        <Run Text="  Fan Curves" />
-                    </TextBlock>
+                <Grid Margin="0,0,0,12">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE9CA;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                   Foreground="{DynamicResource AccentBrush}"
+                                   VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Text="Fan Curves"
+                                   Style="{StaticResource CardTitleStyle}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
                     <Button Content="Reset" HorizontalAlignment="Right"
                             Style="{StaticResource LinkButtonStyle}"
                             Command="{Binding ResetFanCurvesCommand}" />
                 </Grid>
+
+                <Border Style="{StaticResource CautionBannerStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="&#xE7BA;"
+                                   FontFamily="Segoe MDL2 Assets" FontSize="12"
+                                   Foreground="{DynamicResource WarnOrangeBrush}"
+                                   VerticalAlignment="Top" Margin="0,1,8,0" />
+                        <TextBlock Grid.Column="1"
+                                   Style="{StaticResource CautionBannerTextStyle}"
+                                   Text="Changes apply live. Overly aggressive fan curves can cause throttling, excessive fan wear, or overheating." />
+                    </Grid>
+                </Border>
 
                 <controls:FanCurveEditor x:Name="CpuCurveEditor"
                     Height="150"
@@ -106,17 +150,37 @@
             </StackPanel>
         </Border>
 
-        <!-- Power Limits Section (visible when Custom Power or Both selected) -->
+        <!-- ========================================================== -->
+        <!-- POWER LIMITS — only visible when Manual Power / Both        -->
+        <!-- ========================================================== -->
         <Border Style="{StaticResource CardStyle}"
                 Visibility="{Binding DataContext.ShowPowerLimits, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}"
                 DataContext="{Binding FansPower}">
             <StackPanel>
-                <Grid Margin="0,0,0,8">
-                    <TextBlock Style="{StaticResource CardTitleStyle}">
-                        <Run Text="&#xEA93;" FontFamily="Segoe MDL2 Assets" FontSize="14" />
-                        <Run Text="  Power Limits" />
-                    </TextBlock>
-                </Grid>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="&#xEA93;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="Power Limits"
+                               Style="{StaticResource CardTitleStyle}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <Border Style="{StaticResource CautionBannerStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="&#xE7BA;"
+                                   FontFamily="Segoe MDL2 Assets" FontSize="12"
+                                   Foreground="{DynamicResource WarnOrangeBrush}"
+                                   VerticalAlignment="Top" Margin="0,1,8,0" />
+                        <TextBlock Grid.Column="1"
+                                   Style="{StaticResource CautionBannerTextStyle}"
+                                   Text="Changes apply live. Aggressive power limits can cause instability, shutdowns, or reduced component lifespan." />
+                    </Grid>
+                </Border>
 
                 <!-- Total / SPL -->
                 <Grid Style="{StaticResource SettingsRowStyle}">
@@ -187,5 +251,6 @@
                 </Grid>
             </StackPanel>
         </Border>
+
     </StackPanel>
 </UserControl>

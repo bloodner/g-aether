@@ -59,10 +59,14 @@ namespace GHelper.WPF.ViewModels
         private bool _isOverdriveToggle;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ShowAdvancedDisplay))]
         private bool _hasOverdrive;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ShowAdvancedDisplay))]
         private bool _hasMiniled;
+
+        public bool ShowAdvancedDisplay => HasOverdrive || HasMiniled;
 
         [ObservableProperty]
         private int _miniledMode;
