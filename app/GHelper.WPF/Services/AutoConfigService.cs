@@ -1,5 +1,7 @@
+using System.Windows;
 using GHelper.Gpu;
 using GHelper.Mode;
+using GHelper.WPF.ViewModels;
 
 namespace GHelper.WPF.Services
 {
@@ -50,11 +52,17 @@ namespace GHelper.WPF.Services
                     CurrentValue = currentPerfName,
                     RecommendedValue = perfName,
                     Reason = GetPerfReason(stats.Profile),
-                    Apply = () =>
+                    Apply = () => RouteToViewModel(vm =>
                     {
-                        AppConfig.Set("performance_mode", perfMode);
-                        Program.modeControl?.SetPerformanceMode(perfMode);
-                    }
+                        int idx = Array.IndexOf(vm.Performance.ModeLabels, perfName);
+                        if (idx >= 0) vm.Performance.SelectedModeIndex = idx;
+                        else
+                        {
+                            // Fallback: labels not initialized; poke the hardware + config directly.
+                            AppConfig.Set("performance_mode", perfMode);
+                            Program.modeControl?.SetPerformanceMode(perfMode);
+                        }
+                    })
                 },
                 new()
                 {
@@ -62,12 +70,17 @@ namespace GHelper.WPF.Services
                     CurrentValue = currentGpuName,
                     RecommendedValue = gpuName,
                     Reason = GetGpuReason(stats.Profile),
-                    Apply = () =>
+                    Apply = () => RouteToViewModel(vm =>
                     {
-                        AppConfig.Set("gpu_auto", gpuAuto ? 1 : 0);
-                        AppConfig.Set("gpu_mode", gpuMode);
-                        Program.gpuControl?.SetGPUMode(gpuMode, gpuAuto ? 1 : 0);
-                    }
+                        int idx = Array.IndexOf(vm.Gpu.ModeLabels, gpuName);
+                        if (idx >= 0) vm.Gpu.SelectedModeIndex = idx;
+                        else
+                        {
+                            AppConfig.Set("gpu_auto", gpuAuto ? 1 : 0);
+                            AppConfig.Set("gpu_mode", gpuMode);
+                            Program.gpuControl?.SetGPUMode(gpuMode, gpuAuto ? 1 : 0);
+                        }
+                    })
                 },
                 new()
                 {
@@ -75,10 +88,20 @@ namespace GHelper.WPF.Services
                     CurrentValue = currentScreenName,
                     RecommendedValue = screenName,
                     Reason = GetScreenReason(stats.Profile),
-                    Apply = () =>
+                    Apply = () => RouteToViewModel(vm =>
                     {
-                        AppConfig.Set("screen_auto", screenAuto ? 1 : 0);
-                    }
+                        // Auto is always index 0 in FrequencyLabels. Setting it triggers
+                        // OnSelectedFreqIndexChanged which handles config + ScreenControl.
+                        if (screenAuto)
+                        {
+                            vm.Visual.SelectedFreqIndex = 0;
+                        }
+                        else if (vm.Visual.FrequencyLabels.Length > 1)
+                        {
+                            // Manual: pick the highest non-Auto rate (last label).
+                            vm.Visual.SelectedFreqIndex = vm.Visual.FrequencyLabels.Length - 1;
+                        }
+                    })
                 },
             };
 
@@ -99,6 +122,30 @@ namespace GHelper.WPF.Services
                 Reason = stats.ProfileReason,
                 Recommendations = recommendations,
             };
+        }
+
+        /// <summary>
+        /// Apply by driving the VM's selected-index property on the UI thread. Setting
+        /// that property runs the existing OnChanged handler which does config + hardware
+        /// + property-change notification in one place — the same path a real user click
+        /// takes, so every downstream listener (status bar, tray icon, schematic) updates.
+        /// </summary>
+        private static void RouteToViewModel(Action<MainViewModel> action)
+        {
+            var app = Application.Current;
+            if (app == null) return;
+            app.Dispatcher.Invoke(() =>
+            {
+                try
+                {
+                    if (app.MainWindow?.DataContext is MainViewModel vm)
+                        action(vm);
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine("AutoConfig route-to-VM error: " + ex.Message);
+                }
+            });
         }
 
         private static (int mode, string name) GetRecommendedPerfMode(UsageProfile profile) => profile switch
