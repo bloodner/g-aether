@@ -69,18 +69,28 @@ namespace GHelper.WPF.Controls
             bgBrush.Freeze();
             dc.DrawGeometry(bgBrush, null, cardGeo);
 
-            // Soft accent halo in the top-right corner.
-            var halo = new RadialGradientBrush
+            // Dynamic halo — intensity scales with the latest reading as a fraction
+            // of MaxValue. Idle metrics (0 W, 0% usage) fade to pure dark; busy metrics
+            // light up, so the tile doubles as an at-a-glance activity indicator.
+            double haloIntensity = 0.0;
+            var snapshot = Values;
+            if (snapshot != null && snapshot.Length > 0 && MaxValue > 0)
+                haloIntensity = Math.Clamp(snapshot[snapshot.Length - 1] / MaxValue, 0.0, 1.0);
+            byte haloAlpha = (byte)(0x32 * haloIntensity);
+            if (haloAlpha > 0)
             {
-                GradientOrigin = new Point(0.92, 0.08),
-                Center = new Point(0.92, 0.08),
-                RadiusX = 0.95,
-                RadiusY = 1.4
-            };
-            halo.GradientStops.Add(new GradientStop(Color.FromArgb(0x32, accentColor.R, accentColor.G, accentColor.B), 0.0));
-            halo.GradientStops.Add(new GradientStop(Color.FromArgb(0x00, accentColor.R, accentColor.G, accentColor.B), 0.60));
-            halo.Freeze();
-            dc.DrawGeometry(halo, null, cardGeo);
+                var halo = new RadialGradientBrush
+                {
+                    GradientOrigin = new Point(0.92, 0.08),
+                    Center = new Point(0.92, 0.08),
+                    RadiusX = 0.95,
+                    RadiusY = 1.4
+                };
+                halo.GradientStops.Add(new GradientStop(Color.FromArgb(haloAlpha, accentColor.R, accentColor.G, accentColor.B), 0.0));
+                halo.GradientStops.Add(new GradientStop(Color.FromArgb(0x00, accentColor.R, accentColor.G, accentColor.B), 0.60));
+                halo.Freeze();
+                dc.DrawGeometry(halo, null, cardGeo);
+            }
 
             // Hairline border.
             var borderPen = new Pen(new SolidColorBrush(Color.FromRgb(0x22, 0x25, 0x2E)), 1);
@@ -93,10 +103,10 @@ namespace GHelper.WPF.Controls
             // === Content =======================================================
 
             var font = new Typeface(new FontFamily("Segoe UI Variable"), FontStyles.Normal, FontWeights.SemiBold, FontStretches.Normal);
+            var fontMedium = new Typeface(new FontFamily("Segoe UI Variable"), FontStyles.Normal, FontWeights.Medium, FontStretches.Normal);
             var fontNormal = new Typeface(new FontFamily("Segoe UI Variable"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
 
             double labelY = padding - 2;
-            double valueTop = padding - 4;
 
             // Label (top-left, inset past stripe).
             if (!string.IsNullOrEmpty(Label))
@@ -107,19 +117,31 @@ namespace GHelper.WPF.Controls
                 dc.DrawText(labelFt, new Point(leftX, labelY));
             }
 
-            // Current value (top-right, colored by StrokeColor).
+            // Current value: split into number + unit so the number reads as the hero
+            // (matches Performance-page SensorCard). The number hangs up above the label
+            // baseline; the unit sits inline with it at roughly half size.
             if (!string.IsNullOrEmpty(CurrentText))
             {
-                var valFt = new FormattedText(CurrentText, CultureInfo.CurrentUICulture,
-                    System.Windows.FlowDirection.LeftToRight, font, ValueFontSize,
-                    new SolidColorBrush(accentColor), dpi);
-                dc.DrawText(valFt, new Point(rightX - valFt.Width, valueTop));
+                var (numberPart, unitPart) = SplitValueAndUnit(CurrentText);
+                double unitSize = Math.Max(10, ValueFontSize * 0.5);
+
+                var numFt = new FormattedText(numberPart, CultureInfo.CurrentUICulture,
+                    System.Windows.FlowDirection.LeftToRight, font, ValueFontSize, accentBrush, dpi);
+                var unitFt = new FormattedText(unitPart, CultureInfo.CurrentUICulture,
+                    System.Windows.FlowDirection.LeftToRight, fontMedium, unitSize, accentBrush, dpi);
+
+                double unitX = rightX - unitFt.Width;
+                double numX = unitX - numFt.Width - 2;
+                dc.DrawText(unitFt, new Point(unitX, padding + 4));
+                dc.DrawText(numFt, new Point(numX, padding - 8));
             }
 
-            // Sparkline area begins below the header row.
+            // Sparkline area begins below the hero value. Push chartTop proportional
+            // to the value font so bumping ValueFontSize in XAML doesn't collide with
+            // the sparkline.
             double chartLeft = leftX;
             double chartRight = rightX;
-            double chartTop = padding + 20;
+            double chartTop = padding + Math.Max(ValueFontSize - 4, 20);
             double chartBot = h - padding;
             double chartW = chartRight - chartLeft;
             double chartH = chartBot - chartTop;
@@ -181,6 +203,19 @@ namespace GHelper.WPF.Controls
             dc.DrawEllipse(new SolidColorBrush(Color.FromArgb(40, accentColor.R, accentColor.G, accentColor.B)),
                 null, lastPt, 6, 6);
             dc.DrawEllipse(accentBrush, null, lastPt, 3, 3);
+        }
+
+        /// <summary>
+        /// Split a readout like "45°C", "1900RPM", "0W", or "--" into numeric prefix
+        /// and unit suffix so they can render at separate sizes.
+        /// </summary>
+        private static (string number, string unit) SplitValueAndUnit(string text)
+        {
+            int i = 0;
+            while (i < text.Length &&
+                   (char.IsDigit(text[i]) || text[i] == '.' || text[i] == '-' || text[i] == '+'))
+                i++;
+            return (text.Substring(0, i), text.Substring(i));
         }
 
         private static Geometry CreateRoundedRect(Rect rect, double r)

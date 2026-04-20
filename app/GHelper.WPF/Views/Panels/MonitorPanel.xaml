@@ -42,36 +42,36 @@
                  SparklineChart now draws its own card background (fill, border,
                  halo, left stripe) so it drops straight into the grid — no outer
                  TileStyle wrapper. -->
-            <controls:SparklineChart Grid.Row="2" Grid.Column="0" Height="92"
+            <controls:SparklineChart Grid.Row="2" Grid.Column="0" Height="106"
                 Label="CPU Temp"
                 CurrentText="{Binding CpuTempText}"
                 Values="{Binding CpuTempValues}"
                 MaxValue="105"
-                ValueFontSize="16"
+                ValueFontSize="28"
                 StrokeColor="#FF6B6B" />
-            <controls:SparklineChart Grid.Row="2" Grid.Column="2" Height="92"
+            <controls:SparklineChart Grid.Row="2" Grid.Column="2" Height="106"
                 Label="Power Draw"
                 CurrentText="{Binding BatteryRateText}"
                 Values="{Binding BatteryRateValues}"
                 MaxValue="100"
-                ValueFontSize="16"
+                ValueFontSize="28"
                 StrokeColor="#6BCB77" />
 
             <!-- Row 4: GPU Temp + GPU Usage (when active) OR dGPU Idle banner (when Eco) -->
-            <controls:SparklineChart Grid.Row="4" Grid.Column="0" Height="92"
+            <controls:SparklineChart Grid.Row="4" Grid.Column="0" Height="106"
                 Label="GPU Temp"
                 CurrentText="{Binding GpuTempText}"
                 Values="{Binding GpuTempValues}"
                 MaxValue="95"
-                ValueFontSize="16"
+                ValueFontSize="28"
                 StrokeColor="#FFB347"
                 Visibility="{Binding IsGpuActive, Converter={StaticResource BoolToVisibility}}" />
-            <controls:SparklineChart Grid.Row="4" Grid.Column="2" Height="92"
+            <controls:SparklineChart Grid.Row="4" Grid.Column="2" Height="106"
                 Label="GPU Usage"
                 CurrentText="{Binding GpuUseText}"
                 Values="{Binding GpuUseValues}"
                 MaxValue="100"
-                ValueFontSize="16"
+                ValueFontSize="28"
                 StrokeColor="#60CDFF"
                 Visibility="{Binding IsGpuActive, Converter={StaticResource BoolToVisibility}}" />
             <Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"
@@ -90,19 +90,19 @@
             </Border>
 
             <!-- Row 6: CPU Fan / GPU Fan -->
-            <controls:SparklineChart Grid.Row="6" Grid.Column="0" Height="92"
+            <controls:SparklineChart Grid.Row="6" Grid.Column="0" Height="106"
                 Label="CPU Fan"
                 CurrentText="{Binding CpuFanCurrentText}"
                 Values="{Binding CpuFanValues}"
                 MaxValue="7000"
-                ValueFontSize="13"
+                ValueFontSize="22"
                 StrokeColor="#C084FC" />
-            <controls:SparklineChart Grid.Row="6" Grid.Column="2" Height="92"
+            <controls:SparklineChart Grid.Row="6" Grid.Column="2" Height="106"
                 Label="GPU Fan"
                 CurrentText="{Binding GpuFanCurrentText}"
                 Values="{Binding GpuFanValues}"
                 MaxValue="7000"
-                ValueFontSize="13"
+                ValueFontSize="22"
                 StrokeColor="#F472B6" />
 
             <!-- Row 8: Battery Status (full width) — halo color tracks BatteryBrush

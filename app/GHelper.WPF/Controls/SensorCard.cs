@@ -85,8 +85,12 @@ namespace GHelper.WPF.Controls
             bgBrush.Freeze();
             dc.DrawGeometry(bgBrush, null, cardGeo);
 
-            // Soft temperature-colored halo tucked behind the hero value.
-            if (Temperature > 0)
+            // Dynamic halo — intensity scales with Temperature / 100°C (clamped).
+            // Idle sensors fade to pure dark; hot sensors glow vividly. The card
+            // becomes a direct visual readout of activity without reading the number.
+            double haloIntensity = Math.Clamp(Temperature / 100.0, 0.0, 1.0);
+            byte haloAlpha = (byte)(0x32 * haloIntensity);
+            if (haloAlpha > 0)
             {
                 var halo = new RadialGradientBrush
                 {
@@ -95,7 +99,7 @@ namespace GHelper.WPF.Controls
                     RadiusX = 0.95,
                     RadiusY = 1.4
                 };
-                halo.GradientStops.Add(new GradientStop(Color.FromArgb(0x32, accentColor.R, accentColor.G, accentColor.B), 0.0));
+                halo.GradientStops.Add(new GradientStop(Color.FromArgb(haloAlpha, accentColor.R, accentColor.G, accentColor.B), 0.0));
                 halo.GradientStops.Add(new GradientStop(Color.FromArgb(0x00, accentColor.R, accentColor.G, accentColor.B), 0.60));
                 halo.Freeze();
                 dc.DrawGeometry(halo, null, cardGeo);
