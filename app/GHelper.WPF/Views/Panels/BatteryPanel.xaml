@@ -92,6 +92,27 @@
                     </StackPanel>
                 </Grid>
 
+                <!-- Battery Saver automation toggle -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Battery Saver Automation" Style="{StaticResource BodyTextStyle}" />
+                            <controls:HelpButton HelpKey="battery_triggers" VerticalAlignment="Center" Margin="6,0,0,0" />
+                        </StackPanel>
+                        <TextBlock Text="Auto-apply the Focus scene at 20% and show an urgent reminder at 10% while on battery."
+                                   Style="{StaticResource DimTextStyle}" FontSize="10"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                    <controls:ToggleSwitch Grid.Column="1"
+                                           IsChecked="{Binding TriggersEnabled, Mode=TwoWay}"
+                                           Width="44" Height="22"
+                                           VerticalAlignment="Center" />
+                </Grid>
+
                 <!-- Generate battery report: explainer + short primary button -->
                 <Grid>
                     <Grid.ColumnDefinitions>

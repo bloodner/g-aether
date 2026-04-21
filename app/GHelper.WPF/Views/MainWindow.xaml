@@ -145,21 +145,54 @@
                                      Style="{StaticResource NavIconStyle}"
                                      ToolTip="Key Bindings" GroupName="Nav"
                                      Checked="Nav_Checked" Tag="7" />
+                        <RadioButton x:Name="NavProcesses" Content="&#xEB42;"
+                                     Style="{StaticResource NavIconStyle}"
+                                     ToolTip="Processes" GroupName="Nav"
+                                     Checked="Nav_Checked" Tag="10" />
                     </StackPanel>
                 </DockPanel>
             </Border>
 
-            <!-- Mode Badge Strip — edge-to-edge footer bar. Its top border is the
-                 single visual separator between content and footer, so it never
-                 doubles-up with a card's bottom edge on content-heavy pages. -->
+            <!-- Footer bar: Scenes strip + Mode Badge strip, stacked. The Scenes row
+                 gives users one-click access to compound presets (Reading, Focus, etc.);
+                 the badges row below reports current mode state. Top border is the single
+                 visual separator between content and footer. -->
             <Border Grid.Row="2" Grid.ColumnSpan="2"
                     Background="#0BFFFFFF"
                     BorderBrush="#1EFFFFFF"
                     BorderThickness="0,1,0,0"
                     CornerRadius="0,0,11,11"
-                    Padding="14,8,14,8"
+                    Padding="14,6,14,6"
                     HorizontalAlignment="Stretch">
-                <Grid>
+                <StackPanel>
+                    <!-- Scenes strip -->
+                    <ItemsControl ItemsSource="{Binding Scenes}" Margin="0,0,0,4">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="1" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource SceneButtonStyle}"
+                                        Command="{Binding DataContext.ApplySceneCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        ToolTip="{Binding Tooltip}"
+                                        Margin="3,0">
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                        <TextBlock Text="{Binding Icon}" Style="{StaticResource SceneIconStyle}" />
+                                        <TextBlock Text="{Binding Name}" HorizontalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Thin divider between the two rows -->
+                    <Border Height="1" Background="#12FFFFFF" Margin="0,0,0,4" />
+
+                    <!-- Mode badges (existing) -->
+                    <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="1" />
@@ -236,6 +269,7 @@
                         </StackPanel>
                     </Button>
                 </Grid>
+                </StackPanel>
             </Border>
 
 
@@ -271,6 +305,9 @@
                     <panels:ExtraSettingsPanel x:Name="PanelExtra"
                                                DataContext="{Binding Extra}"
                                                Visibility="Collapsed" />
+                    <panels:ProcessesPanel x:Name="PanelProcesses"
+                                           DataContext="{Binding Processes}"
+                                           Visibility="Collapsed" />
                 </Grid>
             </ScrollViewer>
 

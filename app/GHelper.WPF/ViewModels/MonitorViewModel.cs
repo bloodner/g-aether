@@ -151,6 +151,10 @@ namespace GHelper.WPF.ViewModels
 
             bool plugged = power.PowerLineStatus == PowerLineStatus.Online;
             PowerStatusText = plugged ? "Charging" : "On Battery";
+
+            // Opt-in battery automation: fires Focus scene at 20%, urgent toast at 10%.
+            // No-op when disabled or when plugged in.
+            Services.BatteryTriggerService.Check(pct, !plugged);
         }
 
         private static string FormatFanText(string? fanStr)

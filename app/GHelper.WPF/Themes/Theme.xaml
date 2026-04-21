@@ -178,6 +178,57 @@
         <Setter Property="Margin" Value="0,6,0,0" />
     </Style>
 
+    <!-- Global ToolTip style — dark chrome that matches the rest of the app.
+         Without this, WPF falls back to the white Windows default, which clashes
+         with our dark surfaces. Applied to every tooltip app-wide. -->
+    <Style TargetType="ToolTip">
+        <Setter Property="Background" Value="#E0181824" />
+        <Setter Property="Foreground" Value="#E8E8EC" />
+        <Setter Property="BorderBrush" Value="#30FFFFFF" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="10,7" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="HasDropShadow" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToolTip">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6"
+                            Padding="{TemplateBinding Padding}"
+                            MaxWidth="340">
+                        <TextBlock Text="{TemplateBinding Content}"
+                                   Foreground="{TemplateBinding Foreground}"
+                                   TextWrapping="Wrap" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Rich ToolTip — for tooltips whose Content is a Panel (StackPanel, Grid)
+         rather than a plain string. The default template wraps Content in a
+         TextBlock, which silently collapses panel content to nothing. Apply
+         this style explicitly on inline <ToolTip> elements that carry UI. -->
+    <Style x:Key="RichToolTipStyle" TargetType="ToolTip" BasedOn="{StaticResource {x:Type ToolTip}}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToolTip">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6"
+                            Padding="{TemplateBinding Padding}"
+                            MaxWidth="420">
+                        <ContentPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Caution Banner Style — inline warning strip for risky controls -->
     <Style x:Key="CautionBannerStyle" TargetType="Border">
         <Setter Property="Background" Value="#1AFFB347" />
@@ -503,6 +554,79 @@
         </Setter>
     </Style>
 
+    <!-- Scene Button — compound-action button shown in the top footer strip. Deliberately
+         larger than a mode badge so users discover it; accent glow on hover, and a 1.8s
+         accent flash on click that fades back to normal (confirms the click fired without
+         implying a persistent mode). -->
+    <Style x:Key="SceneButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="#E0E0E8" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="8,6" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Border x:Name="Bg"
+                                Background="#13141B"
+                                BorderBrush="#22252E"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              TextBlock.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                        <!-- Click-flash overlay: invisible until Button.Click, then fades from
+                             accent-tinted to transparent over 1.8s. Purely decorative — clicks
+                             pass through to the button underneath. -->
+                        <Border x:Name="FlashLayer"
+                                Background="{DynamicResource AccentBrush}"
+                                CornerRadius="8"
+                                Opacity="0"
+                                IsHitTestVisible="False" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#1C1E28" />
+                            <Setter TargetName="Bg" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource AccentDimBrush}" />
+                        </Trigger>
+                        <EventTrigger RoutedEvent="Button.Click">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="FlashLayer"
+                                                     Storyboard.TargetProperty="Opacity"
+                                                     From="0.55" To="0"
+                                                     Duration="0:0:1.8">
+                                        <DoubleAnimation.EasingFunction>
+                                            <QuadraticEase EasingMode="EaseOut" />
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SceneIconStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0,0,0,2" />
+    </Style>
+
     <!-- Mode Badge Strip styles -->
     <Style x:Key="ModeBadgeLabelStyle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="Segoe UI Variable" />
@@ -562,6 +686,115 @@
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.55" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Status Pill — a rounded button whose label is its state ("Enabled" / "Disabled")
+         and whose click toggles the state. Default fill is the disabled look
+         (dim gray); consumers override via a DataTrigger to apply the enabled
+         (accent-colored) look. Matches the Windows 11 Settings aesthetic for
+         "flip this on/off" rows. -->
+    <Style x:Key="StatusPillStyle" TargetType="Button">
+        <Setter Property="Background" Value="#14FFFFFF" />
+        <Setter Property="BorderBrush" Value="#2AFFFFFF" />
+        <Setter Property="Foreground" Value="#80E0E0E8" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="18,5" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="14"
+                            Padding="{TemplateBinding Padding}"
+                            MinWidth="92">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          TextBlock.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Opacity" Value="0.75" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bg" Property="Opacity" Value="0.55" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Destructive variant of SecondaryActionButtonStyle — red/orange fill and
+         hover for buttons that disable / remove something. Same geometry as the
+         secondary button so swapping styles by DataTrigger doesn't cause layout jitter. -->
+    <Style x:Key="DestructiveActionButtonStyle" TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
+        <Setter Property="Background" Value="#30FF6B6B" />
+        <Setter Property="BorderBrush" Value="#50FF6B6B" />
+        <Setter Property="Foreground" Value="#FFD6D6" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          TextBlock.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#48FF6B6B" />
+                            <Setter TargetName="Bg" Property="BorderBrush" Value="#70FF6B6B" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#60FF6B6B" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Affirmative variant — green fill for enable / activate actions. -->
+    <Style x:Key="AffirmativeActionButtonStyle" TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
+        <Setter Property="Background" Value="#304CC95E" />
+        <Setter Property="BorderBrush" Value="#504CC95E" />
+        <Setter Property="Foreground" Value="#D6F5DC" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          TextBlock.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#484CC95E" />
+                            <Setter TargetName="Bg" Property="BorderBrush" Value="#704CC95E" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#604CC95E" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

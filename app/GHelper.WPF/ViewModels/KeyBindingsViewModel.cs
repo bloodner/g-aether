@@ -5,6 +5,10 @@ namespace GHelper.WPF.ViewModels
 {
     public partial class KeyBindingsViewModel : ObservableObject
     {
+        /// <summary>Nested VM for the Global Hotkeys section below the hardware-key rows.</summary>
+        [ObservableProperty]
+        private GlobalHotkeysViewModel _globalHotkeys = new();
+
         private static readonly string[] ActionLabels =
         [
             "Disabled",

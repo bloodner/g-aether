@@ -56,6 +56,16 @@ namespace GHelper.WPF.ViewModels
         // Reference to FansPower VM for embedded controls
         public FansPowerViewModel FansPower { get; set; } = null!;
 
+        // --- Fan Stop on Idle ---------------------------------------------------
+        [ObservableProperty]
+        private bool _fanStopEnabled;
+
+        partial void OnFanStopEnabledChanged(bool value)
+        {
+            if (_ignoreIndexChange) return;
+            FanStopService.IsEnabled = value;
+        }
+
         private bool _ignoreIndexChange;
 
         partial void OnSelectedModeIndexChanged(int value)
@@ -141,6 +151,12 @@ namespace GHelper.WPF.ViewModels
 
             ShowFanCurves = applyFans;
             ShowPowerLimits = applyPower;
+
+            // Mirror the persisted Fan Stop on Idle flag into the VM so the
+            // toggle reflects reality when the panel renders.
+            _ignoreIndexChange = true;
+            try { FanStopEnabled = FanStopService.IsEnabled; }
+            finally { _ignoreIndexChange = false; }
         }
 
         public void UpdateSensors()

@@ -1,63 +1,138 @@
 <UserControl x:Class="GHelper.WPF.Views.Panels.KeyBindingsPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:GHelper.WPF.Controls">
 
-    <Border Style="{StaticResource CardStyle}">
-        <StackPanel>
-            <!-- Header -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                <TextBlock Text="&#xE92E;" FontFamily="Segoe MDL2 Assets" FontSize="16"
-                           Foreground="{DynamicResource AccentBrush}"
-                           VerticalAlignment="Center" Margin="0,0,8,0" />
-                <TextBlock Text="Key Bindings"
-                           Style="{StaticResource CardTitleStyle}"
-                           VerticalAlignment="Center" />
-            </StackPanel>
+    <StackPanel>
 
-            <TextBlock Text="Assign actions to your laptop's special keys."
-                       Style="{StaticResource DimTextStyle}" Margin="0,0,0,14" />
-
-            <!-- ROG / M4 Key -->
-            <TextBlock Text="ROG Key" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
-            <ComboBox ItemsSource="{Binding Actions}"
-                      SelectedIndex="{Binding RogKeyIndex, Mode=TwoWay}"
-                      Margin="0,0,0,12" />
-
-            <!-- M3 / Aura Key -->
-            <TextBlock Text="Aura Key (M3)" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
-            <ComboBox ItemsSource="{Binding Actions}"
-                      SelectedIndex="{Binding AuraKeyIndex, Mode=TwoWay}"
-                      Margin="0,0,0,12" />
-
-            <!-- Fn+F4 -->
-            <Border BorderBrush="#10FFFFFF" BorderThickness="0,1,0,0" Padding="0,12,0,0">
-                <StackPanel>
-                    <TextBlock Text="Fn + F4" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
-                    <ComboBox ItemsSource="{Binding Actions}"
-                              SelectedIndex="{Binding FnF4Index, Mode=TwoWay}"
-                              Margin="0,0,0,12" />
-
-                    <!-- Fn+V -->
-                    <TextBlock Text="Fn + V" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
-                    <ComboBox ItemsSource="{Binding Actions}"
-                              SelectedIndex="{Binding FnVIndex, Mode=TwoWay}"
-                              Margin="0,0,0,12" />
-
-                    <!-- Fn+Numpad Enter -->
-                    <TextBlock Text="Fn + Numpad Enter" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
-                    <ComboBox ItemsSource="{Binding Actions}"
-                              SelectedIndex="{Binding FnEnterIndex, Mode=TwoWay}"
-                              Margin="0,0,0,12" />
-
-                    <!-- Copilot key -->
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                        <TextBlock Text="Copilot Key" Style="{StaticResource BodyTextStyle}" />
-                        <TextBlock Text="  (Win+Shift+F23)" Style="{StaticResource DimTextStyle}" FontSize="10" VerticalAlignment="Center" />
-                    </StackPanel>
-                    <ComboBox ItemsSource="{Binding Actions}"
-                              SelectedIndex="{Binding CopilotKeyIndex, Mode=TwoWay}" />
+        <!-- ========================================================== -->
+        <!-- HARDWARE KEYS — ROG / M3 / Fn+X / Copilot                   -->
+        <!-- ========================================================== -->
+        <Border Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="&#xE92E;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="Hardware Keys"
+                               Style="{StaticResource CardTitleStyle}"
+                               VerticalAlignment="Center" />
                 </StackPanel>
-            </Border>
-        </StackPanel>
-    </Border>
+
+                <TextBlock Text="Assign actions to your laptop's special keys."
+                           Style="{StaticResource DimTextStyle}" Margin="0,0,0,14" />
+
+                <TextBlock Text="ROG Key" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
+                <ComboBox ItemsSource="{Binding Actions}"
+                          SelectedIndex="{Binding RogKeyIndex, Mode=TwoWay}"
+                          Margin="0,0,0,12" />
+
+                <TextBlock Text="Aura Key (M3)" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
+                <ComboBox ItemsSource="{Binding Actions}"
+                          SelectedIndex="{Binding AuraKeyIndex, Mode=TwoWay}"
+                          Margin="0,0,0,12" />
+
+                <Border BorderBrush="#10FFFFFF" BorderThickness="0,1,0,0" Padding="0,12,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Fn + F4" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
+                        <ComboBox ItemsSource="{Binding Actions}"
+                                  SelectedIndex="{Binding FnF4Index, Mode=TwoWay}"
+                                  Margin="0,0,0,12" />
+
+                        <TextBlock Text="Fn + V" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
+                        <ComboBox ItemsSource="{Binding Actions}"
+                                  SelectedIndex="{Binding FnVIndex, Mode=TwoWay}"
+                                  Margin="0,0,0,12" />
+
+                        <TextBlock Text="Fn + Numpad Enter" Style="{StaticResource BodyTextStyle}" Margin="0,0,0,4" />
+                        <ComboBox ItemsSource="{Binding Actions}"
+                                  SelectedIndex="{Binding FnEnterIndex, Mode=TwoWay}"
+                                  Margin="0,0,0,12" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="Copilot Key" Style="{StaticResource BodyTextStyle}" />
+                            <TextBlock Text="  (Win+Shift+F23)" Style="{StaticResource DimTextStyle}" FontSize="10" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <ComboBox ItemsSource="{Binding Actions}"
+                                  SelectedIndex="{Binding CopilotKeyIndex, Mode=TwoWay}" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <!-- ========================================================== -->
+        <!-- GLOBAL HOTKEYS — system-wide shortcuts                      -->
+        <!-- ========================================================== -->
+        <Border Style="{StaticResource CardStyle}" DataContext="{Binding GlobalHotkeys}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                    <TextBlock Text="&#xE765;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="Global Hotkeys"
+                               Style="{StaticResource CardTitleStyle}"
+                               VerticalAlignment="Center" />
+                    <controls:HelpButton HelpKey="global_hotkeys" VerticalAlignment="Center" Margin="8,0,0,0" />
+                </StackPanel>
+
+                <TextBlock Text="Shortcuts that work anywhere in Windows — even inside games. Click Set to capture a combo."
+                           Style="{StaticResource DimTextStyle}" Margin="0,0,0,12"
+                           TextWrapping="Wrap" />
+
+                <ItemsControl ItemsSource="{Binding Rows}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding ActionLabel}"
+                                               Style="{StaticResource BodyTextStyle}" />
+                                    <TextBlock Text="{Binding Warning}"
+                                               Style="{StaticResource DimTextStyle}"
+                                               FontSize="10"
+                                               Foreground="{DynamicResource WarnOrangeBrush}"
+                                               Visibility="{Binding HasBinding, Converter={StaticResource BoolToVisibility}}" />
+                                </StackPanel>
+                                <Border Grid.Column="1"
+                                        Background="#13141B"
+                                        BorderBrush="#22252E"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Padding="10,5"
+                                        VerticalAlignment="Center"
+                                        Margin="8,0">
+                                    <TextBlock Text="{Binding FormattedBinding}"
+                                               Style="{StaticResource BodyTextStyle}"
+                                               Foreground="{DynamicResource AccentBrush}"
+                                               VerticalAlignment="Center"
+                                               MinWidth="120" />
+                                </Border>
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Content="Set"
+                                            Style="{StaticResource SecondaryActionButtonStyle}"
+                                            Command="{Binding DataContext.SetHotkeyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding Action}"
+                                            Margin="0,0,6,0" />
+                                    <Button Content="&#xE8BB;"
+                                            FontFamily="Segoe MDL2 Assets"
+                                            FontSize="11"
+                                            Width="32" Height="32"
+                                            Style="{StaticResource CloseButtonStyle}"
+                                            Visibility="{Binding HasBinding, Converter={StaticResource BoolToVisibility}}"
+                                            Command="{Binding DataContext.ClearHotkeyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding Action}"
+                                            ToolTip="Clear this hotkey" />
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
+    </StackPanel>
 </UserControl>

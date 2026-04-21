@@ -1,7 +1,8 @@
+using GHelper.Display;
+using GHelper.Gpu;
 using GHelper.Helpers;
 using GHelper.Input;
 using GHelper.Mode;
-using GHelper.Gpu;
 using PawnIO;
 
 namespace GHelper.WPF.Services
@@ -58,6 +59,16 @@ namespace GHelper.WPF.Services
             // Background update check — throttled internally to run at most once per 24h.
             Task.Run(UpdateBackgroundCheck.RunAsync);
 
+            // Per-app profile automation — subscribes to foreground-window events
+            // and applies scenes when rule-matched apps take focus.
+            try { AppProfileService.Initialize(); }
+            catch (Exception ex) { Logger.WriteLine("AppProfileService init error: " + ex.Message); }
+
+            // Fan Stop on Idle — watchdog that commands a passive-cooling curve
+            // while the system is cool. No-op when the user hasn't opted in.
+            try { FanStopService.Initialize(); }
+            catch (Exception ex) { Logger.WriteLine("FanStopService init error: " + ex.Message); }
+
             // Wire up WPF callbacks for key actions that need UI
             InputDispatcher.OnCycleAura = (delta) =>
             {
@@ -73,6 +84,43 @@ namespace GHelper.WPF.Services
                             vm.Keyboard.SelectedAuraModeIndex);
                     }
                 });
+            };
+
+            InputDispatcher.OnCycleVisual = (delta) =>
+            {
+                // Cycle through the device's available Splendid/visual modes
+                // (Default, Vivid, Eyecare, etc.), wrapping at both ends. Apply and
+                // surface a quick OSD so the user sees what they landed on.
+                try
+                {
+                    var modes = VisualControl.GetVisualModes();
+                    if (modes.Count == 0) return;
+
+                    var keys = new List<SplendidCommand>(modes.Keys);
+                    int currentCmd = AppConfig.Get("visual");
+                    int currentIdx = keys.FindIndex(k => (int)k == currentCmd);
+                    if (currentIdx < 0) currentIdx = 0;
+
+                    int nextIdx = ((currentIdx + delta) % keys.Count + keys.Count) % keys.Count;
+                    SplendidCommand nextCmd = keys[nextIdx];
+                    int temp = AppConfig.Get("color_temp");
+
+                    Task.Run(() =>
+                    {
+                        try { VisualControl.SetVisual(nextCmd, temp); }
+                        catch (Exception ex) { Logger.WriteLine("Cycle visual apply error: " + ex.Message); }
+                    });
+
+                    System.Windows.Application.Current?.Dispatcher.BeginInvoke(() =>
+                    {
+                        // Brightness/sun glyph — same icon the Visual Mode nav uses.
+                        ToastService.ShowOsdOnly(modes[nextCmd], "\uE793", ThemeService.AccentColor);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine("OnCycleVisual error: " + ex.Message);
+                }
             };
 
             InputDispatcher.OnCyclePerformanceMode = () =>
@@ -113,6 +161,9 @@ namespace GHelper.WPF.Services
             Logger.WriteLine("AppHost shutting down");
             _sensorTimer?.Stop();
             _sensorTimer?.Dispose();
+            try { AppProfileService.Shutdown(); } catch { }
+            try { GlobalHotkeyService.Shutdown(); } catch { }
+            try { FanStopService.Shutdown(); } catch { }
             Logger.Shutdown();
         }
     }

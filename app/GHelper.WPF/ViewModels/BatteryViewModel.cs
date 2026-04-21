@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GHelper.Battery;
+using GHelper.WPF.Services;
 
 namespace GHelper.WPF.ViewModels
 {
@@ -23,6 +24,15 @@ namespace GHelper.WPF.ViewModels
 
         [ObservableProperty]
         private string _powerStatusText = "";
+
+        [ObservableProperty]
+        private bool _triggersEnabled;
+
+        partial void OnTriggersEnabledChanged(bool value)
+        {
+            if (_ignoreChange) return;
+            BatteryTriggerService.IsEnabled = value;
+        }
 
         private bool _ignoreChange;
         private DateTime _lastHealthRefresh = DateTime.MinValue;
@@ -61,6 +71,8 @@ namespace GHelper.WPF.ViewModels
                 int limit = AppConfig.Get("charge_limit");
                 if (limit >= 40 && limit <= 100) ChargeLimit = limit;
                 else ChargeLimit = 100;
+
+                TriggersEnabled = BatteryTriggerService.IsEnabled;
 
                 UpdateBatteryStatus();
             }

@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using GHelper.Gpu;
 using GHelper.Mode;
 using GHelper.WPF.Services;
@@ -37,6 +38,12 @@ namespace GHelper.WPF.ViewModels
         [ObservableProperty]
         private FansPowerViewModel _fansPower = new();
 
+        [ObservableProperty]
+        private AppProfilesViewModel _appProfiles = new();
+
+        [ObservableProperty]
+        private ProcessesViewModel _processes = new();
+
         // Mode Badge Strip — live-updated badges shown above content on every panel
         [ObservableProperty] private string _perfBadgeName = "Balanced";
         [ObservableProperty] private Brush _perfBadgeBrush = new SolidColorBrush(Color.FromRgb(0x60, 0xCD, 0xFF));
@@ -60,6 +67,29 @@ namespace GHelper.WPF.ViewModels
         // in one place. Recreating on each Update*Badge() call is cheap and lets
         // Balanced/Standard track the live Windows accent.
         private static Brush ModeBrush(Color c) => new SolidColorBrush(c);
+
+        /// <summary>Built-in Scene buttons shown in the footer strip.</summary>
+        public IReadOnlyList<Scene> Scenes => SceneService.BuiltInScenes;
+
+        /// <summary>
+        /// Apply a Scene bundle by routing through the child VMs (same path
+        /// Smart Optimize uses), then surface a quick OSD to confirm.
+        /// </summary>
+        [RelayCommand]
+        private void ApplyScene(Scene? scene)
+        {
+            if (scene == null) return;
+            try
+            {
+                scene.Apply(this);
+                ToastService.ShowOsdOnly(scene.Name, scene.Icon, ThemeService.AccentColor);
+                Logger.WriteLine($"Scene applied: {scene.Name}");
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteLine($"Scene '{scene.Name}' apply error: " + ex.Message);
+            }
+        }
 
         private readonly DispatcherTimer _sensorTimer;
 

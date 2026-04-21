@@ -1,0 +1,622 @@
+<UserControl x:Class="GHelper.WPF.Views.Panels.ProcessesPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:GHelper.WPF.Controls">
+
+    <Border Style="{StaticResource CardStyle}">
+        <StackPanel>
+            <!-- Tab switcher — underline tabs, distinct from PillSelector so the
+                 control's visual language reads as "switch view" rather than
+                 "apply mode." -->
+            <controls:TabHeader Items="{Binding TabLabels}"
+                                SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}"
+                                AccentColor="{DynamicResource AccentColor}"
+                                Height="38"
+                                Margin="0,0,0,14" />
+
+            <!-- ================================================================ -->
+            <!-- RUNNING PROCESSES TAB                                             -->
+            <!-- ================================================================ -->
+            <StackPanel Visibility="{Binding IsRunningTab, Converter={StaticResource BoolToVisibility}}">
+
+                <!-- Header -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="&#xEA62;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                   Foreground="{DynamicResource AccentBrush}"
+                                   VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Style="{StaticResource CardTitleStyle}" VerticalAlignment="Center">
+                            <Run Text="Processes: " />
+                            <Run Text="{Binding ProcessCount, Mode=OneWay}" />
+                        </TextBlock>
+                        <controls:HelpButton HelpKey="processes" VerticalAlignment="Center" Margin="8,0,0,0" />
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Content="Refresh"
+                            Style="{StaticResource SecondaryActionButtonStyle}"
+                            Command="{Binding RefreshCommand}" />
+                </Grid>
+
+                <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="70" />
+                        <ColumnDefinition Width="80" />
+                        <ColumnDefinition Width="36" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="1"
+                            Style="{StaticResource LinkButtonStyle}"
+                            HorizontalAlignment="Left"
+                            Command="{Binding SortByNameCommand}"
+                            Content="Name" />
+                    <Button Grid.Column="2"
+                            Style="{StaticResource LinkButtonStyle}"
+                            HorizontalAlignment="Right"
+                            Command="{Binding SortByCpuCommand}"
+                            Content="CPU" />
+                    <Button Grid.Column="3"
+                            Style="{StaticResource LinkButtonStyle}"
+                            HorizontalAlignment="Right"
+                            Command="{Binding SortByRamCommand}"
+                            Content="RAM" />
+                </Grid>
+
+                <Border Height="1" Background="#18FFFFFF" Margin="0,0,0,4" />
+
+                <ItemsControl ItemsSource="{Binding Processes}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Height="34" Margin="0,1">
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#14FFFFFF" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="24" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="70" />
+                                    <ColumnDefinition Width="80" />
+                                    <ColumnDefinition Width="36" />
+                                </Grid.ColumnDefinitions>
+                                <Image Grid.Column="0" Source="{Binding Icon}"
+                                       Width="16" Height="16"
+                                       VerticalAlignment="Center" HorizontalAlignment="Left" />
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding Name}"
+                                           Style="{StaticResource BodyTextStyle}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"
+                                           ToolTip="{Binding ExePath}" />
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding CpuDisplay}"
+                                           Style="{StaticResource BodyTextStyle}"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Right" />
+                                <TextBlock Grid.Column="3"
+                                           Text="{Binding RamDisplay}"
+                                           Style="{StaticResource BodyTextStyle}"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Right" />
+                                <Button Grid.Column="4"
+                                        Content="&#xE894;"
+                                        FontFamily="Segoe MDL2 Assets"
+                                        FontSize="11"
+                                        Width="28" Height="28"
+                                        Margin="4,0,0,0"
+                                        Style="{StaticResource CloseButtonStyle}"
+                                        Command="{Binding DataContext.KillCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"
+                                        ToolTip="Kill this process (and children)" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Text="Only user-visible apps appear here. System services and hidden helpers live in Task Manager."
+                           Style="{StaticResource DimTextStyle}"
+                           FontSize="10"
+                           Margin="0,8,0,0"
+                           TextWrapping="Wrap"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <!-- ================================================================ -->
+            <!-- STARTUP APPS TAB                                                  -->
+            <!-- ================================================================ -->
+            <StackPanel Visibility="{Binding IsStartupTab, Converter={StaticResource BoolToVisibility}}">
+
+                <!-- Header -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE945;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                   Foreground="{DynamicResource AccentBrush}"
+                                   VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Style="{StaticResource CardTitleStyle}" VerticalAlignment="Center">
+                            <Run Text="Startup apps: " />
+                            <Run Text="{Binding StartupEnabledCount, Mode=OneWay}" />
+                            <Run Text=" of " />
+                            <Run Text="{Binding StartupTotalCount, Mode=OneWay}" />
+                            <Run Text=" enabled" />
+                        </TextBlock>
+                        <controls:HelpButton HelpKey="startup_entries" VerticalAlignment="Center" Margin="8,0,0,0" />
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Content="Refresh"
+                            Style="{StaticResource SecondaryActionButtonStyle}"
+                            Command="{Binding RefreshStartupCommand}" />
+                </Grid>
+
+                <TextBlock Text="Apps that launch automatically when you sign in. Disabling one doesn't delete it — toggle it back on any time to restore."
+                           Style="{StaticResource DimTextStyle}"
+                           Margin="0,0,0,10"
+                           TextWrapping="Wrap" />
+
+                <!-- Column headers -->
+                <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="160" />
+                        <ColumnDefinition Width="110" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Name"
+                               Style="{StaticResource DimTextStyle}" FontSize="10" />
+                    <TextBlock Grid.Column="1" Text="Source"
+                               Style="{StaticResource DimTextStyle}" FontSize="10" />
+                    <TextBlock Grid.Column="2" Text="Status"
+                               Style="{StaticResource DimTextStyle}" FontSize="10"
+                               HorizontalAlignment="Right" />
+                </Grid>
+
+                <Border Height="1" Background="#18FFFFFF" Margin="0,0,0,4" />
+
+                <!-- Startup entries list.
+                     Row opacity dims to .55 when disabled to reinforce the status
+                     at a glance without recoloring the text itself. Button swaps
+                     between destructive-red (Disable) and affirmative-green (Enable)
+                     via DataTrigger so clicking always lands on the intent color. -->
+                <ItemsControl ItemsSource="{Binding StartupEntries}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,3" MinHeight="40">
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Opacity" Value="1.0" />
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                                <Setter Property="Opacity" Value="0.55" />
+                                            </DataTrigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#14FFFFFF" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="160" />
+                                    <ColumnDefinition Width="110" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}"
+                                               Style="{StaticResource BodyTextStyle}"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Path}"
+                                               Style="{StaticResource DimTextStyle}"
+                                               FontSize="10"
+                                               TextTrimming="CharacterEllipsis"
+                                               ToolTip="{Binding Path}" />
+                                </StackPanel>
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding SourceLabel}"
+                                           Style="{StaticResource DimTextStyle}"
+                                           VerticalAlignment="Center" />
+                                <Button Grid.Column="2"
+                                        HorizontalAlignment="Right"
+                                        Command="{Binding DataContext.ToggleStartupCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource StatusPillStyle}">
+                                            <!-- Default = Disabled look; DataTrigger flips to Enabled. -->
+                                            <Setter Property="Content" Value="Disabled" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEnabled}" Value="True">
+                                                    <Setter Property="Content" Value="Enabled" />
+                                                    <Setter Property="Background" Value="{DynamicResource AccentDimBrush}" />
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Text="Task Scheduler boot tasks live in the Scheduled tab; Windows services in the Services tab."
+                           Style="{StaticResource DimTextStyle}"
+                           FontSize="10"
+                           Margin="0,8,0,0"
+                           TextWrapping="Wrap"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <!-- ================================================================ -->
+            <!-- SCHEDULED TASKS TAB — non-Microsoft boot/logon tasks              -->
+            <!-- ================================================================ -->
+            <StackPanel Visibility="{Binding IsScheduledTab, Converter={StaticResource BoolToVisibility}}">
+
+                <!-- Header -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE823;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                   Foreground="{DynamicResource AccentBrush}"
+                                   VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Style="{StaticResource CardTitleStyle}" VerticalAlignment="Center">
+                            <Run Text="Scheduled tasks: " />
+                            <Run Text="{Binding ScheduledEnabledCount, Mode=OneWay}" />
+                            <Run Text=" of " />
+                            <Run Text="{Binding ScheduledTotalCount, Mode=OneWay}" />
+                            <Run Text=" enabled" />
+                        </TextBlock>
+                        <controls:HelpButton HelpKey="scheduled_tasks" VerticalAlignment="Center" Margin="8,0,0,0" />
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Content="Refresh"
+                            Style="{StaticResource SecondaryActionButtonStyle}"
+                            Command="{Binding RefreshScheduledAsyncCommand}"
+                            IsEnabled="{Binding IsScanningScheduled, Converter={StaticResource InverseBoolToVisibility}}" />
+                </Grid>
+
+                <TextBlock Text="Non-Microsoft tasks that run at boot or logon. OEM bloat (Adobe, Razer, etc.) often hides here instead of the Startup tab."
+                           Style="{StaticResource DimTextStyle}"
+                           Margin="0,0,0,10"
+                           TextWrapping="Wrap" />
+
+                <!-- Scanning indicator -->
+                <TextBlock Text="Scanning Task Scheduler..."
+                           Style="{StaticResource DimTextStyle}"
+                           HorizontalAlignment="Center"
+                           Margin="0,20,0,20"
+                           Visibility="{Binding IsScanningScheduled, Converter={StaticResource BoolToVisibility}}" />
+
+                <!-- Empty state (scan done, nothing found) -->
+                <TextBlock Margin="0,20,0,20"
+                           HorizontalAlignment="Center"
+                           Text="No third-party boot or logon tasks found. Nice.">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource DimTextStyle}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsScanningScheduled}" Value="False" />
+                                        <Condition Binding="{Binding ScheduledTotalCount}" Value="0" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <!-- Column headers -->
+                <Grid Margin="0,0,0,6"
+                      Visibility="{Binding IsScanningScheduled, Converter={StaticResource InverseBoolToVisibility}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="130" />
+                        <ColumnDefinition Width="110" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Name"
+                               Style="{StaticResource DimTextStyle}" FontSize="10" />
+                    <TextBlock Grid.Column="1" Text="Trigger"
+                               Style="{StaticResource DimTextStyle}" FontSize="10" />
+                    <TextBlock Grid.Column="2" Text="Status"
+                               Style="{StaticResource DimTextStyle}" FontSize="10"
+                               HorizontalAlignment="Right" />
+                </Grid>
+
+                <Border Height="1" Background="#18FFFFFF" Margin="0,0,0,4"
+                        Visibility="{Binding IsScanningScheduled, Converter={StaticResource InverseBoolToVisibility}}" />
+
+                <!-- Task list -->
+                <ItemsControl ItemsSource="{Binding ScheduledTasks}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,3" MinHeight="40">
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Opacity" Value="1.0" />
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                                <Setter Property="Opacity" Value="0.55" />
+                                            </DataTrigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#14FFFFFF" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="130" />
+                                    <ColumnDefinition Width="110" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}"
+                                               Style="{StaticResource BodyTextStyle}"
+                                               TextTrimming="CharacterEllipsis"
+                                               ToolTip="{Binding Action}" />
+                                    <TextBlock Text="{Binding Folder}"
+                                               Style="{StaticResource DimTextStyle}"
+                                               FontSize="10"
+                                               TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding TriggerLabel}"
+                                           Style="{StaticResource DimTextStyle}"
+                                           VerticalAlignment="Center" />
+                                <Button Grid.Column="2"
+                                        HorizontalAlignment="Right"
+                                        Command="{Binding DataContext.ToggleScheduledCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource StatusPillStyle}">
+                                            <Setter Property="Content" Value="Disabled" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEnabled}" Value="True">
+                                                    <Setter Property="Content" Value="Enabled" />
+                                                    <Setter Property="Background" Value="{DynamicResource AccentDimBrush}" />
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Text="Microsoft-owned tasks are hidden — disabling those can break Windows. For the full Task Scheduler, use taskschd.msc."
+                           Style="{StaticResource DimTextStyle}"
+                           FontSize="10"
+                           Margin="0,8,0,0"
+                           TextWrapping="Wrap"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <!-- ================================================================ -->
+            <!-- SERVICES TAB — non-Microsoft Windows services                     -->
+            <!-- ================================================================ -->
+            <StackPanel Visibility="{Binding IsServicesTab, Converter={StaticResource BoolToVisibility}}">
+
+                <!-- Header -->
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE950;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                                   Foreground="{DynamicResource AccentBrush}"
+                                   VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <TextBlock Style="{StaticResource CardTitleStyle}" VerticalAlignment="Center">
+                            <Run Text="Services: " />
+                            <Run Text="{Binding ServicesAutoCount, Mode=OneWay}" />
+                            <Run Text=" of " />
+                            <Run Text="{Binding ServicesTotalCount, Mode=OneWay}" />
+                            <Run Text=" auto-start" />
+                        </TextBlock>
+                        <controls:HelpButton HelpKey="services" VerticalAlignment="Center" Margin="8,0,0,0" />
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Content="Refresh"
+                            Style="{StaticResource SecondaryActionButtonStyle}"
+                            Command="{Binding RefreshServicesAsyncCommand}"
+                            IsEnabled="{Binding IsScanningServices, Converter={StaticResource InverseBoolToVisibility}}" />
+                </Grid>
+
+                <TextBlock Text="Non-Microsoft services that launch with Windows. Toggle to Manual to prevent auto-start — Stop to kill a running one. Switching to Manual never deletes the service; re-enable any time."
+                           Style="{StaticResource DimTextStyle}"
+                           Margin="0,0,0,10"
+                           TextWrapping="Wrap" />
+
+                <!-- Scanning indicator -->
+                <TextBlock Text="Scanning services..."
+                           Style="{StaticResource DimTextStyle}"
+                           HorizontalAlignment="Center"
+                           Margin="0,20,0,20"
+                           Visibility="{Binding IsScanningServices, Converter={StaticResource BoolToVisibility}}" />
+
+                <!-- Empty state -->
+                <TextBlock Margin="0,20,0,20"
+                           HorizontalAlignment="Center"
+                           Text="No third-party services found.">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource DimTextStyle}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsScanningServices}" Value="False" />
+                                        <Condition Binding="{Binding ServicesTotalCount}" Value="0" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <!-- Column headers -->
+                <Grid Margin="0,0,0,6"
+                      Visibility="{Binding IsScanningServices, Converter={StaticResource InverseBoolToVisibility}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="70" />
+                        <ColumnDefinition Width="110" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Service"
+                               Style="{StaticResource DimTextStyle}" FontSize="10" />
+                    <TextBlock Grid.Column="1" Text="State"
+                               Style="{StaticResource DimTextStyle}" FontSize="10" />
+                    <TextBlock Grid.Column="2" Text="Auto-start"
+                               Style="{StaticResource DimTextStyle}" FontSize="10"
+                               HorizontalAlignment="Right" />
+                </Grid>
+
+                <Border Height="1" Background="#18FFFFFF" Margin="0,0,0,4"
+                        Visibility="{Binding IsScanningServices, Converter={StaticResource InverseBoolToVisibility}}" />
+
+                <!-- Services list -->
+                <ItemsControl ItemsSource="{Binding Services}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,3" MinHeight="40">
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Opacity" Value="1.0" />
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsAutoStart}" Value="False">
+                                                <Setter Property="Opacity" Value="0.55" />
+                                            </DataTrigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#14FFFFFF" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="70" />
+                                    <ColumnDefinition Width="110" />
+                                </Grid.ColumnDefinitions>
+                                <!-- Row-wide tooltip: full name + description + exe
+                                     path. Descriptions are often long enough to be
+                                     truncated in the row, so a tooltip is the least
+                                     intrusive way to surface the full detail. -->
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <StackPanel.ToolTip>
+                                        <ToolTip Style="{StaticResource RichToolTipStyle}">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding DisplayName}"
+                                                           FontWeight="SemiBold" FontSize="12"
+                                                           TextWrapping="Wrap" Margin="0,0,0,4" />
+                                                <TextBlock Text="{Binding Description}"
+                                                           FontSize="11"
+                                                           TextWrapping="Wrap"
+                                                           Foreground="#C0C0C8"
+                                                           Margin="0,0,0,6" />
+                                                <TextBlock Text="{Binding PathName}"
+                                                           FontSize="10"
+                                                           Foreground="#80808A"
+                                                           TextWrapping="Wrap" />
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </StackPanel.ToolTip>
+                                    <TextBlock Text="{Binding DisplayName}"
+                                               Style="{StaticResource BodyTextStyle}"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Description}"
+                                               Style="{StaticResource DimTextStyle}"
+                                               FontSize="10"
+                                               TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+
+                                <!-- State: colored dot + action link. Running ->
+                                     "Stop"; stopped -> "Start". Symmetric so the
+                                     user can kick off a Manual-start service from
+                                     here without leaving for services.msc. -->
+                                <StackPanel Grid.Column="1" Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <Ellipse Width="6" Height="6" Margin="0,0,6,0"
+                                             VerticalAlignment="Center">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Setter Property="Fill" Value="#50FFFFFF" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                                        <Setter Property="Fill" Value="#4CC95E" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                    <Button Content="Stop"
+                                            Style="{StaticResource LinkButtonStyle}"
+                                            Command="{Binding DataContext.StopServiceCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            ToolTip="Stop this service now"
+                                            Visibility="{Binding IsRunning, Converter={StaticResource BoolToVisibility}}" />
+                                    <Button Content="Start"
+                                            Style="{StaticResource LinkButtonStyle}"
+                                            Command="{Binding DataContext.StartServiceCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            ToolTip="Start this service now"
+                                            Visibility="{Binding IsRunning, Converter={StaticResource InverseBoolToVisibility}}" />
+                                </StackPanel>
+
+                                <Button Grid.Column="2"
+                                        HorizontalAlignment="Right"
+                                        Command="{Binding DataContext.ToggleServiceAutoStartCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource StatusPillStyle}">
+                                            <!-- Pill shows CURRENT state; click toggles to the
+                                                 other. Tooltip spells this out so the CTA
+                                                 semantics aren't ambiguous. -->
+                                            <Setter Property="Content" Value="Manual" />
+                                            <Setter Property="ToolTip" Value="Currently Manual — click to set Automatic (start with Windows)" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsAutoStart}" Value="True">
+                                                    <Setter Property="Content" Value="Automatic" />
+                                                    <Setter Property="ToolTip" Value="Currently Automatic — click to set Manual (won't start with Windows)" />
+                                                    <Setter Property="Background" Value="{DynamicResource AccentDimBrush}" />
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Text="Windows-owned services are hidden — disabling those can break the OS. Use services.msc for full control."
+                           Style="{StaticResource DimTextStyle}"
+                           FontSize="10"
+                           Margin="0,8,0,0"
+                           TextWrapping="Wrap"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

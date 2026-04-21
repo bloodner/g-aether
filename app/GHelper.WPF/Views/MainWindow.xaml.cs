@@ -18,8 +18,10 @@ namespace GHelper.WPF.Views
             ThemeService.Initialize();
             DataContext = new MainViewModel();
 
-            _panels = [PanelMonitor, PanelPerformance, PanelFans, PanelGpu, PanelBattery, PanelDisplay, PanelKeyboard, PanelKeyBindings, PanelExtra];
-            _navButtons = [NavMonitor, NavPerformance, null!, NavGpu, NavBattery, NavDisplay, NavLighting, NavKeyBindings, NavExtra];
+            // Slot 9 (App Profiles) is nulled out — App Profiles now lives inside the
+            // Settings panel. Keeping the slot preserves pinned-tab indices for Processes (10).
+            _panels = [PanelMonitor, PanelPerformance, PanelFans, PanelGpu, PanelBattery, PanelDisplay, PanelKeyboard, PanelKeyBindings, PanelExtra, null!, PanelProcesses];
+            _navButtons = [NavMonitor, NavPerformance, null!, NavGpu, NavBattery, NavDisplay, NavLighting, NavKeyBindings, NavExtra, null!, NavProcesses];
 
             // Restore pinned tab (skip removed tabs)
             int pinned = AppConfig.Get("wpf_pinned_tab");
@@ -55,7 +57,8 @@ namespace GHelper.WPF.Views
             if (sender is System.Windows.Controls.RadioButton rb && rb.Tag is string tag && int.TryParse(tag, out int index))
             {
                 for (int i = 0; i < _panels.Length; i++)
-                    _panels[i].Visibility = i == index ? Visibility.Visible : Visibility.Collapsed;
+                    if (_panels[i] != null)
+                        _panels[i].Visibility = i == index ? Visibility.Visible : Visibility.Collapsed;
 
                 // Save as pinned tab
                 AppConfig.Set("wpf_pinned_tab", index);
@@ -65,6 +68,9 @@ namespace GHelper.WPF.Views
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             PositionWindow();
+            // Global hotkeys need the main window's hwnd to receive WM_HOTKEY messages.
+            try { GlobalHotkeyService.Initialize(this); }
+            catch (Exception ex) { Logger.WriteLine("GlobalHotkeyService init error: " + ex.Message); }
         }
 
         private void PositionWindow()
