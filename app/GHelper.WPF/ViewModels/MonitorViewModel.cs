@@ -28,6 +28,7 @@ namespace GHelper.WPF.ViewModels
         private readonly double[] _cpuFanHistory = new double[HistorySize];
         private readonly double[] _gpuFanHistory = new double[HistorySize];
         private readonly double[] _gpuUseHistory = new double[HistorySize];
+        private readonly double[] _gpuPowerHistory = new double[HistorySize];
         private readonly double[] _batteryRateHistory = new double[HistorySize];
 
         [ObservableProperty]
@@ -46,6 +47,9 @@ namespace GHelper.WPF.ViewModels
         private double[] _gpuUseValues = new double[HistorySize];
 
         [ObservableProperty]
+        private double[] _gpuPowerValues = new double[HistorySize];
+
+        [ObservableProperty]
         private double[] _batteryRateValues = new double[HistorySize];
 
         [ObservableProperty]
@@ -55,7 +59,7 @@ namespace GHelper.WPF.ViewModels
         private string _gpuTempText = "--";
 
         [ObservableProperty]
-        private string _gpuTempLabel = "GPU Temp";
+        private string _gpuTempLabel = "dGPU Temp";
 
         [ObservableProperty]
         private string _cpuFanCurrentText = "--";
@@ -67,7 +71,10 @@ namespace GHelper.WPF.ViewModels
         private string _gpuUseText = "--";
 
         [ObservableProperty]
-        private string _gpuUseLabel = "GPU Usage";
+        private string _gpuUseLabel = "dGPU Usage";
+
+        [ObservableProperty]
+        private string _gpuPowerText = "--";
 
         [ObservableProperty]
         private bool _isGpuActive = true;
@@ -109,7 +116,7 @@ namespace GHelper.WPF.ViewModels
             ShiftAndPush(_gpuTempHistory, gpuT > 0 ? gpuT : 0);
             GpuTempValues = (double[])_gpuTempHistory.Clone();
             GpuTempText = gpuT > 0 ? $"{gpuT:F0}°C" : (ecoMode ? "Off" : "--");
-            GpuTempLabel = "GPU Temp";
+            GpuTempLabel = "dGPU Temp";
 
             // Fan speeds
             double cpuFanRpm = ParseFanValue(HardwareControl.cpuFan);
@@ -127,7 +134,14 @@ namespace GHelper.WPF.ViewModels
             ShiftAndPush(_gpuUseHistory, gpuUseVal);
             GpuUseValues = (double[])_gpuUseHistory.Clone();
             GpuUseText = gpuUse >= 0 ? $"{gpuUse}%" : (ecoMode ? "Off" : "--");
-            GpuUseLabel = "GPU Usage";
+            GpuUseLabel = "dGPU Usage";
+
+            // GPU Power Draw (watts)
+            int? gpuPower = HardwareControl.gpuPower;
+            double gpuPowerVal = gpuPower is > 0 ? (double)gpuPower : 0;
+            ShiftAndPush(_gpuPowerHistory, gpuPowerVal);
+            GpuPowerValues = (double[])_gpuPowerHistory.Clone();
+            GpuPowerText = gpuPower is > 0 ? $"{gpuPower}W" : (ecoMode ? "Off" : "--");
 
             // Battery Rate
             decimal rate = HardwareControl.batteryRate ?? 0;

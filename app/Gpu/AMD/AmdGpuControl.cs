@@ -142,6 +142,21 @@ public class AmdGpuControl : IGpuControl
 
     }
 
+    // Interface-level power draw for the Monitor panel. Queries the discrete
+    // adapter (the existing GetGpuPower above hits the iGPU index, which is
+    // an upstream bug we don't want to inherit in the new surface).
+    public int? GetPowerDraw()
+    {
+        if (!IsValid) return null;
+        if (ADL2_New_QueryPMLogData_Get(_adlContextHandle, _internalDiscreteAdapter.AdapterIndex, out ADLPMLogDataOutput log) != Adl2.ADL_SUCCESS)
+            return null;
+
+        ADLSingleSensorData sensor = log.Sensors[(int)ADLSensorType.PMLOG_ASIC_POWER];
+        if (sensor.Supported == 0) return null;
+
+        return sensor.Value;
+    }
+
 
     public bool SetVariBright(int enabled)
     {

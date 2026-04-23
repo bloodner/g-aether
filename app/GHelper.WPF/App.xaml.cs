@@ -23,6 +23,15 @@ namespace GHelper.WPF
                 return;
             }
 
+            // First-run relocation: if we're running from Downloads or %TEMP%, copy
+            // ourselves to %LocalAppData%\Programs\G-Aether, relaunch from there,
+            // and exit. Keeps the Run-on-Startup task anchored to a stable path.
+            if (FirstRunRelocator.TryRelocate(e.Args))
+            {
+                Shutdown();
+                return;
+            }
+
             DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
             AppDomain.CurrentDomain.ProcessExit += OnProcessExit;

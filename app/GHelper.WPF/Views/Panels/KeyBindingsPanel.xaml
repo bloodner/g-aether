@@ -75,7 +75,7 @@
                     <controls:HelpButton HelpKey="global_hotkeys" VerticalAlignment="Center" Margin="8,0,0,0" />
                 </StackPanel>
 
-                <TextBlock Text="Shortcuts that work anywhere in Windows — even inside games. Click Set to capture a combo."
+                <TextBlock Text="Shortcuts that work anywhere in Windows, even inside games. Click Set to capture a combo."
                            Style="{StaticResource DimTextStyle}" Margin="0,0,0,12"
                            TextWrapping="Wrap" />
 

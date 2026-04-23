@@ -50,16 +50,16 @@
                 ValueFontSize="28"
                 StrokeColor="#FF6B6B" />
             <controls:SparklineChart Grid.Row="2" Grid.Column="2" Height="106"
-                Label="Power Draw"
-                CurrentText="{Binding BatteryRateText}"
-                Values="{Binding BatteryRateValues}"
-                MaxValue="100"
+                Label="dGPU Power"
+                CurrentText="{Binding GpuPowerText}"
+                Values="{Binding GpuPowerValues}"
+                MaxValue="150"
                 ValueFontSize="28"
                 StrokeColor="#6BCB77" />
 
             <!-- Row 4: GPU Temp + GPU Usage (when active) OR dGPU Idle banner (when Eco) -->
             <controls:SparklineChart Grid.Row="4" Grid.Column="0" Height="106"
-                Label="GPU Temp"
+                Label="dGPU Temp"
                 CurrentText="{Binding GpuTempText}"
                 Values="{Binding GpuTempValues}"
                 MaxValue="95"
@@ -67,7 +67,7 @@
                 StrokeColor="#FFB347"
                 Visibility="{Binding IsGpuActive, Converter={StaticResource BoolToVisibility}}" />
             <controls:SparklineChart Grid.Row="4" Grid.Column="2" Height="106"
-                Label="GPU Usage"
+                Label="dGPU Usage"
                 CurrentText="{Binding GpuUseText}"
                 Values="{Binding GpuUseValues}"
                 MaxValue="100"
@@ -82,7 +82,7 @@
                     <TextBlock Text="&#xE7F4;" FontFamily="Segoe MDL2 Assets" FontSize="14"
                                Foreground="{DynamicResource ForeDimBrush}"
                                VerticalAlignment="Center" Margin="0,0,8,0" />
-                    <TextBlock Text="dGPU Off — Eco Mode"
+                    <TextBlock Text="dGPU Off (Eco Mode)"
                                Style="{StaticResource DimTextStyle}"
                                FontSize="12"
                                VerticalAlignment="Center" />

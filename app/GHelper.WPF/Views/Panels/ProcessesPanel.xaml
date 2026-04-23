@@ -161,7 +161,7 @@
                             Command="{Binding RefreshStartupCommand}" />
                 </Grid>
 
-                <TextBlock Text="Apps that launch automatically when you sign in. Disabling one doesn't delete it — toggle it back on any time to restore."
+                <TextBlock Text="Apps that launch automatically when you sign in. Disabling one doesn't delete it. Toggle it back on any time to restore."
                            Style="{StaticResource DimTextStyle}"
                            Margin="0,0,0,10"
                            TextWrapping="Wrap" />
@@ -402,7 +402,7 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <TextBlock Text="Microsoft-owned tasks are hidden — disabling those can break Windows. For the full Task Scheduler, use taskschd.msc."
+                <TextBlock Text="Microsoft-owned tasks are hidden, because disabling those can break Windows. For the full Task Scheduler, use taskschd.msc."
                            Style="{StaticResource DimTextStyle}"
                            FontSize="10"
                            Margin="0,8,0,0"
@@ -441,7 +441,7 @@
                             IsEnabled="{Binding IsScanningServices, Converter={StaticResource InverseBoolToVisibility}}" />
                 </Grid>
 
-                <TextBlock Text="Non-Microsoft services that launch with Windows. Toggle to Manual to prevent auto-start — Stop to kill a running one. Switching to Manual never deletes the service; re-enable any time."
+                <TextBlock Text="Non-Microsoft services that launch with Windows. Toggle to Manual to prevent auto-start, or Stop to kill a running one. Switching to Manual never deletes the service, and you can re-enable it any time."
                            Style="{StaticResource DimTextStyle}"
                            Margin="0,0,0,10"
                            TextWrapping="Wrap" />
@@ -592,11 +592,11 @@
                                                  other. Tooltip spells this out so the CTA
                                                  semantics aren't ambiguous. -->
                                             <Setter Property="Content" Value="Manual" />
-                                            <Setter Property="ToolTip" Value="Currently Manual — click to set Automatic (start with Windows)" />
+                                            <Setter Property="ToolTip" Value="Currently Manual. Click to set Automatic (start with Windows)." />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsAutoStart}" Value="True">
                                                     <Setter Property="Content" Value="Automatic" />
-                                                    <Setter Property="ToolTip" Value="Currently Automatic — click to set Manual (won't start with Windows)" />
+                                                    <Setter Property="ToolTip" Value="Currently Automatic. Click to set Manual (won't start with Windows)." />
                                                     <Setter Property="Background" Value="{DynamicResource AccentDimBrush}" />
                                                     <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                                                     <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
@@ -610,7 +610,7 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <TextBlock Text="Windows-owned services are hidden — disabling those can break the OS. Use services.msc for full control."
+                <TextBlock Text="Windows-owned services are hidden, because disabling those can break the OS. Use services.msc for full control."
                            Style="{StaticResource DimTextStyle}"
                            FontSize="10"
                            Margin="0,8,0,0"

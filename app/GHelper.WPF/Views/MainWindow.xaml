@@ -208,7 +208,7 @@
                             BorderBrush="{Binding PerfBadgeBrush}"
                             local:ModeBadgeProps.IsActive="{Binding IsChecked, ElementName=NavPerformance}"
                             Tag="1" Click="ModeBadge_Click"
-                            ToolTip="{Binding PerfBadgeName, StringFormat='Performance: {0} — click to configure'}">
+                            ToolTip="{Binding PerfBadgeName, StringFormat='Performance: {0}. Click to configure.'}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock Text="&#xE945;" Style="{StaticResource ModeBadgePulseIconStyle}"
                                        Foreground="{Binding PerfBadgeBrush}"
@@ -225,7 +225,7 @@
                             BorderBrush="{Binding GpuBadgeBrush}"
                             local:ModeBadgeProps.IsActive="{Binding IsChecked, ElementName=NavGpu}"
                             Tag="3" Click="ModeBadge_Click"
-                            ToolTip="{Binding GpuBadgeName, StringFormat='GPU: {0} — click to configure'}">
+                            ToolTip="{Binding GpuBadgeName, StringFormat='GPU: {0}. Click to configure.'}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock Text="&#xE950;" Style="{StaticResource ModeBadgePulseIconStyle}"
                                        Foreground="{Binding GpuBadgeBrush}"
@@ -242,7 +242,7 @@
                             BorderBrush="{Binding DisplayBadgeBrush}"
                             local:ModeBadgeProps.IsActive="{Binding IsChecked, ElementName=NavDisplay}"
                             Tag="5" Click="ModeBadge_Click"
-                            ToolTip="{Binding DisplayBadgeName, StringFormat='Display refresh: {0} — click to configure'}">
+                            ToolTip="{Binding DisplayBadgeName, StringFormat='Display refresh: {0}. Click to configure.'}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock Text="&#xE7F4;" Style="{StaticResource ModeBadgeIconStyle}"
                                        Foreground="{Binding DisplayBadgeBrush}" />
@@ -258,7 +258,7 @@
                             BorderBrush="{Binding ServicesBadgeBrush}"
                             local:ModeBadgeProps.IsActive="{Binding IsChecked, ElementName=NavExtra}"
                             Tag="8" Click="ModeBadge_Click"
-                            ToolTip="{Binding ServicesBadgeName, StringFormat='ASUS services: {0} — click to manage'}">
+                            ToolTip="{Binding ServicesBadgeName, StringFormat='ASUS services: {0}. Click to manage.'}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock Text="&#xE72E;" Style="{StaticResource ModeBadgePulseIconStyle}"
                                        Foreground="{Binding ServicesBadgeBrush}"

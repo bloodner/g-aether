@@ -32,6 +32,7 @@ public static class HardwareControl
     public static string? midFan;
 
     public static int? gpuUse;
+    public static int? gpuPower;  // watts, from NVML (NVIDIA) or ADL (AMD) via IGpuControl.GetPowerDraw()
 
     static long lastUpdate;
 
@@ -486,6 +487,7 @@ public static class HardwareControl
     public static void ReadSensors(bool log = false)
     {
         gpuUse = -1;
+        gpuPower = null;
 
         if (Program.acpi is null) return;
 
@@ -496,7 +498,23 @@ public static class HardwareControl
         cpuTemp = GetCPUTemp();
         gpuTemp = GetGPUTemp();
 
-        if (log) Logger.WriteLine($"Temps: {cpuTemp} {gpuTemp} {cpuFan} {gpuFan} {midFan}");
+        // Populate GPU usage and power draw for the Monitor panel. Inline rather
+        // than calling GetGpuUse() above because that helper logs every call,
+        // which would spam the log at the 2s poll cadence.
+        try
+        {
+            int? use = GpuControl?.GetGpuUse();
+            if (use is not null) gpuUse = (int)use;
+        }
+        catch (Exception ex) { Debug.WriteLine(ex.ToString()); }
+
+        try
+        {
+            gpuPower = GpuControl?.GetPowerDraw();
+        }
+        catch (Exception ex) { Debug.WriteLine(ex.ToString()); }
+
+        if (log) Logger.WriteLine($"Temps: {cpuTemp} {gpuTemp} {cpuFan} {gpuFan} {midFan}  use={gpuUse}% pwr={gpuPower}W");
 
         ReadBatteryState();
     }

@@ -7,131 +7,131 @@ namespace GHelper.WPF.Services
         public static readonly Dictionary<string, HelpEntry> Entries = new()
         {
             ["perf_mode"] = new("Performance Modes",
-                "Silent — Lowest fan noise and power draw. Best for quiet work, browsing, and battery life. CPU and GPU run at reduced clocks.\n\n" +
-                "Balanced — Default mode. Fans ramp up under load but stay quiet at idle. Good all-around for mixed workloads.\n\n" +
-                "Turbo — Maximum performance. Fans run aggressively to keep thermals in check. Use for gaming, rendering, or heavy multitasking."),
+                "Silent: the quietest option. The CPU and GPU run at reduced clocks so your fans barely spin. Great for browsing, reading, and squeezing extra battery life out of a long day.\n\n" +
+                "Balanced: the everyday default. Fans stay quiet at idle and only ramp up when something really needs the horsepower. A good all-rounder for mixed work where you don't want to think about it.\n\n" +
+                "Turbo: full send. Fans run hard to keep thermals in check while the CPU and GPU push their limits. Pick this for gaming, rendering, or anything that wants every watt."),
 
             ["fan_control"] = new("Fan & Power Control",
-                "Auto — G-Aether manages fans and power limits automatically based on your performance mode.\n\n" +
-                "Manual Fans — Set custom fan curves for CPU and GPU. Drag points on the curve to adjust fan speed at different temperatures.\n\n" +
-                "Manual Power — Override CPU/GPU power limits (TDP). Higher values = more performance but more heat.\n\n" +
-                "Manual Both — Full control over both fan curves and power limits."),
+                "Auto: let G-Aether handle fans and power limits based on your performance mode. If you're not sure what to pick, this is it.\n\n" +
+                "Manual Fans: shape your own fan curves for the CPU and GPU. Drag the points on the curve to decide how fast the fans spin at each temperature.\n\n" +
+                "Manual Power: override the default CPU and GPU power limits (TDP). Higher numbers mean more performance and more heat.\n\n" +
+                "Manual Both: take the wheel on fan curves and power limits at once."),
 
             ["gpu_mode"] = new("GPU Modes",
-                "Eco — Disables the dedicated GPU entirely. The laptop runs on integrated graphics only. Best battery life, but no gaming or GPU-accelerated tasks.\n\n" +
-                "Standard — Both iGPU and dGPU are available. The system switches automatically based on demand. Normal mode for most users.\n\n" +
-                "Ultimate — Routes display directly through the dGPU (MUX switch). Eliminates iGPU bottleneck for maximum gaming FPS. Requires restart.\n\n" +
-                "Optimized — Like Standard, but automatically switches to Eco when on battery and back to Standard when plugged in."),
+                "Eco: turns off the dedicated GPU entirely and runs on integrated graphics only. Easiest on the battery, but it rules out gaming and anything GPU-accelerated.\n\n" +
+                "Standard: keeps both the iGPU and dGPU available, letting Windows decide which one to use moment to moment. This is the normal mode for most people.\n\n" +
+                "Ultimate: sends the display straight through the dGPU via the MUX switch. You get maximum FPS in games because the iGPU is out of the pipeline. Needs a restart to take effect.\n\n" +
+                "Optimized: behaves like Standard while you're plugged in, and switches to Eco the moment you unplug. Set it and forget it."),
 
             ["refresh_rate"] = new("Screen Refresh Rate",
-                "Higher refresh rates (144Hz, 240Hz) make motion smoother — great for gaming and scrolling. Lower rates (60Hz, 120Hz) save significant battery life.\n\n" +
-                "Auto — G-Aether picks the best rate based on whether you're plugged in or on battery."),
+                "Higher refresh rates like 144Hz or 240Hz make motion look smoother. You'll notice it most while gaming and scrolling. Lower rates like 60Hz or 120Hz save a meaningful chunk of battery.\n\n" +
+                "Auto: let G-Aether pick for you based on whether you're plugged in or running on battery."),
 
             ["color_temp"] = new("Color Temperature",
-                "Adjusts the warmth of your display. Warmer (yellow-ish) tones reduce eye strain at night. Cooler (blue-ish) tones are more accurate for color work.\n\n" +
-                "This does not affect color accuracy for design work — use the Gamut setting for that."),
+                "Shifts the warmth of your display. Warmer, yellow-ish tones are easier on the eyes at night. Cooler, blue-ish tones feel more neutral during the day.\n\n" +
+                "This doesn't affect color accuracy for design work. For that, reach for the Gamut setting below."),
 
             ["gamut"] = new("Color Gamut",
                 "Controls the color space your display uses.\n\n" +
-                "Native — Full display capability, widest colors. May look oversaturated for web content.\n\n" +
-                "sRGB — Standard web/office color space. Most accurate for general use.\n\n" +
-                "DCI-P3 — Wide gamut used in film and HDR content. Good for media consumption."),
+                "Native: the full range your panel can show. Colors pop, though web content can look a bit oversaturated.\n\n" +
+                "sRGB: the standard web and office color space. Most accurate for day-to-day use.\n\n" +
+                "DCI-P3: a wide gamut used in film and HDR. Great for watching movies and streaming shows."),
 
             ["overdrive"] = new("Panel Overdrive",
-                "Speeds up pixel response time to reduce motion blur and ghosting. May cause slight overshoot artifacts on some panels. Disable if you notice inverse ghosting (bright trails behind moving objects)."),
+                "Speeds up how quickly pixels change color, cutting down motion blur and ghosting. Some panels can overshoot a little. If you notice bright trails behind moving objects (inverse ghosting), turn this off."),
 
             ["fn_lock"] = new("Fn Lock",
-                "When enabled, F1-F12 keys act as standard function keys by default (you hold Fn to access media/brightness). When disabled, the special functions are the default and you hold Fn for F1-F12."),
+                "When on, F1-F12 act as standard function keys and you hold Fn to reach the media and brightness shortcuts. When off, the shortcuts are the default and you hold Fn to get plain F1-F12."),
 
             ["gpu_fix"] = new("GPU Fix on Shutdown",
-                "Forces the dedicated GPU to Standard mode before shutdown or hibernate. Prevents a rare issue where some laptops fail to wake from sleep when the GPU was in Eco mode. Enable if you experience wake-from-sleep problems."),
+                "Forces the dedicated GPU back to Standard mode before shutdown or hibernate. A few laptops have trouble waking from sleep when the GPU was last in Eco. If that's happened to you, turn this on."),
 
             ["boot_sound"] = new("Boot Sound",
-                "The ASUS POST beep that plays when you power on the laptop. Disable to start up silently."),
+                "The ASUS POST beep that plays when you power on the laptop. Turn it off if you'd rather start up silently."),
 
             ["asus_services"] = new("ASUS Services",
-                "ASUS installs background services (Armoury Crate, optimization agents, telemetry) that consume RAM, CPU, and sometimes conflict with G-Aether.\n\n" +
-                "G-Aether replaces all of their functionality. Stopping them frees resources and prevents conflicts. The orange dot on the Settings icon warns you when they're running."),
+                "ASUS installs background services like Armoury Crate, optimization agents, and telemetry. They eat RAM and CPU, and sometimes fight with G-Aether over hardware control.\n\n" +
+                "G-Aether covers everything those services do, so stopping them frees up resources and prevents conflicts. When any of them are running, the Settings icon shows an orange dot so you know."),
 
             ["charge_limit"] = new("Battery Charge Limit",
-                "Limits the maximum battery charge to extend long-term battery health. Lithium batteries degrade faster when kept at 100%. Set to 80% for daily use, or 100% only when you need full capacity for travel."),
+                "Caps how much your battery charges, which helps it stay healthy over the long haul. Lithium cells wear faster when they're parked at 100% all the time. 80% is a great everyday setting. Bump it up to 100% for travel when you need every last minute."),
 
             ["battery_health"] = new("Battery Health",
-                "The ratio of your battery's current maximum capacity to its original design capacity. A new battery is 100%.\n\n" +
-                "As the battery ages, this percentage drops — each full charge holds slightly less energy than the previous one. Below about 80%, you'll notice battery life per charge is meaningfully shorter than when the laptop was new.\n\n" +
-                "Keeping the charge limit under 100% (see above) is the single biggest thing you can do to slow this decline."),
+                "Shows how much of its original design capacity your battery can still hold. A brand new battery reads 100%.\n\n" +
+                "Every full charge stores a tiny bit less than the one before it, so this number slowly falls as the battery ages. Once you dip below roughly 80%, you'll feel the difference between a charge now and what the laptop could do when it was new.\n\n" +
+                "The single most impactful thing you can do to slow this decline is keep the charge limit below 100% (see above)."),
 
             ["monitor_telemetry"] = new("Live Telemetry",
-                "Real-time readings straight from the hardware sensors. Values refresh every 2 seconds; sparkline charts show the last ~30 seconds of history so you can spot spikes and trends at a glance."),
+                "Real-time readings straight from the hardware sensors. Values refresh every 2 seconds, and the sparkline charts keep about the last 30 seconds of history so you can spot spikes and trends at a glance."),
 
             ["live_sensors"] = new("Live Sensors",
-                "Current CPU and GPU temperatures and fan RPM. These reflect the hardware's actual running state — useful for checking that a mode change or fan curve is producing the behavior you expect."),
+                "Current CPU and GPU temperatures, plus live fan RPM. These numbers come directly from the hardware, so they're handy for checking that a mode change or a fan curve is doing what you expected."),
 
             ["fan_stop_on_idle"] = new("Fan Stop on Idle",
-                "Genuine passive cooling. When both CPU and GPU are below 62°C, G-Aether applies a 0-RPM fan curve so your laptop runs in complete silence. When either component heats up past 72°C, the fans resume normal mode-driven behavior.\n\n" +
-                "The 10°C hysteresis gap (on at <62°C, off at >72°C) prevents fans from flapping on/off at the threshold. Thresholds are tuned for realistic ROG idle temps — Silent-mode idle typically sits in the high 50s, so a lower entry point would effectively never fire.\n\n" +
-                "Safety: the \"idle\" curve isn't 0% everywhere — it's 0% up to 72°C, then ramps to 100% by 95°C. Even if G-Aether crashes or hangs while fans are stopped, the hardware curve will spin them up automatically as temperatures climb. Your laptop can't end up with fans pinned off under load.\n\n" +
-                "Non-destructive: your customized fan curves are never edited. Fan Stop applies as a temporary overlay; when temps rise, your saved curves come right back.\n\n" +
-                "Default off. Worth trying on most ROG laptops — you'd be surprised how often the fans don't actually need to be spinning."),
+                "True passive cooling. When both the CPU and GPU are below 62°C, G-Aether drops the fan curve to 0 RPM so your laptop runs in complete silence. Once either component crosses 72°C, the fans pick up their normal mode-driven behavior again.\n\n" +
+                "The 10°C gap (on below 62°C, off above 72°C) keeps the fans from flipping back and forth right at the threshold. The numbers are tuned for how ROG laptops actually idle. Silent mode usually sits in the high 50s, so a lower entry point would basically never fire.\n\n" +
+                "Safe by design: the idle curve isn't 0% the whole way. It holds at 0% up to 72°C and then ramps to 100% by 95°C. Even if G-Aether crashes or hangs while the fans are stopped, the hardware curve will spin them back up as the temperature climbs. You won't end up with fans pinned off under a real load.\n\n" +
+                "Non-destructive: your custom fan curves are never touched. Fan Stop lays on top as a temporary overlay, and the moment temps rise your saved curves come right back.\n\n" +
+                "Off by default. Worth trying on most ROG laptops. You might be surprised how often the fans don't actually need to be spinning."),
 
             ["scheduled_tasks"] = new("Scheduled Tasks",
-                "Windows Task Scheduler boot and logon tasks — another popular hiding spot for autostart bloat.\n\n" +
-                "OEM-bundled helpers from Adobe, Razer, Logitech, NVIDIA, GameBar, Zoom, Creative Cloud, and many others often register Task Scheduler tasks instead of Run keys specifically because those don't appear in Task Manager's Startup tab. Everything in that category is fair game to review here.\n\n" +
-                "What's filtered out:\n" +
-                "• Every task under \\Microsoft\\ (Windows Update, driver housekeeping, telemetry cleanup, system maintenance — breaking these breaks Windows)\n" +
-                "• Tasks explicitly authored by Microsoft, even outside that tree\n" +
-                "• Hidden tasks\n" +
-                "• Tasks without a boot or logon trigger\n" +
-                "• G-Aether's own tasks (manage those from Settings → Run on Startup)\n\n" +
-                "Toggle flips the task's Enabled flag via the standard TaskScheduler API — same mechanism taskschd.msc uses. Disabling never deletes the task; re-enabling restores it exactly. If you want full control (see hidden tasks, edit triggers, etc.), use taskschd.msc."),
+                "Windows Task Scheduler boot and logon tasks. This is another popular hiding spot for autostart bloat.\n\n" +
+                "OEM helpers from Adobe, Razer, Logitech, NVIDIA, GameBar, Zoom, Creative Cloud, and plenty of others often register Task Scheduler tasks instead of Run keys, specifically because those don't show up in Task Manager's Startup tab. Anything in that category is fair game to review here.\n\n" +
+                "What gets filtered out:\n" +
+                "• Every task under \\Microsoft\\ (Windows Update, driver housekeeping, telemetry cleanup, system maintenance). Breaking these breaks Windows.\n" +
+                "• Tasks explicitly authored by Microsoft, even outside that tree.\n" +
+                "• Hidden tasks.\n" +
+                "• Tasks without a boot or logon trigger.\n" +
+                "• G-Aether's own tasks. Manage those from Settings, under Run on Startup.\n\n" +
+                "The toggle flips the task's Enabled flag through the standard TaskScheduler API, the same way taskschd.msc does it. Disabling never deletes the task, so turning it back on restores it exactly. If you want full control like editing triggers or seeing hidden tasks, taskschd.msc is the place for that."),
 
             ["startup_entries"] = new("Startup Apps",
-                "Apps configured to launch automatically when you sign in.\n\n" +
-                "G-Aether scans four sources:\n" +
-                "• Registry (user) — your personal Run key, where most consumer apps register\n" +
-                "• Registry (system) — the all-users Run key (toggling requires admin)\n" +
-                "• Startup folder (user) — shortcuts in your personal Startup folder\n" +
-                "• Startup folder (system) — shortcuts in the all-users Startup folder\n\n" +
-                "Disable / Enable uses Windows' own StartupApproved mechanism — the same one Task Manager and Settings → Apps → Startup use. It flips a single byte of state, never deletes your entry, so re-enabling restores the original exactly.\n\n" +
-                "Task Scheduler boot/logon tasks, Windows services, and RunOnce entries are not listed — those need their own surfaces and deserve dedicated review."),
+                "Apps set to launch automatically when you sign in.\n\n" +
+                "G-Aether checks four places for these:\n" +
+                "• Registry (user): your personal Run key, where most consumer apps register themselves.\n" +
+                "• Registry (system): the all-users Run key. Toggling this one requires admin.\n" +
+                "• Startup folder (user): shortcuts in your personal Startup folder.\n" +
+                "• Startup folder (system): shortcuts in the all-users Startup folder.\n\n" +
+                "Disable and Enable use Windows' own StartupApproved mechanism, the same one Task Manager and the Settings app's Startup page rely on. It flips a single byte of state and never deletes your entry, so turning it back on restores the original exactly.\n\n" +
+                "Task Scheduler boot and logon tasks, Windows services, and RunOnce entries aren't listed here. Each of those deserves its own dedicated review, so they live on their own surfaces."),
 
             ["processes"] = new("Processes",
-                "Running apps with a visible window, sorted by how much they're using right now.\n\n" +
-                "Click a column header to sort by Name, CPU %, or RAM. Click again to reverse. The X on any row kills that process and its children.\n\n" +
-                "G-Aether only shows processes that own a top-level window — services, background helpers, and hidden workers live in Task Manager.\n\n" +
-                "Auto-refreshes every 2 seconds while you're on this page. Switching away pauses the refresh so we don't waste cycles enumerating when you're not looking."),
+                "Running apps with a visible window, sorted by how much of your machine they're using right now.\n\n" +
+                "Click a column header to sort by Name, CPU %, or RAM. Click it again to reverse the order. The X on any row kills that process and its children.\n\n" +
+                "G-Aether only lists processes that own a top-level window. Services, background helpers, and hidden workers belong in Task Manager.\n\n" +
+                "The list auto-refreshes every 2 seconds while you're on this page. Switching away pauses the refresh, so we don't waste cycles enumerating processes nobody is looking at."),
 
             ["services"] = new("Services",
                 "Non-Microsoft Windows services that launch with the OS.\n\n" +
-                "G-Aether reads the service list via WMI and filters out anything whose binary lives under %SystemRoot%\\ (almost always Windows itself). Services with Start=Disabled are hidden too — re-enabling a disabled service is a services.msc power move, not a triage action.\n\n" +
-                "What you can do:\n\n" +
-                "• Flip a service from Automatic to Manual to stop it launching with Windows. The service still works — it just won't run until something (you or another app) starts it on demand.\n\n" +
-                "• Stop a running service now. Same as services.msc's Stop button. If the service has dependents or Windows refuses, the attempt fails cleanly and the row stays running.\n\n" +
-                "What we never do:\n\n" +
-                "• Set a service to Disabled. Too easy to brick a vendor install or lock yourself out of an app that auto-starts its helper on launch. If you really want Disabled, services.msc is one click away.\n\n" +
-                "• Delete or reconfigure beyond start mode. Your install stays intact — this is purely a Run-at-boot toggle."),
+                "G-Aether reads the service list through WMI and filters out anything whose binary lives under %SystemRoot%\\, which is almost always Windows itself. Services already set to Disabled are hidden too, since re-enabling a disabled service is more of a services.msc power move than a triage action.\n\n" +
+                "What you can do here:\n\n" +
+                "• Flip a service from Automatic to Manual to stop it launching with Windows. The service still works. It just won't run until you or another app asks for it.\n\n" +
+                "• Stop a running service right now, same as the Stop button in services.msc. If the service has dependents or Windows refuses, the attempt fails cleanly and the row stays running.\n\n" +
+                "What we won't do:\n\n" +
+                "• Set a service to Disabled. That's an easy way to brick a vendor install or lock yourself out of an app that auto-starts its helper on launch. If you really want Disabled, services.msc is one click away.\n\n" +
+                "• Delete or reconfigure anything beyond the start mode. Your install stays intact. This is purely a toggle for whether a service runs at boot."),
 
             ["global_hotkeys"] = new("Global Hotkeys",
-                "System-wide keyboard shortcuts that fire from anywhere in Windows — including inside games and full-screen apps.\n\n" +
-                "Click Set on an action, then press your chosen combination. You must include at least one modifier (Ctrl, Alt, Shift, or Win) — bare letters aren't allowed (they'd swallow that key globally).\n\n" +
-                "If another app has already claimed your combination, G-Aether will surface \"Combo in use by another app\" next to the action. Pick something else — no two apps can own the same global combo.\n\n" +
-                "Hotkeys are saved across launches and registered again automatically on startup."),
+                "Keyboard shortcuts that fire from anywhere in Windows, including inside games and full-screen apps.\n\n" +
+                "Click Set on an action, then press your chosen combination. At least one modifier (Ctrl, Alt, Shift, or Win) is required. Bare letters aren't allowed, because they'd swallow that key globally.\n\n" +
+                "If another app has already claimed the combination you picked, G-Aether shows \"Combo in use by another app\" next to the action. Pick something else, since no two apps can own the same global combo.\n\n" +
+                "Your hotkeys are saved across launches and re-registered automatically on startup."),
 
             ["app_profiles"] = new("App Profiles",
                 "Automatically apply a scene when a specific app takes focus.\n\n" +
-                "Each rule is a simple pair: a process name (like \"blender\" or \"chrome\") and a scene from the footer strip (Reading, Focus, Present, Night, or Game).\n\n" +
+                "Each rule is a simple pair: a process name like \"blender\" or \"chrome\", plus a scene from the footer strip (Reading, Focus, Present, Night, or Game).\n\n" +
                 "How it works:\n\n" +
-                "• When you switch TO a matching app, G-Aether snapshots your current Perf / GPU / Refresh settings, then applies the rule's scene.\n\n" +
-                "• When you switch AWAY to an unprofiled app, your snapshot is restored — so per-app profiles never leave you stuck in Turbo after closing Blender.\n\n" +
-                "• Switching from one profiled app to another applies the new scene without touching the original snapshot — the baseline is whatever you had before the first trigger.\n\n" +
-                "Rules persist across launches. Remove a rule with the X on its row."),
+                "• When you switch TO a matching app, G-Aether snapshots your current Perf, GPU, and Refresh settings, then applies the rule's scene.\n\n" +
+                "• When you switch AWAY to an unprofiled app, that snapshot comes back. That way, per-app profiles never leave you stuck in Turbo after closing Blender.\n\n" +
+                "• Switching from one profiled app to another swaps in the new scene without touching the original snapshot. The baseline stays as whatever you had before the first trigger fired.\n\n" +
+                "Your rules persist across launches. Remove one with the X on its row."),
 
             ["battery_triggers"] = new("Battery Saver Automation",
-                "Opt-in, hands-off power saving while on battery.\n\n" +
-                "When enabled, two things happen:\n\n" +
-                "At 20% — G-Aether applies the Focus scene (Silent performance + Eco GPU) and shows an OSD. This quiets the fans and cuts GPU power draw so your remaining battery lasts longer.\n\n" +
-                "At 10% — an urgent on-screen warning prompts you to save your work.\n\n" +
-                "Nothing happens while the laptop is plugged in. Each threshold fires at most once per low-battery cycle — once the battery rises back above a recovery level, the trigger rearms. G-Aether does NOT automatically revert your modes when you plug back in; that's always your call."),
+                "Opt-in, hands-off power saving while you're running on battery.\n\n" +
+                "When enabled, two things happen automatically:\n\n" +
+                "At 20%: G-Aether applies the Focus scene (Silent performance with an Eco GPU) and shows an OSD. The fans quiet down and the GPU draws less, stretching the rest of your battery as far as it'll go.\n\n" +
+                "At 10%: an urgent on-screen warning asks you to save your work.\n\n" +
+                "Nothing fires while you're plugged in. Each threshold fires at most once per low-battery cycle and rearms once the battery climbs back above a recovery level. G-Aether won't automatically revert your modes when you plug back in. That's always your call."),
         };
 
         public static HelpEntry? Get(string key) =>

@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using GHelper.Gpu;
 using GHelper.WPF.Services;
 
@@ -15,6 +17,9 @@ namespace GHelper.WPF.ViewModels
 
         [ObservableProperty]
         private bool _showRestart;
+
+        [ObservableProperty]
+        private bool _isRestartPending;
 
         [ObservableProperty]
         private bool _hasEco = true;
@@ -78,6 +83,9 @@ namespace GHelper.WPF.ViewModels
             bool needsRestart = (mode == 2) || (currentMode == AsusACPI.GPUModeUltimate && mode != 2);
             ShowRestart = needsRestart;
 
+            // If the user picked a mode that no longer needs restart, abort any pending shutdown.
+            if (!needsRestart && IsRestartPending) CancelRestart();
+
             UpdateHeaderText(mode);
 
             AppConfig.Set("gpu_auto", mode == 3 ? 1 : 0);
@@ -104,6 +112,7 @@ namespace GHelper.WPF.ViewModels
                 SelectedModeIndex = index;
                 SchematicMode = mode;
                 ShowRestart = false;
+                if (IsRestartPending) CancelRestart();
                 UpdateHeaderText(mode);
             }
             finally
@@ -164,6 +173,44 @@ namespace GHelper.WPF.ViewModels
             int gpuMode = AppConfig.Get("gpu_mode");
             _currentHardwareMode = gpuMode;
             if (gpuMode >= 0) SetFromGpuMode(gpuMode);
+        }
+
+        [RelayCommand]
+        private void RestartNow()
+        {
+            // /t 30 leaves Windows' own "you're about to be signed out" notification
+            // visible long enough for the user to cancel via our button or `shutdown /a`.
+            if (TryRunShutdown("/r /t 30 /c \"G-Aether: applying GPU mode change\""))
+                IsRestartPending = true;
+        }
+
+        [RelayCommand]
+        private void CancelRestart()
+        {
+            if (TryRunShutdown("/a"))
+                IsRestartPending = false;
+        }
+
+        private static bool TryRunShutdown(string args)
+        {
+            try
+            {
+                var p = Process.Start(new ProcessStartInfo
+                {
+                    FileName = "shutdown",
+                    Arguments = args,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardError = true,
+                });
+                p?.WaitForExit(2000);
+                return (p?.ExitCode ?? 1) == 0;
+            }
+            catch (Exception ex)
+            {
+                Logger.WriteLine("shutdown " + args + " failed: " + ex.Message);
+                return false;
+            }
         }
     }
 }

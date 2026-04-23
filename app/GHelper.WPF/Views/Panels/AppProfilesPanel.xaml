@@ -70,7 +70,7 @@
                 </ItemsControl>
 
                 <!-- Empty state -->
-                <TextBlock Text="No profiles yet — add one below to get started."
+                <TextBlock Text="No profiles yet. Add one below to get started."
                            FontSize="11"
                            HorizontalAlignment="Center"
                            Margin="0,8,0,8">

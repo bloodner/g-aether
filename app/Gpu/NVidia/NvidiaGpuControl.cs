@@ -262,4 +262,50 @@ public class NvidiaGpuControl : IGpuControl
 
     }
 
+    // NVML lives alongside NvAPI and exposes live power draw in milliwatts.
+    // We lazy-init and cache the device handle. On failure, a 30s throttle
+    // lets us retry (useful when the dGPU was asleep in Eco at first poll).
+    private static bool _nvmlReady;
+    private static nint _nvmlDevice;
+    private static DateTime _nvmlLastAttempt = DateTime.MinValue;
+
+    private static bool EnsureNvml()
+    {
+        if (_nvmlReady) return true;
+        if ((DateTime.UtcNow - _nvmlLastAttempt).TotalSeconds < 30) return false;
+        _nvmlLastAttempt = DateTime.UtcNow;
+
+        try
+        {
+            if (NvmlInterop.Init() != NvmlInterop.NVML_SUCCESS) return false;
+            if (NvmlInterop.DeviceGetHandleByIndex(0, out nint handle) != NvmlInterop.NVML_SUCCESS) return false;
+            _nvmlDevice = handle;
+            _nvmlReady = true;
+            Logger.WriteLine("NVML ready for power draw readings.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Logger.WriteLine("NVML init failed: " + ex.Message);
+            return false;
+        }
+    }
+
+    public int? GetPowerDraw()
+    {
+        if (!IsValid) return null;
+        if (!EnsureNvml()) return null;
+
+        try
+        {
+            if (NvmlInterop.DeviceGetPowerUsage(_nvmlDevice, out uint mw) != NvmlInterop.NVML_SUCCESS)
+                return null;
+            return (int)(mw / 1000);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
 }

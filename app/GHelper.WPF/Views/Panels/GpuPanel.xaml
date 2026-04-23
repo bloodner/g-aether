@@ -6,30 +6,55 @@
 
     <Border Style="{StaticResource CardStyle}">
         <StackPanel>
-            <!-- Header -->
-            <Grid Margin="0,0,0,28">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
+            <!-- Header.
+                 Title lives on its own row so the restart chip below it can grow
+                 freely without overlapping the mode name on narrow windows. The
+                 chip row only takes vertical space when ShowRestart is true. -->
+            <StackPanel Margin="0,0,0,28">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="&#xE836;" FontFamily="Segoe MDL2 Assets" FontSize="16"
                                Foreground="{DynamicResource AccentBrush}"
                                VerticalAlignment="Center" Margin="0,0,8,0" />
                     <TextBlock Text="{Binding HeaderText}"
                                Style="{StaticResource CardTitleStyle}"
-                               VerticalAlignment="Center" />
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis" />
                     <controls:HelpButton HelpKey="gpu_mode" VerticalAlignment="Center" Margin="8,0,0,0" />
                 </StackPanel>
 
-                <TextBlock Grid.Column="1" Text="Requires Restart &#x26A0;"
-                           Foreground="{DynamicResource WarnOrangeBrush}"
-                           FontSize="11"
-                           FontStyle="Italic"
-                           VerticalAlignment="Center"
-                           Visibility="{Binding ShowRestart, Converter={StaticResource BoolToVisibility}}" />
-            </Grid>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                            Margin="0,8,0,0"
+                            Visibility="{Binding ShowRestart, Converter={StaticResource BoolToVisibility}}">
+
+                    <!-- Idle: warning + "Restart now" action -->
+                    <StackPanel Orientation="Horizontal"
+                                Visibility="{Binding IsRestartPending, Converter={StaticResource InverseBoolToVisibility}}">
+                        <TextBlock Text="Requires Restart &#x26A0;"
+                                   Foreground="{DynamicResource WarnOrangeBrush}"
+                                   FontSize="11"
+                                   FontStyle="Italic"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,8,0" />
+                        <Button Content="Restart now"
+                                Command="{Binding RestartNowCommand}"
+                                Style="{StaticResource LinkButtonStyle}" />
+                    </StackPanel>
+
+                    <!-- Pending: countdown hint + Cancel -->
+                    <StackPanel Orientation="Horizontal"
+                                Visibility="{Binding IsRestartPending, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="Restarting in ~30s&#x2026;"
+                                   Foreground="{DynamicResource WarnOrangeBrush}"
+                                   FontSize="11"
+                                   FontStyle="Italic"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,8,0" />
+                        <Button Content="Cancel"
+                                Command="{Binding CancelRestartCommand}"
+                                Style="{StaticResource LinkButtonStyle}" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
 
             <!-- GPU Schematic Diagram -->
             <controls:GpuSchematic
