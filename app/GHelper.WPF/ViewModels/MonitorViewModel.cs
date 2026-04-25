@@ -29,6 +29,7 @@ namespace GHelper.WPF.ViewModels
         private readonly double[] _gpuFanHistory = new double[HistorySize];
         private readonly double[] _gpuUseHistory = new double[HistorySize];
         private readonly double[] _gpuPowerHistory = new double[HistorySize];
+        private readonly double[] _cpuUseHistory = new double[HistorySize];
         private readonly double[] _batteryRateHistory = new double[HistorySize];
 
         [ObservableProperty]
@@ -48,6 +49,9 @@ namespace GHelper.WPF.ViewModels
 
         [ObservableProperty]
         private double[] _gpuPowerValues = new double[HistorySize];
+
+        [ObservableProperty]
+        private double[] _cpuUseValues = new double[HistorySize];
 
         [ObservableProperty]
         private double[] _batteryRateValues = new double[HistorySize];
@@ -75,6 +79,9 @@ namespace GHelper.WPF.ViewModels
 
         [ObservableProperty]
         private string _gpuPowerText = "--";
+
+        [ObservableProperty]
+        private string _cpuUseText = "--";
 
         [ObservableProperty]
         private bool _isGpuActive = true;
@@ -135,6 +142,13 @@ namespace GHelper.WPF.ViewModels
             GpuUseValues = (double[])_gpuUseHistory.Clone();
             GpuUseText = gpuUse >= 0 ? $"{gpuUse}%" : (ecoMode ? "Off" : "--");
             GpuUseLabel = "dGPU Usage";
+
+            // CPU Usage (%)
+            int? cpuUseRaw = HardwareControl.cpuUse;
+            double cpuUseVal = cpuUseRaw is > 0 ? (double)cpuUseRaw : 0;
+            ShiftAndPush(_cpuUseHistory, cpuUseVal);
+            CpuUseValues = (double[])_cpuUseHistory.Clone();
+            CpuUseText = cpuUseRaw is null or < 0 ? "--" : $"{cpuUseRaw}%";
 
             // GPU Power Draw (watts)
             int? gpuPower = HardwareControl.gpuPower;

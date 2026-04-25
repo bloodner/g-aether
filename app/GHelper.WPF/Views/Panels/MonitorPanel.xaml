@@ -9,12 +9,19 @@
                 <!-- Header row — standardizes the page with the rest of the app -->
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="14" />
+                <!-- Row 2: CPU Temp + CPU Usage -->
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="8" />
+                <!-- Row 4: dGPU Temp + dGPU Usage -->
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="8" />
+                <!-- Row 6: dGPU Power (full width) -->
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="8" />
+                <!-- Row 8: CPU Fan + GPU Fan -->
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
+                <!-- Row 10: Battery -->
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -38,8 +45,9 @@
                 <controls:HelpButton HelpKey="monitor_telemetry" VerticalAlignment="Center" Margin="8,0,0,0" />
             </StackPanel>
 
-            <!-- Row 2: CPU Temp + Power Draw (always visible).
-                 SparklineChart now draws its own card background (fill, border,
+            <!-- Row 2: CPU Temp + CPU Usage. The CPU group is paired so users
+                 see CPU heat and load side by side.
+                 SparklineChart draws its own card background (fill, border,
                  halo, left stripe) so it drops straight into the grid — no outer
                  TileStyle wrapper. -->
             <controls:SparklineChart Grid.Row="2" Grid.Column="0" Height="106"
@@ -50,14 +58,14 @@
                 ValueFontSize="28"
                 StrokeColor="#FF6B6B" />
             <controls:SparklineChart Grid.Row="2" Grid.Column="2" Height="106"
-                Label="dGPU Power"
-                CurrentText="{Binding GpuPowerText}"
-                Values="{Binding GpuPowerValues}"
-                MaxValue="150"
+                Label="CPU Usage"
+                CurrentText="{Binding CpuUseText}"
+                Values="{Binding CpuUseValues}"
+                MaxValue="100"
                 ValueFontSize="28"
-                StrokeColor="#6BCB77" />
+                StrokeColor="#A78BFA" />
 
-            <!-- Row 4: GPU Temp + GPU Usage (when active) OR dGPU Idle banner (when Eco) -->
+            <!-- Row 4: dGPU Temp + dGPU Usage (when active) OR dGPU Idle banner (when Eco) -->
             <controls:SparklineChart Grid.Row="4" Grid.Column="0" Height="106"
                 Label="dGPU Temp"
                 CurrentText="{Binding GpuTempText}"
@@ -89,15 +97,26 @@
                 </StackPanel>
             </Border>
 
-            <!-- Row 6: CPU Fan / GPU Fan -->
-            <controls:SparklineChart Grid.Row="6" Grid.Column="0" Height="106"
+            <!-- Row 6: dGPU Power (full width). Sits on its own line because the
+                 sparkline has more breathing room and the "wattage" value reads
+                 more naturally without a competing tile next to it. -->
+            <controls:SparklineChart Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" Height="106"
+                Label="dGPU Power"
+                CurrentText="{Binding GpuPowerText}"
+                Values="{Binding GpuPowerValues}"
+                MaxValue="150"
+                ValueFontSize="28"
+                StrokeColor="#6BCB77" />
+
+            <!-- Row 8: CPU Fan / GPU Fan -->
+            <controls:SparklineChart Grid.Row="8" Grid.Column="0" Height="106"
                 Label="CPU Fan"
                 CurrentText="{Binding CpuFanCurrentText}"
                 Values="{Binding CpuFanValues}"
                 MaxValue="7000"
                 ValueFontSize="22"
                 StrokeColor="#C084FC" />
-            <controls:SparklineChart Grid.Row="6" Grid.Column="2" Height="106"
+            <controls:SparklineChart Grid.Row="8" Grid.Column="2" Height="106"
                 Label="GPU Fan"
                 CurrentText="{Binding GpuFanCurrentText}"
                 Values="{Binding GpuFanValues}"
@@ -105,9 +124,9 @@
                 ValueFontSize="22"
                 StrokeColor="#F472B6" />
 
-            <!-- Row 8: Battery Status (full width) — halo color tracks BatteryBrush
+            <!-- Row 10: Battery Status (full width) — halo color tracks BatteryBrush
                  (green when charging/healthy, amber/orange/red as charge drops). -->
-            <Grid Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3">
+            <Grid Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="3">
                 <controls:AccentHaloBackground AccentColor="{Binding BatteryAccentColor}" />
                 <Grid Margin="18,12,16,12">
                     <Grid.ColumnDefinitions>

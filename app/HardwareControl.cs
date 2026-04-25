@@ -33,6 +33,7 @@ public static class HardwareControl
 
     public static int? gpuUse;
     public static int? gpuPower;  // watts, from NVML (NVIDIA) or ADL (AMD) via IGpuControl.GetPowerDraw()
+    public static int? cpuUse;    // % from PerformanceCounter "Processor / % Processor Time / _Total"
 
     static long lastUpdate;
 
@@ -41,6 +42,7 @@ public static class HardwareControl
     static bool _chargeWatt = AppConfig.Is("charge_watt");
 
     static PerformanceCounter? _cpuTempCounter;
+    static PerformanceCounter? _cpuUseCounter;
 
     #region Native Battery API
 
@@ -488,6 +490,7 @@ public static class HardwareControl
     {
         gpuUse = -1;
         gpuPower = null;
+        cpuUse = null;
 
         if (Program.acpi is null) return;
 
@@ -511,6 +514,16 @@ public static class HardwareControl
         try
         {
             gpuPower = GpuControl?.GetPowerDraw();
+        }
+        catch (Exception ex) { Debug.WriteLine(ex.ToString()); }
+
+        // CPU usage. PerformanceCounter's first NextValue() always returns 0
+        // because it needs two samples to compute a delta — we live with one
+        // tick of "0%" on launch, then it's accurate.
+        try
+        {
+            _cpuUseCounter ??= new PerformanceCounter("Processor", "% Processor Time", "_Total");
+            cpuUse = (int)Math.Round(_cpuUseCounter.NextValue());
         }
         catch (Exception ex) { Debug.WriteLine(ex.ToString()); }
 
@@ -623,5 +636,7 @@ public static class HardwareControl
     {
         _cpuTempCounter?.Dispose();
         _cpuTempCounter = null;
+        _cpuUseCounter?.Dispose();
+        _cpuUseCounter = null;
     }
 }

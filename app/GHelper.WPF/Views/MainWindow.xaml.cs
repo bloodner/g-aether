@@ -11,22 +11,40 @@ namespace GHelper.WPF.Views
         private readonly System.Windows.Controls.RadioButton[] _navButtons;
         private readonly TrayIconService _trayService = new();
 
+        // Suppresses the Nav_Checked AppConfig.Set while the ctor is applying
+        // the initial tab. Without it, a cold-boot override to Monitor would
+        // clobber the user's saved pinned tab.
+        private bool _restoringTab;
+
         public MainWindow()
         {
             InitializeComponent();
 
             ThemeService.Initialize();
-            DataContext = new MainViewModel();
+            var mainVm = new MainViewModel();
+            DataContext = mainVm;
+
+            // Hand the gadget service the MonitorViewModel it binds to, and
+            // show the gadget if the user had it on last session.
+            GadgetService.Configure(mainVm.Monitor);
 
             // Slot 9 (App Profiles) is nulled out — App Profiles now lives inside the
             // Settings panel. Keeping the slot preserves pinned-tab indices for Processes (10).
             _panels = [PanelMonitor, PanelPerformance, PanelFans, PanelGpu, PanelBattery, PanelDisplay, PanelKeyboard, PanelKeyBindings, PanelExtra, null!, PanelProcesses];
             _navButtons = [NavMonitor, NavPerformance, null!, NavGpu, NavBattery, NavDisplay, NavLighting, NavKeyBindings, NavExtra, null!, NavProcesses];
 
-            // Restore pinned tab (skip removed tabs)
+            // Restore pinned tab (skip removed tabs). On a cold boot — system
+            // uptime under 2 minutes, i.e. launched by Task Scheduler right after
+            // login — always land on Monitor regardless of the saved tab. That's
+            // the dashboard view; opening scrolled somewhere mid-Settings is
+            // disorienting when the machine has just booted.
+            _restoringTab = true;
             int pinned = AppConfig.Get("wpf_pinned_tab");
+            bool coldBoot = Environment.TickCount64 < 2 * 60 * 1000;
+            if (coldBoot) pinned = 0;
             if (pinned >= 0 && pinned < _navButtons.Length && _navButtons[pinned] != null)
                 _navButtons[pinned].IsChecked = true;
+            _restoringTab = false;
 
             // Initialize toast overlay on the root grid
             var mainGrid = (Grid)((System.Windows.Controls.Border)Content).Child;
@@ -60,8 +78,10 @@ namespace GHelper.WPF.Views
                     if (_panels[i] != null)
                         _panels[i].Visibility = i == index ? Visibility.Visible : Visibility.Collapsed;
 
-                // Save as pinned tab
-                AppConfig.Set("wpf_pinned_tab", index);
+                // Save as pinned tab, except while the ctor is applying the
+                // initial selection (so a cold-boot override to Monitor doesn't
+                // clobber the user's saved preference).
+                if (!_restoringTab) AppConfig.Set("wpf_pinned_tab", index);
             }
         }
 

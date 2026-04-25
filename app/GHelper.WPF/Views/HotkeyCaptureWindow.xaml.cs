@@ -22,6 +22,12 @@ namespace GHelper.WPF.Views
             _pending.Action = action;
             ActionLabel.Text = GlobalHotkeyService.ActionLabel(action);
             PreviewKeyDown += OnPreviewKeyDown;
+
+            // Release every global hotkey while we're capturing so the keypress
+            // we're trying to record doesn't trigger its own handler. Restored
+            // on close regardless of accept/cancel.
+            Loaded += (_, _) => GlobalHotkeyService.Suspend();
+            Closed += (_, _) => GlobalHotkeyService.Resume();
         }
 
         /// <summary>
@@ -49,13 +55,15 @@ namespace GHelper.WPF.Views
             }
 
             // Read modifiers live from Keyboard so Shift/Ctrl held for other
-            // purposes don't pollute the binding.
+            // purposes don't pollute the binding. WPF's ModifierKeys.Windows is
+            // unreliable (the OS often consumes the Win key state before we see
+            // it), so we check the physical LWin/RWin keys directly.
             var mods = HotkeyModifiers.None;
             var wpfMods = Keyboard.Modifiers;
             if ((wpfMods & System.Windows.Input.ModifierKeys.Control) != 0) mods |= HotkeyModifiers.Control;
             if ((wpfMods & System.Windows.Input.ModifierKeys.Alt) != 0) mods |= HotkeyModifiers.Alt;
             if ((wpfMods & System.Windows.Input.ModifierKeys.Shift) != 0) mods |= HotkeyModifiers.Shift;
-            if ((wpfMods & System.Windows.Input.ModifierKeys.Windows) != 0) mods |= HotkeyModifiers.Win;
+            if (Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin)) mods |= HotkeyModifiers.Win;
 
             _pending.Modifiers = mods;
 

@@ -1,4 +1,4 @@
-<UserControl x:Class="GHelper.WPF.Views.Panels.ExtraSettingsPanel"
+﻿<UserControl x:Class="GHelper.WPF.Views.Panels.ExtraSettingsPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:GHelper.WPF.Controls"
@@ -176,6 +176,51 @@
         </Border>
 
         <!-- ======================================================== -->
+        <!-- FLOATING GADGET                                          -->
+        <!-- ======================================================== -->
+        <Border Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                    <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="Floating Gadget"
+                               Style="{StaticResource CardTitleStyle}"
+                               VerticalAlignment="Center" />
+                    <controls:HelpButton HelpKey="floating_gadget" VerticalAlignment="Center" Margin="8,0,0,0" />
+                </StackPanel>
+
+                <TextBlock Text="Compact live telemetry that stays on top of games and other apps."
+                           Style="{StaticResource DimTextStyle}"
+                           FontSize="11"
+                           Margin="0,0,0,12"
+                           TextWrapping="Wrap" />
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Show gadget" Style="{StaticResource BodyTextStyle}" />
+                        <TextBlock Text="Live telemetry, always on top, drag to reposition"
+                                   Style="{StaticResource DimTextStyle}" FontSize="10" />
+                    </StackPanel>
+                    <controls:ToggleSwitch Grid.Column="1"
+                                           IsChecked="{Binding ShowGadget, Mode=TwoWay}"
+                                           Width="44" Height="22" VerticalAlignment="Center"
+                                           Margin="0,0,10,0" />
+                    <Button Grid.Column="2"
+                            Content="Configure..."
+                            Command="{Binding OpenGadgetSettingsCommand}"
+                            Style="{StaticResource SecondaryActionButtonStyle}"
+                            VerticalAlignment="Center" />
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- ======================================================== -->
         <!-- SMART OPTIMIZE                                           -->
         <!-- ======================================================== -->
         <Border Style="{StaticResource CardStyle}">
@@ -314,7 +359,7 @@
         </Border>
 
         <!-- ======================================================== -->
-        <!-- APP PROFILES — embedded from AppProfilesPanel. DataContext  -->
+        <!-- APP PROFILES â€” embedded from AppProfilesPanel. DataContext  -->
         <!-- walks up to the root MainViewModel to reach .AppProfiles.   -->
         <!-- ======================================================== -->
         <panels:AppProfilesPanel DataContext="{Binding DataContext.AppProfiles, RelativeSource={RelativeSource AncestorType=Window}}" />

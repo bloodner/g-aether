@@ -226,6 +226,10 @@ namespace GHelper.WPF.ViewModels
                 Logger.WriteLine("Sensor tick error: " + ex.Message);
             }
 
+            // Publish the snapshot to any connected pipe clients (Game Bar widget, etc.).
+            // No-op when nobody's connected, so the cost is a null check.
+            Services.TelemetryPipeServer.PushSnapshot();
+
             // Sync performance mode if changed externally (e.g., via hotkey)
             try
             {

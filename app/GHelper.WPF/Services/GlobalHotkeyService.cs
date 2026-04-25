@@ -21,6 +21,7 @@ namespace GHelper.WPF.Services
         SceneNight = 13,
         SceneGame = 14,
         ToggleWindow = 20,
+        ToggleGadget = 21,
     }
 
     [Flags]
@@ -95,6 +96,15 @@ namespace GHelper.WPF.Services
             }
         }
 
+        /// <summary>
+        /// Temporarily release all global hotkey registrations so a capture
+        /// dialog can read keystrokes without our handlers stealing them. Pair
+        /// with <see cref="Resume"/> on dialog close.
+        /// </summary>
+        public static void Suspend() => UnregisterAll();
+
+        public static void Resume() => RegisterAll();
+
         /// <summary>Replace all bindings with a new set (called by the VM after add/clear).</summary>
         public static void SetBindings(IEnumerable<HotkeyBinding> bindings)
         {
@@ -166,6 +176,10 @@ namespace GHelper.WPF.Services
                         if (win == null) return;
                         if (win.IsVisible) { win.Hide(); }
                         else { win.Show(); win.Activate(); }
+                        break;
+
+                    case HotkeyAction.ToggleGadget:
+                        GadgetService.SetEnabled(!GadgetService.IsEnabled);
                         break;
                 }
             });
@@ -246,11 +260,13 @@ namespace GHelper.WPF.Services
         public static string? FormatBinding(HotkeyBinding? b)
         {
             if (b == null || b.VirtualKey == 0) return null;
+            // Win first — it's the most distinctive modifier and reads as the
+            // anchor of the chord. Then Ctrl > Alt > Shift > trigger.
             var parts = new List<string>();
+            if ((b.Modifiers & HotkeyModifiers.Win) != 0) parts.Add("Win");
             if ((b.Modifiers & HotkeyModifiers.Control) != 0) parts.Add("Ctrl");
             if ((b.Modifiers & HotkeyModifiers.Alt) != 0) parts.Add("Alt");
             if ((b.Modifiers & HotkeyModifiers.Shift) != 0) parts.Add("Shift");
-            if ((b.Modifiers & HotkeyModifiers.Win) != 0) parts.Add("Win");
             parts.Add(KeyInterop.KeyFromVirtualKey((int)b.VirtualKey).ToString());
             return string.Join(" + ", parts);
         }
@@ -265,6 +281,7 @@ namespace GHelper.WPF.Services
             HotkeyAction.SceneNight => "Scene: Night",
             HotkeyAction.SceneGame => "Scene: Game",
             HotkeyAction.ToggleWindow => "Show / Hide G-Aether",
+            HotkeyAction.ToggleGadget => "Show / Hide Floating Gadget",
             _ => action.ToString(),
         };
 
@@ -278,6 +295,7 @@ namespace GHelper.WPF.Services
             HotkeyAction.SceneNight,
             HotkeyAction.SceneGame,
             HotkeyAction.ToggleWindow,
+            HotkeyAction.ToggleGadget,
         };
 
         // --- P/Invoke -------------------------------------------------------

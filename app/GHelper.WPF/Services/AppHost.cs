@@ -69,6 +69,12 @@ namespace GHelper.WPF.Services
             try { FanStopService.Initialize(); }
             catch (Exception ex) { Logger.WriteLine("FanStopService init error: " + ex.Message); }
 
+            // Telemetry pipe server — streams live sensor data over a named
+            // pipe so the Game Bar widget and other local consumers can read
+            // it without duplicating ACPI/NVML calls.
+            try { TelemetryPipeServer.Initialize(); }
+            catch (Exception ex) { Logger.WriteLine("TelemetryPipeServer init error: " + ex.Message); }
+
             // Wire up WPF callbacks for key actions that need UI
             InputDispatcher.OnCycleAura = (delta) =>
             {

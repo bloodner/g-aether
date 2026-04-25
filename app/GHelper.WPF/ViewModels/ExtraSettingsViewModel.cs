@@ -40,6 +40,80 @@ namespace GHelper.WPF.ViewModels
         private bool _advancedRgb;
 
         [ObservableProperty]
+        private bool _showGadget;
+
+        [ObservableProperty]
+        private bool _hideGadgetClose;
+
+        [ObservableProperty]
+        private bool _hideGadgetLogo;
+
+        [ObservableProperty]
+        private bool _gadgetHoverFade;
+
+        [ObservableProperty]
+        private double _gadgetOpacity = 1.0;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsGadgetSizeXSmall), nameof(IsGadgetSizeSmall), nameof(IsGadgetSizeMedium), nameof(IsGadgetSizeLarge))]
+        private string _gadgetSize = "medium";
+
+        public bool IsGadgetSizeXSmall => GadgetSize == "xsmall";
+        public bool IsGadgetSizeSmall => GadgetSize == "small";
+        public bool IsGadgetSizeMedium => GadgetSize == "medium";
+        public bool IsGadgetSizeLarge => GadgetSize == "large";
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsAccentMulti), nameof(IsAccentBlue), nameof(IsAccentPurple), nameof(IsAccentGreen), nameof(IsAccentOrange), nameof(IsAccentRed))]
+        private string _gadgetAccent = "multi";
+
+        public bool IsAccentMulti => GadgetAccent == "multi";
+        public bool IsAccentBlue => GadgetAccent == "blue";
+        public bool IsAccentPurple => GadgetAccent == "purple";
+        public bool IsAccentGreen => GadgetAccent == "green";
+        public bool IsAccentOrange => GadgetAccent == "orange";
+        public bool IsAccentRed => GadgetAccent == "red";
+
+        // Per-tile visibility — all default to true. Saved as gadget_show_<key>.
+        [ObservableProperty] private bool _showCpuTemp = true;
+        [ObservableProperty] private bool _showDgpuTemp = true;
+        [ObservableProperty] private bool _showCpuUse = true;
+        [ObservableProperty] private bool _showDgpuUse = true;
+        [ObservableProperty] private bool _showPower = true;
+        [ObservableProperty] private bool _showBattery = true;
+        [ObservableProperty] private bool _showCpuFan = true;
+        [ObservableProperty] private bool _showGpuFan = true;
+
+        partial void OnShowCpuTempChanged(bool value)  => SetTileVisibility("cpu_temp", value);
+        partial void OnShowDgpuTempChanged(bool value) => SetTileVisibility("dgpu_temp", value);
+        partial void OnShowCpuUseChanged(bool value)   => SetTileVisibility("cpu_use", value);
+        partial void OnShowDgpuUseChanged(bool value)  => SetTileVisibility("dgpu_use", value);
+        partial void OnShowPowerChanged(bool value)    => SetTileVisibility("power", value);
+        partial void OnShowBatteryChanged(bool value)  => SetTileVisibility("battery", value);
+        partial void OnShowCpuFanChanged(bool value)   => SetTileVisibility("cpu_fan", value);
+        partial void OnShowGpuFanChanged(bool value)   => SetTileVisibility("gpu_fan", value);
+
+        private void SetTileVisibility(string key, bool value)
+        {
+            if (_ignoreChange) return;
+            AppConfig.Set("gadget_show_" + key, value ? 1 : 0);
+            GadgetService.ApplySettings();
+        }
+
+        [RelayCommand]
+        private void OpenGadgetSettings()
+        {
+            var owner = Application.Current?.MainWindow;
+            GadgetSettingsWindow.Show(owner, this);
+        }
+
+        [ObservableProperty]
+        private string _gadgetHotkeyText = "Not set";
+
+        [ObservableProperty]
+        private bool _gadgetHotkeyAssigned;
+
+        [ObservableProperty]
         private int _asusServicesCount;
 
         [ObservableProperty]
@@ -115,6 +189,11 @@ namespace GHelper.WPF.ViewModels
             // the user opened this panel.
             if (UpdateNotifier.Latest is { Status: UpdateStatus.UpdateAvailable } cached)
                 ApplyDiscoveredUpdate(cached);
+
+            // GlobalHotkeyService loads its bindings later in MainWindow.OnLoaded,
+            // after this VM has already constructed. Subscribe so the gadget hotkey
+            // label refreshes once bindings are actually available.
+            GlobalHotkeyService.BindingsChanged += RefreshGadgetHotkey;
 
             UpdateNotifier.UpdateDiscovered += OnUpdateDiscovered;
         }
@@ -223,6 +302,103 @@ namespace GHelper.WPF.ViewModels
             if (_ignoreChange) return;
             AppConfig.Set("advanced_rgb", value ? 1 : 0);
             Aura.RefreshRGBFlags();
+        }
+
+        partial void OnShowGadgetChanged(bool value)
+        {
+            if (_ignoreChange) return;
+            GadgetService.SetEnabled(value);
+        }
+
+        partial void OnHideGadgetCloseChanged(bool value)
+        {
+            if (_ignoreChange) return;
+            AppConfig.Set("gadget_hide_close", value ? 1 : 0);
+            GadgetService.ApplySettings();
+        }
+
+        partial void OnHideGadgetLogoChanged(bool value)
+        {
+            if (_ignoreChange) return;
+            AppConfig.Set("gadget_hide_logo", value ? 1 : 0);
+            GadgetService.ApplySettings();
+        }
+
+        partial void OnGadgetHoverFadeChanged(bool value)
+        {
+            if (_ignoreChange) return;
+            AppConfig.Set("gadget_hover_fade", value ? 1 : 0);
+            GadgetService.ApplySettings();
+        }
+
+        partial void OnGadgetOpacityChanged(double value)
+        {
+            if (_ignoreChange) return;
+            int pct = (int)Math.Round(Math.Clamp(value, 0.20, 1.00) * 100);
+            AppConfig.Set("gadget_opacity", pct);
+            GadgetService.ApplySettings();
+        }
+
+        partial void OnGadgetSizeChanged(string value)
+        {
+            if (_ignoreChange) return;
+            AppConfig.Set("gadget_size", value);
+            // Going Small → Large could push the gadget off the right or
+            // bottom edge of the screen. Snap back to the corner so the new
+            // size is always visible.
+            GadgetService.ResetPosition();
+        }
+
+        partial void OnGadgetAccentChanged(string value)
+        {
+            if (_ignoreChange) return;
+            AppConfig.Set("gadget_accent", value);
+            GadgetService.ApplySettings();
+        }
+
+        [RelayCommand]
+        private void SetGadgetSize(string size) => GadgetSize = size;
+
+        [RelayCommand]
+        private void SetGadgetAccent(string accent) => GadgetAccent = accent;
+
+        [RelayCommand]
+        private void SetGadgetHotkey()
+        {
+            var owner = Application.Current?.MainWindow;
+            var binding = HotkeyCaptureWindow.Capture(owner, HotkeyAction.ToggleGadget);
+            if (binding == null) return;
+
+            var updated = GlobalHotkeyService.Bindings
+                .Where(b => b.Action != HotkeyAction.ToggleGadget)
+                .Append(binding)
+                .ToList();
+            GlobalHotkeyService.SetBindings(updated);
+            RefreshGadgetHotkey();
+        }
+
+        [RelayCommand]
+        private void ClearGadgetHotkey()
+        {
+            var updated = GlobalHotkeyService.Bindings
+                .Where(b => b.Action != HotkeyAction.ToggleGadget)
+                .ToList();
+            GlobalHotkeyService.SetBindings(updated);
+            RefreshGadgetHotkey();
+        }
+
+        [RelayCommand]
+        private void ResetGadgetPosition()
+        {
+            GadgetService.ResetPosition();
+        }
+
+        private void RefreshGadgetHotkey()
+        {
+            var binding = GlobalHotkeyService.Bindings.FirstOrDefault(b => b.Action == HotkeyAction.ToggleGadget);
+            string? label = GlobalHotkeyService.FormatBinding(binding);
+            GadgetHotkeyText = label ?? "Not set";
+            GadgetHotkeyAssigned = label != null;
         }
 
         partial void OnStopArmoryCrateChanged(bool value)
@@ -485,6 +661,23 @@ namespace GHelper.WPF.ViewModels
                 GpuFixEnabled = AppConfig.Is("gpu_fix");
                 NoOverdrive = AppConfig.Is("no_overdrive");
                 WindowTopmost = AppConfig.Is("topmost");
+                ShowGadget = AppConfig.Is("gadget_enabled");
+                HideGadgetClose = AppConfig.Is("gadget_hide_close");
+                HideGadgetLogo = AppConfig.Is("gadget_hide_logo");
+                GadgetHoverFade = AppConfig.Is("gadget_hover_fade");
+                int rawOpacity = AppConfig.Get("gadget_opacity");
+                GadgetOpacity = (rawOpacity == 0 ? 100 : Math.Clamp(rawOpacity, 20, 100)) / 100.0;
+                GadgetSize = AppConfig.GetString("gadget_size") ?? "medium";
+                GadgetAccent = AppConfig.GetString("gadget_accent") ?? "multi";
+                ShowCpuTemp  = AppConfig.Get("gadget_show_cpu_temp", 1) == 1;
+                ShowDgpuTemp = AppConfig.Get("gadget_show_dgpu_temp", 1) == 1;
+                ShowCpuUse   = AppConfig.Get("gadget_show_cpu_use", 1) == 1;
+                ShowDgpuUse  = AppConfig.Get("gadget_show_dgpu_use", 1) == 1;
+                ShowPower    = AppConfig.Get("gadget_show_power", 1) == 1;
+                ShowBattery  = AppConfig.Get("gadget_show_battery", 1) == 1;
+                ShowCpuFan   = AppConfig.Get("gadget_show_cpu_fan", 1) == 1;
+                ShowGpuFan   = AppConfig.Get("gadget_show_gpu_fan", 1) == 1;
+                RefreshGadgetHotkey();
                 BootSound = AppConfig.Is("boot_sound");
                 BwTrayIcon = AppConfig.Is("bw_icon");
                 AdvancedRgb = AppConfig.Is("advanced_rgb");

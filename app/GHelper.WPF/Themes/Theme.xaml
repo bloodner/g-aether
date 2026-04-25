@@ -58,6 +58,30 @@
         <Setter Property="Margin" Value="0,0,0,8" />
     </Style>
 
+    <!-- Gadget tile styles — compact label+value cells used by the floating
+         telemetry gadget (GadgetWindow). Kept separate from CardStyle so the
+         gadget stays tight without dragging CardStyle's padding into a
+         micro layout. -->
+    <Style x:Key="GadgetTileStyle" TargetType="Border">
+        <Setter Property="Background" Value="#10FFFFFF" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="8,6" />
+        <Setter Property="Margin" Value="2" />
+    </Style>
+
+    <Style x:Key="GadgetLabelStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="Foreground" Value="{DynamicResource ForeDimBrush}" />
+        <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+    </Style>
+
+    <Style x:Key="GadgetValueStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Margin" Value="0,1,0,0" />
+        <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+    </Style>
+
     <!-- Tile Style - a gently raised surface that sits on top of the deep window bg.
          Mirrors the SensorCard fill/border so every tiled surface in the app reads the
          same way. The subtle luminance lift + border is what gives the page hierarchy. -->
