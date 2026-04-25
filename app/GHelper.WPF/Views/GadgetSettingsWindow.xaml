@@ -401,7 +401,7 @@
                                         </Button.Style>
                                     </Button>
                                     <Button CommandParameter="red" Command="{Binding SetGadgetAccentCommand}"
-                                            Width="22" Height="22" Padding="0" Cursor="Hand" ToolTip="Red">
+                                            Width="22" Height="22" Padding="0" Margin="0,0,6,0" Cursor="Hand" ToolTip="Red">
                                         <Button.Style>
                                             <Style TargetType="Button">
                                                 <Setter Property="Template">
@@ -413,6 +413,52 @@
                                                             </Grid>
                                                             <ControlTemplate.Triggers>
                                                                 <DataTrigger Binding="{Binding IsAccentRed}" Value="True">
+                                                                    <Setter TargetName="Ring" Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button CommandParameter="white" Command="{Binding SetGadgetAccentCommand}"
+                                            Width="22" Height="22" Padding="0" Margin="0,0,6,0" Cursor="Hand" ToolTip="White">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Grid>
+                                                                <!-- Hairline border so the white circle is visible against the dark card. -->
+                                                                <Ellipse Fill="#F0F0F2" Stroke="#22FFFFFF" StrokeThickness="1" />
+                                                                <Ellipse x:Name="Ring" Stroke="#60CDFF" StrokeThickness="2" Visibility="Collapsed" />
+                                                            </Grid>
+                                                            <ControlTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding IsAccentWhite}" Value="True">
+                                                                    <Setter TargetName="Ring" Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button CommandParameter="dark" Command="{Binding SetGadgetAccentCommand}"
+                                            Width="22" Height="22" Padding="0" Cursor="Hand" ToolTip="Stealth (near-black)">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Grid>
+                                                                <!-- Subtle outline so the dark circle is visible against the dark card. -->
+                                                                <Ellipse Fill="#36363B" Stroke="#22FFFFFF" StrokeThickness="1" />
+                                                                <Ellipse x:Name="Ring" Stroke="White" StrokeThickness="2" Visibility="Collapsed" />
+                                                            </Grid>
+                                                            <ControlTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding IsAccentDark}" Value="True">
                                                                     <Setter TargetName="Ring" Property="Visibility" Value="Visible" />
                                                                 </DataTrigger>
                                                             </ControlTemplate.Triggers>

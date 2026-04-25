@@ -52,6 +52,8 @@ namespace GHelper.WPF.Views
             "green"  => Color.FromRgb(0x6B, 0xCB, 0x77),
             "orange" => Color.FromRgb(0xFF, 0xB3, 0x47),
             "red"    => Color.FromRgb(0xFF, 0x6B, 0x6B),
+            "white"  => Color.FromRgb(0xF0, 0xF0, 0xF2),  // soft off-white (avoid harsh #FFFFFF)
+            "dark"   => Color.FromRgb(0x36, 0x36, 0x3B),  // near-black gray, "stealth" look
             _        => Color.FromRgb(0x60, 0xCD, 0xFF),  // blue (single-color fallback)
         };
 

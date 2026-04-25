@@ -64,7 +64,7 @@ namespace GHelper.WPF.ViewModels
         public bool IsGadgetSizeLarge => GadgetSize == "large";
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(IsAccentMulti), nameof(IsAccentBlue), nameof(IsAccentPurple), nameof(IsAccentGreen), nameof(IsAccentOrange), nameof(IsAccentRed))]
+        [NotifyPropertyChangedFor(nameof(IsAccentMulti), nameof(IsAccentBlue), nameof(IsAccentPurple), nameof(IsAccentGreen), nameof(IsAccentOrange), nameof(IsAccentRed), nameof(IsAccentWhite), nameof(IsAccentDark))]
         private string _gadgetAccent = "multi";
 
         public bool IsAccentMulti => GadgetAccent == "multi";
@@ -73,6 +73,8 @@ namespace GHelper.WPF.ViewModels
         public bool IsAccentGreen => GadgetAccent == "green";
         public bool IsAccentOrange => GadgetAccent == "orange";
         public bool IsAccentRed => GadgetAccent == "red";
+        public bool IsAccentWhite => GadgetAccent == "white";
+        public bool IsAccentDark => GadgetAccent == "dark";
 
         // Per-tile visibility — all default to true. Saved as gadget_show_<key>.
         [ObservableProperty] private bool _showCpuTemp = true;
