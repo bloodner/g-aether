@@ -55,6 +55,9 @@ namespace GHelper.WPF.ViewModels
         private bool _gadgetHoverFade;
 
         [ObservableProperty]
+        private bool _gadgetClickThrough;
+
+        [ObservableProperty]
         private double _gadgetOpacity = 1.0;
 
         [ObservableProperty]
@@ -333,6 +336,13 @@ namespace GHelper.WPF.ViewModels
         {
             if (_ignoreChange) return;
             AppConfig.Set("gadget_hover_fade", value ? 1 : 0);
+            GadgetService.ApplySettings();
+        }
+
+        partial void OnGadgetClickThroughChanged(bool value)
+        {
+            if (_ignoreChange) return;
+            AppConfig.Set("gadget_click_through", value ? 1 : 0);
             GadgetService.ApplySettings();
         }
 
@@ -690,6 +700,7 @@ namespace GHelper.WPF.ViewModels
                 ShowCpuFan   = AppConfig.Get("gadget_show_cpu_fan", 1) == 1;
                 ShowGpuFan        = AppConfig.Get("gadget_show_gpu_fan", 1) == 1;
                 ShowGadgetModeStrip = AppConfig.Get("gadget_show_modestrip", 1) == 1;
+                GadgetClickThrough = AppConfig.Get("gadget_click_through", 0) == 1;
                 RefreshGadgetHotkey();
                 BootSound = AppConfig.Is("boot_sound");
                 BwTrayIcon = AppConfig.Is("bw_icon");

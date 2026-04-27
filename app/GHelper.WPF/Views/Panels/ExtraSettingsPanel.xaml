@@ -465,7 +465,7 @@
                             </StackPanel>
                             <controls:ToggleSwitch Grid.Column="1"
                                                    IsChecked="{Binding StopArmoryCrate, Mode=TwoWay}"
-                                                   Width="36" Height="18"
+                                                   Width="44" Height="22"
                                                    VerticalAlignment="Center" Margin="8,0,4,0" />
                         </Grid>
                     </Border>

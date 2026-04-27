@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using GHelper.WPF.Services;
 using GHelper.WPF.ViewModels;
 
@@ -139,6 +140,21 @@ namespace GHelper.WPF.Views
             {
                 if (index >= 0 && index < _navButtons.Length && _navButtons[index] != null)
                     _navButtons[index].IsChecked = true;
+            }
+        }
+
+        /// <summary>
+        /// Slows touchpad scroll to a usable rate. Default WPF scroll speed (1 wheel
+        /// notch ≈ 120 delta = 3 lines × the OS multiplier) is fine for mice but
+        /// becomes a runaway when laptop touchpads send continuous deltas. Dividing
+        /// by 3 brings it to a comfortable rate while keeping mouse wheels usable.
+        /// </summary>
+        private void MainScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (sender is System.Windows.Controls.ScrollViewer sv)
+            {
+                sv.ScrollToVerticalOffset(sv.VerticalOffset - e.Delta / 3.0);
+                e.Handled = true;
             }
         }
     }

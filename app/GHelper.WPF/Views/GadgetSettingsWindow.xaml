@@ -188,6 +188,22 @@
                                                        Width="44" Height="22" VerticalAlignment="Center" />
                             </Grid>
 
+                            <!-- Click-through toggle -->
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Click-through" Style="{StaticResource BodyTextStyle}" />
+                                    <TextBlock Text="Mouse clicks pass through to whatever is behind the gadget. Disable to move the gadget."
+                                               Style="{StaticResource DimTextStyle}" FontSize="10" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <controls:ToggleSwitch Grid.Column="1"
+                                                       IsChecked="{Binding GadgetClickThrough, Mode=TwoWay}"
+                                                       Width="44" Height="22" VerticalAlignment="Center" />
+                            </Grid>
+
                             <Grid Margin="0,12,0,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />

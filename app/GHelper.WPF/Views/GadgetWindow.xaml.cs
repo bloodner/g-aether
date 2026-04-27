@@ -1,7 +1,9 @@
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 
 namespace GHelper.WPF.Views
@@ -76,6 +78,19 @@ namespace GHelper.WPF.Views
         private double _baseOpacity = 1.0;
         private bool _hoverFadeEnabled;
 
+        // Win32 interop for click-through. WS_EX_TRANSPARENT lets mouse events
+        // pass through this window to whatever is underneath. Requires WS_EX_LAYERED,
+        // which AllowsTransparency=True already gives us.
+        private const int GWL_EXSTYLE = -20;
+        private const int WS_EX_TRANSPARENT = 0x00000020;
+        private const int WS_EX_LAYERED = 0x00080000;
+
+        [DllImport("user32.dll")]
+        private static extern int GetWindowLong(IntPtr hwnd, int index);
+
+        [DllImport("user32.dll")]
+        private static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
+
         public void ApplySettings()
         {
             // Close button
@@ -126,6 +141,24 @@ namespace GHelper.WPF.Views
             // Disappear on hover
             _hoverFadeEnabled = AppConfig.Is("gadget_hover_fade");
             if (!_hoverFadeEnabled) Opacity = _baseOpacity;
+
+            // Click-through: when enabled, mouse events pass through to whatever is
+            // underneath the gadget. The user must disable this to drag/move the
+            // gadget — there's no other way to grab it.
+            bool clickThrough = AppConfig.Is("gadget_click_through");
+            ApplyClickThrough(clickThrough);
+        }
+
+        private void ApplyClickThrough(bool enabled)
+        {
+            var hwnd = new WindowInteropHelper(this).Handle;
+            if (hwnd == IntPtr.Zero) return;  // not yet initialized; OnLoaded will retry via ApplySettings
+            int extStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+            int updated = enabled
+                ? extStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED
+                : (extStyle & ~WS_EX_TRANSPARENT) | WS_EX_LAYERED;
+            if (updated != extStyle)
+                SetWindowLong(hwnd, GWL_EXSTYLE, updated);
         }
 
         private void ApplyTileFontSizes(double valueSize, double labelSize, double headerSize)
