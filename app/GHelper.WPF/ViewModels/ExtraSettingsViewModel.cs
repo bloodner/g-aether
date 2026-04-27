@@ -49,6 +49,9 @@ namespace GHelper.WPF.ViewModels
         private bool _hideGadgetLogo;
 
         [ObservableProperty]
+        private bool _showGadgetModeStrip = true;
+
+        [ObservableProperty]
         private bool _gadgetHoverFade;
 
         [ObservableProperty]
@@ -330,6 +333,13 @@ namespace GHelper.WPF.ViewModels
         {
             if (_ignoreChange) return;
             AppConfig.Set("gadget_hover_fade", value ? 1 : 0);
+            GadgetService.ApplySettings();
+        }
+
+        partial void OnShowGadgetModeStripChanged(bool value)
+        {
+            if (_ignoreChange) return;
+            AppConfig.Set("gadget_show_modestrip", value ? 1 : 0);
             GadgetService.ApplySettings();
         }
 
@@ -678,7 +688,8 @@ namespace GHelper.WPF.ViewModels
                 ShowPower    = AppConfig.Get("gadget_show_power", 1) == 1;
                 ShowBattery  = AppConfig.Get("gadget_show_battery", 1) == 1;
                 ShowCpuFan   = AppConfig.Get("gadget_show_cpu_fan", 1) == 1;
-                ShowGpuFan   = AppConfig.Get("gadget_show_gpu_fan", 1) == 1;
+                ShowGpuFan        = AppConfig.Get("gadget_show_gpu_fan", 1) == 1;
+                ShowGadgetModeStrip = AppConfig.Get("gadget_show_modestrip", 1) == 1;
                 RefreshGadgetHotkey();
                 BootSound = AppConfig.Is("boot_sound");
                 BwTrayIcon = AppConfig.Is("bw_icon");
