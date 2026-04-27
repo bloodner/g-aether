@@ -86,7 +86,7 @@ A small gear icon (`Segoe MDL2 &#xE713;`) sits in the panel header next to the e
 
 Persisted as `scope_size`. The "X-Small" preset from the gadget is dropped — at panel scale it would crush the sparklines below readable density.
 
-**4. History window** — pill selector: **60 s / 5 min / 15 min**. `MonitorViewModel` keeps one rolling buffer per series, each sized for the longest window (15 min). Shorter windows render the tail of that buffer. Sample cadence stays at the existing 2 s tick — that's 30 / 150 / 450 points respectively, well within what `SparklineChart` can draw without downsampling. Persisted as `scope_history_window`.
+**4. History window** — pill selector: **60 s / 5 min / 15 min**. `MonitorViewModel` keeps one rolling buffer per series, each sized for the longest window (15 min). Shorter windows render the tail of that buffer. Sample cadence stays at the existing 1 s tick — that's 60 / 300 / 900 points respectively, well within what `SparklineChart` can draw without downsampling. Persisted as `scope_history_window`.
 
 ### Live application
 
@@ -137,7 +137,7 @@ Defaults match today's behavior: all eight `scope_show_*` = true, accent = `mult
 
 - **`ModeStripViewModel`** *(new)* — owns the four badge name/brush/warning property triples. Lifted from `MainViewModel`. Subscribes to the existing 2 s sensor tick.
 - **`ScopeSettingsViewModel`** *(new)* — owns all `scope_*` properties. Two-way bound to `ScopeSettingsWindow`. On any change: writes to `AppConfig`, then calls `ScopeService.ApplySettings()`.
-- **`MonitorViewModel`** *(extended)* — rolling buffers grow to hold 15 min of samples (450 points × 8 series ≈ 14 KB, trivial). New computed properties `HistoryWindowSeconds`, `SparklineHeight`, `ValueFontSize`, plus an `AccentBrushFor(tile)` helper drive the sparklines through bindings. Observes `scope_*` keys.
+- **`MonitorViewModel`** *(extended)* — rolling buffers grow to hold 15 min of samples (900 points × 8 series ≈ 57 KB, trivial). New computed properties `HistoryWindowSeconds`, `SparklineHeight`, `ValueFontSize`, plus an `AccentBrushFor(tile)` helper drive the sparklines through bindings. Observes `scope_*` keys.
 - **`MainViewModel`** *(reduced)* — delegates badge logic to `ModeStripViewModel`. Exposes a single `ModeStrip` property.
 
 ### Services
