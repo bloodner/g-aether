@@ -27,6 +27,7 @@ namespace GHelper.WPF.Views
             // Hand the gadget service the MonitorViewModel it binds to, and
             // show the gadget if the user had it on last session.
             GadgetService.Configure(mainVm.Monitor, mainVm.ModeStrip);
+            ScopeService.Configure(mainVm.Monitor);
 
             // Slot 9 (App Profiles) is nulled out — App Profiles now lives inside the
             // Settings panel. Keeping the slot preserves pinned-tab indices for Processes (10).
