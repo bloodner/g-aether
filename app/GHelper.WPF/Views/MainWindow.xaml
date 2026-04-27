@@ -205,67 +205,67 @@
 
                     <!-- Perf badge -->
                     <Button Grid.Column="0" Style="{StaticResource ModeBadgeStyle}"
-                            BorderBrush="{Binding PerfBadgeBrush}"
+                            BorderBrush="{Binding ModeStrip.PerfBadgeBrush}"
                             local:ModeBadgeProps.IsActive="{Binding IsChecked, ElementName=NavPerformance}"
                             Tag="1" Click="ModeBadge_Click"
-                            ToolTip="{Binding PerfBadgeName, StringFormat='Performance: {0}. Click to configure.'}">
+                            ToolTip="{Binding ModeStrip.PerfBadgeName, StringFormat='Performance: {0}. Click to configure.'}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock Text="&#xE945;" Style="{StaticResource ModeBadgePulseIconStyle}"
-                                       Foreground="{Binding PerfBadgeBrush}"
-                                       IsEnabled="{Binding PerfBadgeIsWarning}" />
-                            <TextBlock Text="{Binding PerfBadgeName}"
+                                       Foreground="{Binding ModeStrip.PerfBadgeBrush}"
+                                       IsEnabled="{Binding ModeStrip.PerfBadgeIsWarning}" />
+                            <TextBlock Text="{Binding ModeStrip.PerfBadgeName}"
                                        Style="{StaticResource ModeBadgeValueStyle}"
-                                       Foreground="{Binding PerfBadgeBrush}" />
+                                       Foreground="{Binding ModeStrip.PerfBadgeBrush}" />
                         </StackPanel>
                     </Button>
                     <Rectangle Grid.Column="1" Margin="0,6" Fill="#14FFFFFF" />
 
                     <!-- GPU badge -->
                     <Button Grid.Column="2" Style="{StaticResource ModeBadgeStyle}"
-                            BorderBrush="{Binding GpuBadgeBrush}"
+                            BorderBrush="{Binding ModeStrip.GpuBadgeBrush}"
                             local:ModeBadgeProps.IsActive="{Binding IsChecked, ElementName=NavGpu}"
                             Tag="3" Click="ModeBadge_Click"
-                            ToolTip="{Binding GpuBadgeName, StringFormat='GPU: {0}. Click to configure.'}">
+                            ToolTip="{Binding ModeStrip.GpuBadgeName, StringFormat='GPU: {0}. Click to configure.'}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock Text="&#xE950;" Style="{StaticResource ModeBadgePulseIconStyle}"
-                                       Foreground="{Binding GpuBadgeBrush}"
-                                       IsEnabled="{Binding GpuBadgeIsWarning}" />
-                            <TextBlock Text="{Binding GpuBadgeName}"
+                                       Foreground="{Binding ModeStrip.GpuBadgeBrush}"
+                                       IsEnabled="{Binding ModeStrip.GpuBadgeIsWarning}" />
+                            <TextBlock Text="{Binding ModeStrip.GpuBadgeName}"
                                        Style="{StaticResource ModeBadgeValueStyle}"
-                                       Foreground="{Binding GpuBadgeBrush}" />
+                                       Foreground="{Binding ModeStrip.GpuBadgeBrush}" />
                         </StackPanel>
                     </Button>
                     <Rectangle Grid.Column="3" Margin="0,6" Fill="#14FFFFFF" />
 
                     <!-- Display badge -->
                     <Button Grid.Column="4" Style="{StaticResource ModeBadgeStyle}"
-                            BorderBrush="{Binding DisplayBadgeBrush}"
+                            BorderBrush="{Binding ModeStrip.DisplayBadgeBrush}"
                             local:ModeBadgeProps.IsActive="{Binding IsChecked, ElementName=NavDisplay}"
                             Tag="5" Click="ModeBadge_Click"
-                            ToolTip="{Binding DisplayBadgeName, StringFormat='Display refresh: {0}. Click to configure.'}">
+                            ToolTip="{Binding ModeStrip.DisplayBadgeName, StringFormat='Display refresh: {0}. Click to configure.'}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock Text="&#xE7F4;" Style="{StaticResource ModeBadgeIconStyle}"
-                                       Foreground="{Binding DisplayBadgeBrush}" />
-                            <TextBlock Text="{Binding DisplayBadgeName}"
+                                       Foreground="{Binding ModeStrip.DisplayBadgeBrush}" />
+                            <TextBlock Text="{Binding ModeStrip.DisplayBadgeName}"
                                        Style="{StaticResource ModeBadgeValueStyle}"
-                                       Foreground="{Binding DisplayBadgeBrush}" />
+                                       Foreground="{Binding ModeStrip.DisplayBadgeBrush}" />
                         </StackPanel>
                     </Button>
                     <Rectangle Grid.Column="5" Margin="0,6" Fill="#14FFFFFF" />
 
                     <!-- Services badge -->
                     <Button Grid.Column="6" Style="{StaticResource ModeBadgeStyle}"
-                            BorderBrush="{Binding ServicesBadgeBrush}"
+                            BorderBrush="{Binding ModeStrip.ServicesBadgeBrush}"
                             local:ModeBadgeProps.IsActive="{Binding IsChecked, ElementName=NavExtra}"
                             Tag="8" Click="ModeBadge_Click"
-                            ToolTip="{Binding ServicesBadgeName, StringFormat='ASUS services: {0}. Click to manage.'}">
+                            ToolTip="{Binding ModeStrip.ServicesBadgeName, StringFormat='ASUS services: {0}. Click to manage.'}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock Text="&#xE72E;" Style="{StaticResource ModeBadgePulseIconStyle}"
-                                       Foreground="{Binding ServicesBadgeBrush}"
-                                       IsEnabled="{Binding ServicesBadgeIsWarning}" />
-                            <TextBlock Text="{Binding ServicesBadgeName}"
+                                       Foreground="{Binding ModeStrip.ServicesBadgeBrush}"
+                                       IsEnabled="{Binding ModeStrip.ServicesBadgeIsWarning}" />
+                            <TextBlock Text="{Binding ModeStrip.ServicesBadgeName}"
                                        Style="{StaticResource ModeBadgeValueStyle}"
-                                       Foreground="{Binding ServicesBadgeBrush}" />
+                                       Foreground="{Binding ModeStrip.ServicesBadgeBrush}" />
                         </StackPanel>
                     </Button>
                 </Grid>
