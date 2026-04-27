@@ -39,7 +39,7 @@
                 <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" FontSize="16"
                            Foreground="{DynamicResource AccentBrush}"
                            VerticalAlignment="Center" Margin="0,0,8,0" />
-                <TextBlock Text="Live Telemetry"
+                <TextBlock Text="G-Scope"
                            Style="{StaticResource CardTitleStyle}"
                            VerticalAlignment="Center" />
                 <controls:HelpButton HelpKey="monitor_telemetry" VerticalAlignment="Center" Margin="8,0,0,0" />
