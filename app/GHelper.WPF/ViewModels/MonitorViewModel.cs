@@ -300,6 +300,8 @@ namespace GHelper.WPF.ViewModels
             };
 
             // Accent → per-tile stroke colors.
+            // Battery tile uses the charge-level BatteryBrush (green/amber/orange/red) and
+            // is intentionally excluded from accent theming.
             string accent = AppConfig.GetString("scope_accent") ?? "multi";
             if (accent == "multi")
             {

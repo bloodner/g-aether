@@ -63,18 +63,24 @@ namespace GHelper.WPF.ViewModels
         public ScopeSettingsViewModel()
         {
             _ignoreChange = true;
-            ShowCpuTemp = AppConfig.Get("scope_show_cpu_temp", 1) == 1;
-            ShowDgpuTemp = AppConfig.Get("scope_show_dgpu_temp", 1) == 1;
-            ShowCpuUse = AppConfig.Get("scope_show_cpu_use", 1) == 1;
-            ShowDgpuUse = AppConfig.Get("scope_show_dgpu_use", 1) == 1;
-            ShowPower = AppConfig.Get("scope_show_power", 1) == 1;
-            ShowBattery = AppConfig.Get("scope_show_battery", 1) == 1;
-            ShowCpuFan = AppConfig.Get("scope_show_cpu_fan", 1) == 1;
-            ShowGpuFan = AppConfig.Get("scope_show_gpu_fan", 1) == 1;
-            ScopeAccent = AppConfig.GetString("scope_accent") ?? "multi";
-            ScopeSize = AppConfig.GetString("scope_size") ?? "regular";
-            ScopeHistoryWindow = AppConfig.GetString("scope_history_window") ?? "60s";
-            _ignoreChange = false;
+            try
+            {
+                ShowCpuTemp = AppConfig.Get("scope_show_cpu_temp", 1) == 1;
+                ShowDgpuTemp = AppConfig.Get("scope_show_dgpu_temp", 1) == 1;
+                ShowCpuUse = AppConfig.Get("scope_show_cpu_use", 1) == 1;
+                ShowDgpuUse = AppConfig.Get("scope_show_dgpu_use", 1) == 1;
+                ShowPower = AppConfig.Get("scope_show_power", 1) == 1;
+                ShowBattery = AppConfig.Get("scope_show_battery", 1) == 1;
+                ShowCpuFan = AppConfig.Get("scope_show_cpu_fan", 1) == 1;
+                ShowGpuFan = AppConfig.Get("scope_show_gpu_fan", 1) == 1;
+                ScopeAccent = AppConfig.GetString("scope_accent") ?? "multi";
+                ScopeSize = AppConfig.GetString("scope_size") ?? "regular";
+                ScopeHistoryWindow = AppConfig.GetString("scope_history_window") ?? "60s";
+            }
+            finally
+            {
+                _ignoreChange = false;
+            }
         }
 
         // ---- Visible-tile change handlers ----
