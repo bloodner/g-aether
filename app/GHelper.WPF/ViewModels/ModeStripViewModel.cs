@@ -74,6 +74,9 @@ namespace GHelper.WPF.ViewModels
                     e.PropertyName == nameof(VisualModeViewModel.IsAutoFreqMode))
                     UpdateDisplayBadge();
             };
+            // Watch both — AsusServicesText changes mid-stop ("Stopping...") even when
+            // the count hasn't decremented yet, and we want the badge to refresh in
+            // case the count is updated atomically with the text on a future change.
             _extra.PropertyChanged += (_, e) =>
             {
                 if (e.PropertyName == nameof(ExtraSettingsViewModel.AsusServicesCount) ||
@@ -128,21 +131,26 @@ namespace GHelper.WPF.ViewModels
         {
             int idx = _visual.SelectedFreqIndex;
             var labels = _visual.FrequencyLabels;
-            if (_visual.IsAutoFreqMode)
+            if (idx < 0 || idx >= labels.Length)
+            {
                 DisplayBadgeName = "Auto";
-            else if (idx >= 0 && idx < labels.Length)
+            }
+            else
+            {
                 DisplayBadgeName = labels[idx];
-
+            }
+            // Auto refresh rate means "system decides" — same semantic as GPU Optimized,
+            // so it uses the same magenta. Any fixed rate uses the plain accent.
             DisplayBadgeBrush = _visual.IsAutoFreqMode
-                ? ModeBrush(ThemeService.ColorBalanced)
-                : ModeBrush(ThemeService.ColorOptimized);
+                ? ModeBrush(ThemeService.ColorOptimized)
+                : ModeBrush(ThemeService.AccentColor);
             UpdateHeaderAccent();
         }
 
         private void UpdateServicesBadge()
         {
             int count = _extra.AsusServicesCount;
-            if (count <= 0)
+            if (count == 0)
             {
                 ServicesBadgeName = "Healthy";
                 ServicesBadgeBrush = ModeBrush(ThemeService.ColorEco);
