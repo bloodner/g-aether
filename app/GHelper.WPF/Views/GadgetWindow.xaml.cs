@@ -86,6 +86,10 @@ namespace GHelper.WPF.Views
             TitleText.Visibility = AppConfig.Is("gadget_hide_logo")
                 ? Visibility.Collapsed : Visibility.Visible;
 
+            // Mode strip visibility — defaults to visible (key absent or 1).
+            ModeStripContainer.Visibility = AppConfig.Get("gadget_show_modestrip", 1) == 1
+                ? Visibility.Visible : Visibility.Collapsed;
+
             // Size preset
             string size = AppConfig.GetString("gadget_size") ?? "medium";
             var s = size switch

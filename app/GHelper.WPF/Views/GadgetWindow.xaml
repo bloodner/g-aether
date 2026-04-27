@@ -134,14 +134,14 @@
                 <Border Style="{StaticResource GadgetTileStyle}">
                     <StackPanel>
                         <TextBlock Text="CPU" Style="{StaticResource GadgetLabelStyle}" />
-                        <TextBlock Text="{Binding CpuTempText}" Style="{StaticResource GadgetValueStyle}"
+                        <TextBlock Text="{Binding Monitor.CpuTempText}" Style="{StaticResource GadgetValueStyle}"
                                    Foreground="#FF6B6B" />
                     </StackPanel>
                 </Border>
                 <Border Style="{StaticResource GadgetTileStyle}">
                     <StackPanel>
                         <TextBlock Text="dGPU" Style="{StaticResource GadgetLabelStyle}" />
-                        <TextBlock Text="{Binding GpuTempText}" Style="{StaticResource GadgetValueStyle}"
+                        <TextBlock Text="{Binding Monitor.GpuTempText}" Style="{StaticResource GadgetValueStyle}"
                                    Foreground="#FFB347" />
                     </StackPanel>
                 </Border>
@@ -150,14 +150,14 @@
                 <Border Style="{StaticResource GadgetTileStyle}">
                     <StackPanel>
                         <TextBlock Text="CPU Use" Style="{StaticResource GadgetLabelStyle}" />
-                        <TextBlock Text="{Binding CpuUseText}" Style="{StaticResource GadgetValueStyle}"
+                        <TextBlock Text="{Binding Monitor.CpuUseText}" Style="{StaticResource GadgetValueStyle}"
                                    Foreground="#A78BFA" />
                     </StackPanel>
                 </Border>
                 <Border Style="{StaticResource GadgetTileStyle}">
                     <StackPanel>
                         <TextBlock Text="dGPU Use" Style="{StaticResource GadgetLabelStyle}" />
-                        <TextBlock Text="{Binding GpuUseText}" Style="{StaticResource GadgetValueStyle}"
+                        <TextBlock Text="{Binding Monitor.GpuUseText}" Style="{StaticResource GadgetValueStyle}"
                                    Foreground="#60CDFF" />
                     </StackPanel>
                 </Border>
@@ -166,14 +166,14 @@
                 <Border Style="{StaticResource GadgetTileStyle}">
                     <StackPanel>
                         <TextBlock Text="Power" Style="{StaticResource GadgetLabelStyle}" />
-                        <TextBlock Text="{Binding GpuPowerText}" Style="{StaticResource GadgetValueStyle}"
+                        <TextBlock Text="{Binding Monitor.GpuPowerText}" Style="{StaticResource GadgetValueStyle}"
                                    Foreground="#6BCB77" />
                     </StackPanel>
                 </Border>
                 <Border Style="{StaticResource GadgetTileStyle}">
                     <StackPanel>
                         <TextBlock Text="Battery" Style="{StaticResource GadgetLabelStyle}" />
-                        <TextBlock Text="{Binding BatteryPercentText}" Style="{StaticResource GadgetValueStyle}"
+                        <TextBlock Text="{Binding Monitor.BatteryPercentText}" Style="{StaticResource GadgetValueStyle}"
                                    Foreground="#4CC95E" />
                     </StackPanel>
                 </Border>
@@ -182,14 +182,14 @@
                 <Border Style="{StaticResource GadgetTileStyle}">
                     <StackPanel>
                         <TextBlock Text="CPU Fan" Style="{StaticResource GadgetLabelStyle}" />
-                        <TextBlock Text="{Binding CpuFanCurrentText}" Style="{StaticResource GadgetValueStyle}"
+                        <TextBlock Text="{Binding Monitor.CpuFanCurrentText}" Style="{StaticResource GadgetValueStyle}"
                                    Foreground="#C084FC" />
                     </StackPanel>
                 </Border>
                 <Border Style="{StaticResource GadgetTileStyle}">
                     <StackPanel>
                         <TextBlock Text="GPU Fan" Style="{StaticResource GadgetLabelStyle}" />
-                        <TextBlock Text="{Binding GpuFanCurrentText}" Style="{StaticResource GadgetValueStyle}"
+                        <TextBlock Text="{Binding Monitor.GpuFanCurrentText}" Style="{StaticResource GadgetValueStyle}"
                                    Foreground="#F472B6" />
                     </StackPanel>
                 </Border>
