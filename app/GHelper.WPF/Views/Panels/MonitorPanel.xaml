@@ -43,6 +43,21 @@
                            Style="{StaticResource CardTitleStyle}"
                            VerticalAlignment="Center" />
                 <controls:HelpButton HelpKey="monitor_telemetry" VerticalAlignment="Center" Margin="8,0,0,0" />
+                <Button x:Name="ScopeSettingsButton"
+                        Click="ScopeSettingsButton_Click"
+                        VerticalAlignment="Center"
+                        Margin="6,0,0,0"
+                        Width="22" Height="22"
+                        Padding="0"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        ToolTip="G-Scope settings">
+                    <TextBlock Text="&#xE713;"
+                               FontFamily="Segoe MDL2 Assets"
+                               FontSize="13"
+                               Foreground="{DynamicResource ForeDimBrush}" />
+                </Button>
             </StackPanel>
 
             <!-- Row 2: CPU Temp + CPU Usage. The CPU group is paired so users
