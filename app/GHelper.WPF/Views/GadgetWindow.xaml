@@ -25,6 +25,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
@@ -57,8 +58,78 @@
                         ToolTip="Hide gadget" />
             </Grid>
 
+            <!-- Mode strip — mini of the main window's PERF/GPU/DISPLAY/SERVICES strip.
+                 Bound to the same ModeStripViewModel instance the main window uses, so
+                 names/colors/warnings always match. Hairline dividers above and below. -->
+            <Border x:Name="ModeStripContainer"
+                    Grid.Row="1"
+                    Margin="0,0,0,8"
+                    Padding="2,4,2,4"
+                    BorderBrush="#18FFFFFF"
+                    BorderThickness="0,1,0,1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Perf badge -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                ToolTip="{Binding ModeStrip.PerfBadgeName, StringFormat='Performance: {0}'}">
+                        <TextBlock Text="&#xE945;"
+                                   Style="{StaticResource ModeBadgePulseIconStyle}"
+                                   Foreground="{Binding ModeStrip.PerfBadgeBrush}"
+                                   IsEnabled="{Binding ModeStrip.PerfBadgeIsWarning}" />
+                        <TextBlock Text="{Binding ModeStrip.PerfBadgeName}"
+                                   Style="{StaticResource ModeBadgeValueStyle}"
+                                   Foreground="{Binding ModeStrip.PerfBadgeBrush}" />
+                    </StackPanel>
+
+                    <!-- GPU badge -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                ToolTip="{Binding ModeStrip.GpuBadgeName, StringFormat='GPU: {0}'}">
+                        <TextBlock Text="&#xE950;"
+                                   Style="{StaticResource ModeBadgePulseIconStyle}"
+                                   Foreground="{Binding ModeStrip.GpuBadgeBrush}"
+                                   IsEnabled="{Binding ModeStrip.GpuBadgeIsWarning}" />
+                        <TextBlock Text="{Binding ModeStrip.GpuBadgeName}"
+                                   Style="{StaticResource ModeBadgeValueStyle}"
+                                   Foreground="{Binding ModeStrip.GpuBadgeBrush}" />
+                    </StackPanel>
+
+                    <!-- Display badge -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                ToolTip="{Binding ModeStrip.DisplayBadgeName, StringFormat='Display: {0}'}">
+                        <TextBlock Text="&#xE7F4;"
+                                   Style="{StaticResource ModeBadgeIconStyle}"
+                                   Foreground="{Binding ModeStrip.DisplayBadgeBrush}" />
+                        <TextBlock Text="{Binding ModeStrip.DisplayBadgeName}"
+                                   Style="{StaticResource ModeBadgeValueStyle}"
+                                   Foreground="{Binding ModeStrip.DisplayBadgeBrush}" />
+                    </StackPanel>
+
+                    <!-- Services badge -->
+                    <StackPanel Grid.Column="3" Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                ToolTip="{Binding ModeStrip.ServicesBadgeName, StringFormat='Services: {0}'}">
+                        <TextBlock Text="&#xE72E;"
+                                   Style="{StaticResource ModeBadgePulseIconStyle}"
+                                   Foreground="{Binding ModeStrip.ServicesBadgeBrush}"
+                                   IsEnabled="{Binding ModeStrip.ServicesBadgeIsWarning}" />
+                        <TextBlock Text="{Binding ModeStrip.ServicesBadgeName}"
+                                   Style="{StaticResource ModeBadgeValueStyle}"
+                                   Foreground="{Binding ModeStrip.ServicesBadgeBrush}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
             <!-- 4x2 tile grid -->
-            <UniformGrid x:Name="TileGrid" Grid.Row="1" Columns="2" Rows="4" Margin="0">
+            <UniformGrid x:Name="TileGrid" Grid.Row="2" Columns="2" Rows="4" Margin="0">
                 <!-- Row 1: CPU Temp / dGPU Temp -->
                 <Border Style="{StaticResource GadgetTileStyle}">
                     <StackPanel>
