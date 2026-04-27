@@ -51,7 +51,403 @@
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled"
                           Padding="20,14,20,8">
-                <StackPanel x:Name="ContentStack" />
+                <StackPanel>
+
+                    <!-- ===================================================== -->
+                    <!-- VISIBLE TILES                                         -->
+                    <!-- ===================================================== -->
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Visible Tiles" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,4" />
+                            <TextBlock Text="Pick which sparklines show on the G-Scope panel."
+                                       Style="{StaticResource DimTextStyle}" FontSize="11" Margin="0,0,0,12" TextWrapping="Wrap" />
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Grid Grid.Row="0" Grid.Column="0" Margin="0,0,12,12">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="CPU Temp" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                                    <controls:ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowCpuTemp, Mode=TwoWay}" Width="44" Height="22" />
+                                </Grid>
+                                <Grid Grid.Row="0" Grid.Column="1" Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="dGPU Temp" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                                    <controls:ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowDgpuTemp, Mode=TwoWay}" Width="44" Height="22" />
+                                </Grid>
+                                <Grid Grid.Row="1" Grid.Column="0" Margin="0,0,12,12">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="CPU Use" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                                    <controls:ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowCpuUse, Mode=TwoWay}" Width="44" Height="22" />
+                                </Grid>
+                                <Grid Grid.Row="1" Grid.Column="1" Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="dGPU Use" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                                    <controls:ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowDgpuUse, Mode=TwoWay}" Width="44" Height="22" />
+                                </Grid>
+                                <Grid Grid.Row="2" Grid.Column="0" Margin="0,0,12,12">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="dGPU Power" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                                    <controls:ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowPower, Mode=TwoWay}" Width="44" Height="22" />
+                                </Grid>
+                                <Grid Grid.Row="2" Grid.Column="1" Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="Battery" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                                    <controls:ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowBattery, Mode=TwoWay}" Width="44" Height="22" />
+                                </Grid>
+                                <Grid Grid.Row="3" Grid.Column="0" Margin="0,0,12,0">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="CPU Fan" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                                    <controls:ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowCpuFan, Mode=TwoWay}" Width="44" Height="22" />
+                                </Grid>
+                                <Grid Grid.Row="3" Grid.Column="1">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                    <TextBlock Text="GPU Fan" Style="{StaticResource BodyTextStyle}" VerticalAlignment="Center" />
+                                    <controls:ToggleSwitch Grid.Column="1" IsChecked="{Binding ShowGpuFan, Mode=TwoWay}" Width="44" Height="22" />
+                                </Grid>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ===================================================== -->
+                    <!-- APPEARANCE                                            -->
+                    <!-- ===================================================== -->
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Appearance" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,12" />
+
+                            <!-- Size -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Size" Style="{StaticResource BodyTextStyle}" />
+                                    <TextBlock Text="Sparkline density on the G-Scope panel"
+                                               Style="{StaticResource DimTextStyle}" FontSize="10" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Content="Compact" CommandParameter="compact" Command="{Binding SetScopeSizeCommand}" Margin="0,0,4,0">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsScopeSizeCompact}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Content="Regular" CommandParameter="regular" Command="{Binding SetScopeSizeCommand}" Margin="0,0,4,0">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsScopeSizeRegular}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Content="Large" CommandParameter="large" Command="{Binding SetScopeSizeCommand}">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsScopeSizeLarge}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Accent — same eight swatches as the gadget; selected swatch gets a white ring. -->
+                            <Grid Margin="0,14,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Accent color" Style="{StaticResource BodyTextStyle}" />
+                                    <TextBlock Text="Multi keeps each tile's original color"
+                                               Style="{StaticResource DimTextStyle}" FontSize="10" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <!-- Multi -->
+                                    <Button CommandParameter="multi" Command="{Binding SetScopeAccentCommand}"
+                                            Width="22" Height="22" Padding="0" Margin="0,0,6,0" Cursor="Hand" ToolTip="Multi (default)">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Grid>
+                                                                <Ellipse>
+                                                                    <Ellipse.Fill>
+                                                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                                            <GradientStop Color="#FF6B6B" Offset="0.0" />
+                                                                            <GradientStop Color="#FFB347" Offset="0.2" />
+                                                                            <GradientStop Color="#6BCB77" Offset="0.4" />
+                                                                            <GradientStop Color="#60CDFF" Offset="0.6" />
+                                                                            <GradientStop Color="#A78BFA" Offset="0.8" />
+                                                                            <GradientStop Color="#F472B6" Offset="1.0" />
+                                                                        </LinearGradientBrush>
+                                                                    </Ellipse.Fill>
+                                                                </Ellipse>
+                                                                <Ellipse x:Name="Ring" Stroke="White" StrokeThickness="2" Visibility="Collapsed" />
+                                                            </Grid>
+                                                            <ControlTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding IsAccentMulti}" Value="True">
+                                                                    <Setter TargetName="Ring" Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <!-- Blue -->
+                                    <Button CommandParameter="blue" Command="{Binding SetScopeAccentCommand}"
+                                            Width="22" Height="22" Padding="0" Margin="0,0,6,0" Cursor="Hand" ToolTip="Blue">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Grid>
+                                                                <Ellipse Fill="#60CDFF" />
+                                                                <Ellipse x:Name="Ring" Stroke="White" StrokeThickness="2" Visibility="Collapsed" />
+                                                            </Grid>
+                                                            <ControlTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding IsAccentBlue}" Value="True">
+                                                                    <Setter TargetName="Ring" Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <!-- Purple -->
+                                    <Button CommandParameter="purple" Command="{Binding SetScopeAccentCommand}"
+                                            Width="22" Height="22" Padding="0" Margin="0,0,6,0" Cursor="Hand" ToolTip="Purple">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Grid>
+                                                                <Ellipse Fill="#C084FC" />
+                                                                <Ellipse x:Name="Ring" Stroke="White" StrokeThickness="2" Visibility="Collapsed" />
+                                                            </Grid>
+                                                            <ControlTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding IsAccentPurple}" Value="True">
+                                                                    <Setter TargetName="Ring" Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <!-- Green -->
+                                    <Button CommandParameter="green" Command="{Binding SetScopeAccentCommand}"
+                                            Width="22" Height="22" Padding="0" Margin="0,0,6,0" Cursor="Hand" ToolTip="Green">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Grid>
+                                                                <Ellipse Fill="#6BCB77" />
+                                                                <Ellipse x:Name="Ring" Stroke="White" StrokeThickness="2" Visibility="Collapsed" />
+                                                            </Grid>
+                                                            <ControlTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding IsAccentGreen}" Value="True">
+                                                                    <Setter TargetName="Ring" Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <!-- Orange -->
+                                    <Button CommandParameter="orange" Command="{Binding SetScopeAccentCommand}"
+                                            Width="22" Height="22" Padding="0" Margin="0,0,6,0" Cursor="Hand" ToolTip="Orange">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Grid>
+                                                                <Ellipse Fill="#FFB347" />
+                                                                <Ellipse x:Name="Ring" Stroke="White" StrokeThickness="2" Visibility="Collapsed" />
+                                                            </Grid>
+                                                            <ControlTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding IsAccentOrange}" Value="True">
+                                                                    <Setter TargetName="Ring" Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <!-- Red -->
+                                    <Button CommandParameter="red" Command="{Binding SetScopeAccentCommand}"
+                                            Width="22" Height="22" Padding="0" Margin="0,0,6,0" Cursor="Hand" ToolTip="Red">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Grid>
+                                                                <Ellipse Fill="#FF6B6B" />
+                                                                <Ellipse x:Name="Ring" Stroke="White" StrokeThickness="2" Visibility="Collapsed" />
+                                                            </Grid>
+                                                            <ControlTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding IsAccentRed}" Value="True">
+                                                                    <Setter TargetName="Ring" Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <!-- White -->
+                                    <Button CommandParameter="white" Command="{Binding SetScopeAccentCommand}"
+                                            Width="22" Height="22" Padding="0" Margin="0,0,6,0" Cursor="Hand" ToolTip="White">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Grid>
+                                                                <Ellipse Fill="#F0F0F2" Stroke="#22FFFFFF" StrokeThickness="1" />
+                                                                <Ellipse x:Name="Ring" Stroke="#60CDFF" StrokeThickness="2" Visibility="Collapsed" />
+                                                            </Grid>
+                                                            <ControlTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding IsAccentWhite}" Value="True">
+                                                                    <Setter TargetName="Ring" Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <!-- Dark / Stealth -->
+                                    <Button CommandParameter="dark" Command="{Binding SetScopeAccentCommand}"
+                                            Width="22" Height="22" Padding="0" Cursor="Hand" ToolTip="Stealth (near-black)">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Grid>
+                                                                <Ellipse Fill="#36363B" Stroke="#22FFFFFF" StrokeThickness="1" />
+                                                                <Ellipse x:Name="Ring" Stroke="White" StrokeThickness="2" Visibility="Collapsed" />
+                                                            </Grid>
+                                                            <ControlTemplate.Triggers>
+                                                                <DataTrigger Binding="{Binding IsAccentDark}" Value="True">
+                                                                    <Setter TargetName="Ring" Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ===================================================== -->
+                    <!-- HISTORY                                               -->
+                    <!-- ===================================================== -->
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="History" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,4" />
+                            <TextBlock Text="How far back the sparklines extend. Longer windows are useful for spotting slow trends; the gadget keeps its own short window."
+                                       Style="{StaticResource DimTextStyle}" FontSize="11" Margin="0,0,0,12" TextWrapping="Wrap" />
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Window" Style="{StaticResource BodyTextStyle}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Content="60s" CommandParameter="60s" Command="{Binding SetScopeHistoryCommand}" Margin="0,0,4,0">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsHistory60s}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Content="5 min" CommandParameter="5min" Command="{Binding SetScopeHistoryCommand}" Margin="0,0,4,0">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsHistory5min}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Content="15 min" CommandParameter="15min" Command="{Binding SetScopeHistoryCommand}">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsHistory15min}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
             </ScrollViewer>
 
             <!-- Footer -->
