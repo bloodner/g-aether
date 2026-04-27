@@ -61,8 +61,8 @@ namespace GHelper.WPF.Services
                 "Every full charge stores a tiny bit less than the one before it, so this number slowly falls as the battery ages. Once you dip below roughly 80%, you'll feel the difference between a charge now and what the laptop could do when it was new.\n\n" +
                 "The single most impactful thing you can do to slow this decline is keep the charge limit below 100% (see above)."),
 
-            ["monitor_telemetry"] = new("Live Telemetry",
-                "Real-time readings straight from the hardware sensors. Values refresh every 2 seconds, and the sparkline charts keep about the last 30 seconds of history so you can spot spikes and trends at a glance."),
+            ["monitor_telemetry"] = new("G-Scope",
+                "Real-time readings straight from the hardware sensors. Values refresh every second; the sparkline charts default to the last 60 seconds and can be extended up to 15 minutes via the gear icon next to this help button — useful for spotting slow trends, not just spikes."),
 
             ["live_sensors"] = new("Live Sensors",
                 "Current CPU and GPU temperatures, plus live fan RPM. These numbers come directly from the hardware, so they're handy for checking that a mode change or a fan curve is doing what you expected."),

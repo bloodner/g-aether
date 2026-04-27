@@ -37,10 +37,6 @@ namespace GHelper.WPF.ViewModels
             new SolidColorBrush(Color.FromRgb(0x4C, 0xC9, 0x5E));
         [ObservableProperty] private bool _servicesBadgeIsWarning;
 
-        // Header accent hairline — green when healthy, orange/red when any badge is warning.
-        [ObservableProperty] private Brush _headerAccentBrush =
-            new SolidColorBrush(Color.FromRgb(0x4C, 0xC9, 0x5E));
-
         private static Brush ModeBrush(Color c) => new SolidColorBrush(c);
 
         public ModeStripViewModel(
@@ -105,7 +101,6 @@ namespace GHelper.WPF.ViewModels
                 _ => ModeBrush(ThemeService.ColorBalanced),
             };
             PerfBadgeIsWarning = name == "Turbo";
-            UpdateHeaderAccent();
         }
 
         private void UpdateGpuBadge()
@@ -124,7 +119,6 @@ namespace GHelper.WPF.ViewModels
                 _ => ModeBrush(ThemeService.ColorStandard),
             };
             GpuBadgeIsWarning = name == "Ultimate";
-            UpdateHeaderAccent();
         }
 
         private void UpdateDisplayBadge()
@@ -144,7 +138,6 @@ namespace GHelper.WPF.ViewModels
             DisplayBadgeBrush = _visual.IsAutoFreqMode
                 ? ModeBrush(ThemeService.ColorOptimized)
                 : ModeBrush(ThemeService.AccentColor);
-            UpdateHeaderAccent();
         }
 
         private void UpdateServicesBadge()
@@ -162,15 +155,6 @@ namespace GHelper.WPF.ViewModels
                 ServicesBadgeBrush = ModeBrush(ThemeService.ColorTurbo);
                 ServicesBadgeIsWarning = true;
             }
-            UpdateHeaderAccent();
-        }
-
-        private void UpdateHeaderAccent()
-        {
-            bool anyWarning = ServicesBadgeIsWarning || PerfBadgeIsWarning || GpuBadgeIsWarning;
-            HeaderAccentBrush = anyWarning
-                ? ModeBrush(ThemeService.ColorTurbo)
-                : ModeBrush(ThemeService.ColorEco);
         }
 
         /// <summary>
