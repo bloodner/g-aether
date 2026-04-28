@@ -21,6 +21,42 @@ namespace GHelper.WPF.ViewModels
             RedBrush.Freeze();
         }
 
+        /// <summary>
+        /// Holds the last valid reading for a sensor metric and considers it "fresh"
+        /// for a short TTL. Hardware sensors on this platform intermittently return
+        /// -1 / null between successful reads (especially for the dGPU when it's in
+        /// a transitional state); without this, the UI text would flash off every
+        /// time a single tick failed.
+        /// </summary>
+        private sealed class StickyReading
+        {
+            private readonly TimeSpan _ttl = TimeSpan.FromSeconds(5);
+            private double _value;
+            private DateTime _stampUtc = DateTime.MinValue;
+
+            public bool HasFresh => (DateTime.UtcNow - _stampUtc) < _ttl;
+            public double Value => _value;
+
+            public void Push(double value)
+            {
+                _value = value;
+                _stampUtc = DateTime.UtcNow;
+            }
+
+            public bool TryGet(out double value)
+            {
+                if (HasFresh) { value = _value; return true; }
+                value = 0;
+                return false;
+            }
+        }
+
+        private readonly StickyReading _stickyCpuTemp = new();
+        private readonly StickyReading _stickyGpuTemp = new();
+        private readonly StickyReading _stickyCpuUse = new();
+        private readonly StickyReading _stickyGpuUse = new();
+        private readonly StickyReading _stickyGpuPower = new();
+
         // Buffers now hold the longest possible window (15 min @ 1s tick = 900).
         // Shorter windows are rendered by slicing the tail.
         private const int BufferSize = 900;
@@ -154,25 +190,34 @@ namespace GHelper.WPF.ViewModels
 
         public void UpdateSensors()
         {
-            // CPU Temp
+            // CPU Temp — sticky over transient sensor failures.
             float cpuT = HardwareControl.cpuTemp ?? -1;
-            ShiftAndPush(_cpuTempHistory, cpuT > 0 ? cpuT : 0);
+            if (cpuT > 0) _stickyCpuTemp.Push(cpuT);
+            double cpuTDisplay = _stickyCpuTemp.TryGet(out var ct) ? ct : 0;
+            ShiftAndPush(_cpuTempHistory, cpuTDisplay);
             CpuTempValues = TailOf(_cpuTempHistory);
-            CpuTempText = cpuT > 0 ? $"{cpuT:F0}°C" : "--";
+            CpuTempText = _stickyCpuTemp.TryGet(out var ctOut) ? $"{ctOut:F0}°C" : "--";
 
             // GPU Temp
             float gpuT = HardwareControl.gpuTemp ?? -1;
             int gpuUse = HardwareControl.gpuUse ?? -1;
 
-            // dGPU is only truly off in Eco mode; Standard/Optimized/Ultimate = available
+            // dGPU is only truly off in Eco mode; Standard/Optimized/Ultimate = available.
+            // Use sticky-fresh sensor presence so a single missed tick doesn't yank
+            // the active flag (which would hide tiles and toggle the Eco banner).
             bool ecoMode = AppConfig.Get("gpu_mode") == AsusACPI.GPUModeEco;
-            bool hasSensorData = gpuT > 0 || gpuUse >= 0;
+            bool hasSensorData = gpuT > 0 || gpuUse >= 0
+                || _stickyGpuTemp.HasFresh || _stickyGpuUse.HasFresh || _stickyGpuPower.HasFresh;
             bool gpuActive = !ecoMode || hasSensorData;
             IsGpuActive = gpuActive;
 
-            ShiftAndPush(_gpuTempHistory, gpuT > 0 ? gpuT : 0);
+            if (gpuT > 0) _stickyGpuTemp.Push(gpuT);
+            double gpuTDisplay = _stickyGpuTemp.TryGet(out var gt) ? gt : 0;
+            ShiftAndPush(_gpuTempHistory, gpuTDisplay);
             GpuTempValues = TailOf(_gpuTempHistory);
-            GpuTempText = gpuT > 0 ? $"{gpuT:F0}°C" : (ecoMode ? "Off" : "--");
+            GpuTempText = _stickyGpuTemp.TryGet(out var gtOut)
+                ? $"{gtOut:F0}°C"
+                : (ecoMode ? "Off" : "--");
             GpuTempLabel = "dGPU Temp";
 
             // Fan speeds
@@ -186,31 +231,37 @@ namespace GHelper.WPF.ViewModels
             GpuFanValues = TailOf(_gpuFanHistory);
             GpuFanCurrentText = FormatFanText(HardwareControl.gpuFan);
 
-            // GPU Usage
-            double gpuUseVal = gpuUse >= 0 ? gpuUse : 0;
-            ShiftAndPush(_gpuUseHistory, gpuUseVal);
+            // GPU Usage — sticky.
+            if (gpuUse >= 0) _stickyGpuUse.Push(gpuUse);
+            double gpuUseDisplay = _stickyGpuUse.TryGet(out var gu) ? gu : 0;
+            ShiftAndPush(_gpuUseHistory, gpuUseDisplay);
             GpuUseValues = TailOf(_gpuUseHistory);
-            GpuUseText = gpuUse >= 0 ? $"{gpuUse}%" : (ecoMode ? "Off" : "--");
+            GpuUseText = _stickyGpuUse.TryGet(out var guOut)
+                ? $"{guOut:F0}%"
+                : (ecoMode ? "Off" : "--");
             GpuUseLabel = "dGPU Usage";
 
-            // CPU Usage (%)
+            // CPU Usage — sticky.
             int? cpuUseRaw = HardwareControl.cpuUse;
-            double cpuUseVal = cpuUseRaw is > 0 ? (double)cpuUseRaw : 0;
-            ShiftAndPush(_cpuUseHistory, cpuUseVal);
+            if (cpuUseRaw is > 0) _stickyCpuUse.Push((double)cpuUseRaw);
+            double cpuUseDisplay = _stickyCpuUse.TryGet(out var cu) ? cu : 0;
+            ShiftAndPush(_cpuUseHistory, cpuUseDisplay);
             CpuUseValues = TailOf(_cpuUseHistory);
-            CpuUseText = cpuUseRaw is null or < 0 ? "--" : $"{cpuUseRaw}%";
+            CpuUseText = _stickyCpuUse.TryGet(out var cuOut) ? $"{cuOut:F0}%" : "--";
 
-            // GPU Power Draw (watts).
-            // Laptop dGPUs cap around 175W TGP; anything above 200W is almost
-            // certainly a stale/garbage read from NvAPI when the dGPU is in a
-            // transitional or parked state. Clamp the upper bound and treat
-            // out-of-range values as unavailable, the same way temp/usage do.
+            // GPU Power Draw (watts) — sticky over transient sensor failures.
+            // Clamp upper bound: laptop dGPUs cap around 175W TGP; anything above
+            // 200W is almost certainly a stale/garbage read from NvAPI during a
+            // dGPU transition. Use the last valid reading for up to 5s.
             int? gpuPower = HardwareControl.gpuPower;
             bool gpuPowerValid = gpuPower is > 0 and < 200;
-            double gpuPowerVal = gpuPowerValid ? (double)gpuPower! : 0;
-            ShiftAndPush(_gpuPowerHistory, gpuPowerVal);
+            if (gpuPowerValid) _stickyGpuPower.Push((double)gpuPower!);
+            double gpuPowerDisplay = _stickyGpuPower.TryGet(out var gp) ? gp : 0;
+            ShiftAndPush(_gpuPowerHistory, gpuPowerDisplay);
             GpuPowerValues = TailOf(_gpuPowerHistory);
-            GpuPowerText = gpuPowerValid ? $"{gpuPower}W" : (ecoMode ? "Off" : "--");
+            GpuPowerText = _stickyGpuPower.TryGet(out var gpOut)
+                ? $"{gpOut:F0}W"
+                : (ecoMode ? "Off" : "--");
 
             // Battery Rate
             decimal rate = HardwareControl.batteryRate ?? 0;

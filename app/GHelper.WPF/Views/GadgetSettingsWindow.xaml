@@ -173,7 +173,8 @@
                             </Grid>
 
                             <!-- Mode strip style — Badges (full PERF/GPU/DISPLAY/SERVICES) vs Compact (Scene · Mode · health dot) -->
-                            <Grid Margin="0,12,0,0">
+                            <Grid Margin="0,12,0,0"
+                                  Visibility="{Binding ShowGadgetModeStrip, Converter={StaticResource BoolToVisibility}}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
