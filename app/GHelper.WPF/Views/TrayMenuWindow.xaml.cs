@@ -20,6 +20,7 @@ namespace GHelper.WPF.Views
         private static Color EcoColor       => GHelper.WPF.Services.ThemeService.ColorEco;
         private static Color StandardColor  => GHelper.WPF.Services.ThemeService.ColorStandard;
         private static Color OptimizedColor => GHelper.WPF.Services.ThemeService.ColorOptimized;
+        private static Color UltimateColor  => GHelper.WPF.Services.ThemeService.ColorUltimate;
         private static readonly Color QuitColor = Color.FromRgb(0xFF, 0x6B, 0x6B);
         private static readonly Color DimText   = Color.FromRgb(0xD6, 0xD6, 0xDE);
 
@@ -52,6 +53,9 @@ namespace GHelper.WPF.Views
             MenuStack.Children.Add(ModeItem("\uEA8A", "Optimized", OptimizedColor,
                 gpuMode == AsusACPI.GPUModeStandard && gpuAuto,
                 () => GpuSelected?.Invoke(AsusACPI.GPUModeStandard, true)));
+            MenuStack.Children.Add(ModeItem("\uE945", "Ultimate", UltimateColor,
+                gpuMode == AsusACPI.GPUModeUltimate,
+                () => GpuSelected?.Invoke(AsusACPI.GPUModeUltimate, false)));
 
             MenuStack.Children.Add(Separator());
 

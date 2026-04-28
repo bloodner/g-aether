@@ -111,17 +111,14 @@ namespace GHelper.WPF.Views
                 _        => MediumSize,
             };
 
-            // Mode strip — two styles:
-            //   "badges"  = full PERF/GPU/DISPLAY/SERVICES strip in its own row.
-            //   "compact" = Scene · PerfMode + health dot in the title row, replacing "G-Aether".
-            // User toggles visibility via gadget_show_modestrip; chooses style via
-            // gadget_modestrip_style. When the toggle is off, both styles hide and
-            // the title goes back to "G-Aether".
-            bool stripUserToggle = AppConfig.Get("gadget_show_modestrip", 1) == 1;
+            // Mode strip — single source of truth in gadget_modestrip_style.
+            //   "off"     = both containers hidden; header reverts to "G-Aether"
+            //   "badges"  = full PERF/GPU/DISPLAY/SERVICES row below the header (Small+)
+            //   "compact" = Scene · PerfMode + health dot inline in the header, replaces the title
             string stripStyle = AppConfig.GetString("gadget_modestrip_style") ?? "badges";
 
-            bool showBadges = stripUserToggle && stripStyle == "badges" && size != "xsmall";
-            bool showCompact = stripUserToggle && stripStyle == "compact";
+            bool showBadges = stripStyle == "badges" && size != "xsmall";
+            bool showCompact = stripStyle == "compact";
 
             ModeStripContainer.Visibility = showBadges ? Visibility.Visible : Visibility.Collapsed;
 

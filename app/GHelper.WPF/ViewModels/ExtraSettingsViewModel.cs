@@ -49,12 +49,13 @@ namespace GHelper.WPF.ViewModels
         private bool _hideGadgetLogo;
 
         [ObservableProperty]
-        private bool _showGadgetModeStrip = true;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(IsModeStripBadges), nameof(IsModeStripCompact))]
+        [NotifyPropertyChangedFor(
+            nameof(IsModeStripOff),
+            nameof(IsModeStripBadges),
+            nameof(IsModeStripCompact))]
         private string _gadgetModeStripStyle = "badges";
 
+        public bool IsModeStripOff => GadgetModeStripStyle == "off";
         public bool IsModeStripBadges => GadgetModeStripStyle == "badges";
         public bool IsModeStripCompact => GadgetModeStripStyle == "compact";
 
@@ -357,13 +358,6 @@ namespace GHelper.WPF.ViewModels
         {
             if (_ignoreChange) return;
             AppConfig.Set("gadget_click_through", value ? 1 : 0);
-            GadgetService.ApplySettings();
-        }
-
-        partial void OnShowGadgetModeStripChanged(bool value)
-        {
-            if (_ignoreChange) return;
-            AppConfig.Set("gadget_show_modestrip", value ? 1 : 0);
             GadgetService.ApplySettings();
         }
 
@@ -716,8 +710,20 @@ namespace GHelper.WPF.ViewModels
                 ShowBattery  = AppConfig.Get("gadget_show_battery", 1) == 1;
                 ShowCpuFan   = AppConfig.Get("gadget_show_cpu_fan", 1) == 1;
                 ShowGpuFan        = AppConfig.Get("gadget_show_gpu_fan", 1) == 1;
-                ShowGadgetModeStrip = AppConfig.Get("gadget_show_modestrip", 1) == 1;
-                GadgetModeStripStyle = AppConfig.GetString("gadget_modestrip_style") ?? "badges";
+                // Migrate from the old gadget_show_modestrip toggle if needed.
+                // New key gadget_modestrip_style holds the source of truth: "off" / "badges" / "compact".
+                string? savedStyle = AppConfig.GetString("gadget_modestrip_style");
+                if (savedStyle == null)
+                {
+                    // Old config: if gadget_show_modestrip explicitly = 0, treat as "off".
+                    // Otherwise default to "badges".
+                    GadgetModeStripStyle = AppConfig.Get("gadget_show_modestrip", 1) == 0 ? "off" : "badges";
+                    AppConfig.Set("gadget_modestrip_style", GadgetModeStripStyle);
+                }
+                else
+                {
+                    GadgetModeStripStyle = savedStyle;
+                }
                 GadgetClickThrough = AppConfig.Get("gadget_click_through", 0) == 1;
                 RefreshGadgetHotkey();
                 BootSound = AppConfig.Is("boot_sound");
