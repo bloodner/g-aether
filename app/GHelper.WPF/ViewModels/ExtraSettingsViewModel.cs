@@ -67,10 +67,15 @@ namespace GHelper.WPF.ViewModels
         }
 
         [ObservableProperty]
-        private bool _gadgetHoverFade;
+        [NotifyPropertyChangedFor(
+            nameof(IsMouseInteractionNormal),
+            nameof(IsMouseInteractionHover),
+            nameof(IsMouseInteractionAlways))]
+        private string _gadgetMouseInteraction = "normal";
 
-        [ObservableProperty]
-        private bool _gadgetClickThrough;
+        public bool IsMouseInteractionNormal => GadgetMouseInteraction == "normal";
+        public bool IsMouseInteractionHover  => GadgetMouseInteraction == "hover";
+        public bool IsMouseInteractionAlways => GadgetMouseInteraction == "always";
 
         [ObservableProperty]
         private double _gadgetOpacity = 1.0;
@@ -347,19 +352,15 @@ namespace GHelper.WPF.ViewModels
             GadgetService.ApplySettings();
         }
 
-        partial void OnGadgetHoverFadeChanged(bool value)
+        partial void OnGadgetMouseInteractionChanged(string value)
         {
             if (_ignoreChange) return;
-            AppConfig.Set("gadget_hover_fade", value ? 1 : 0);
+            AppConfig.Set("gadget_mouse_interaction", value);
             GadgetService.ApplySettings();
         }
 
-        partial void OnGadgetClickThroughChanged(bool value)
-        {
-            if (_ignoreChange) return;
-            AppConfig.Set("gadget_click_through", value ? 1 : 0);
-            GadgetService.ApplySettings();
-        }
+        [RelayCommand]
+        private void SetGadgetMouseInteraction(string mode) => GadgetMouseInteraction = mode;
 
         partial void OnGadgetOpacityChanged(double value)
         {
@@ -697,7 +698,6 @@ namespace GHelper.WPF.ViewModels
                 ShowGadget = AppConfig.Is("gadget_enabled");
                 HideGadgetClose = AppConfig.Is("gadget_hide_close");
                 HideGadgetLogo = AppConfig.Is("gadget_hide_logo");
-                GadgetHoverFade = AppConfig.Is("gadget_hover_fade");
                 int rawOpacity = AppConfig.Get("gadget_opacity");
                 GadgetOpacity = (rawOpacity == 0 ? 100 : Math.Clamp(rawOpacity, 20, 100)) / 100.0;
                 GadgetSize = AppConfig.GetString("gadget_size") ?? "medium";
@@ -724,7 +724,23 @@ namespace GHelper.WPF.ViewModels
                 {
                     GadgetModeStripStyle = savedStyle;
                 }
-                GadgetClickThrough = AppConfig.Get("gadget_click_through", 0) == 1;
+                // Migrate from old click_through + hover_fade toggles to the unified
+                // gadget_mouse_interaction key. The old toggles silently conflicted (Click-through
+                // blocked Hover-fade's MouseEnter via WS_EX_TRANSPARENT), so we collapsed them.
+                string? savedInteraction = AppConfig.GetString("gadget_mouse_interaction");
+                if (savedInteraction == null)
+                {
+                    bool oldClickThrough = AppConfig.Is("gadget_click_through");
+                    bool oldHoverFade = AppConfig.Is("gadget_hover_fade");
+                    GadgetMouseInteraction = oldClickThrough ? "always"
+                                          : oldHoverFade   ? "hover"
+                                          : "normal";
+                    AppConfig.Set("gadget_mouse_interaction", GadgetMouseInteraction);
+                }
+                else
+                {
+                    GadgetMouseInteraction = savedInteraction;
+                }
                 RefreshGadgetHotkey();
                 BootSound = AppConfig.Is("boot_sound");
                 BwTrayIcon = AppConfig.Is("bw_icon");

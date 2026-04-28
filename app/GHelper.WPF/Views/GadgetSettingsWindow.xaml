@@ -223,22 +223,6 @@
                                                        Width="44" Height="22" VerticalAlignment="Center" />
                             </Grid>
 
-                            <!-- Click-through toggle -->
-                            <Grid Margin="0,12,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Click-through" Style="{StaticResource BodyTextStyle}" />
-                                    <TextBlock Text="Mouse clicks pass through to whatever is behind the gadget. Disable to move the gadget."
-                                               Style="{StaticResource DimTextStyle}" FontSize="10" TextWrapping="Wrap" />
-                                </StackPanel>
-                                <controls:ToggleSwitch Grid.Column="1"
-                                                       IsChecked="{Binding GadgetClickThrough, Mode=TwoWay}"
-                                                       Width="44" Height="22" VerticalAlignment="Center" />
-                            </Grid>
-
                             <Grid Margin="0,12,0,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -547,18 +531,55 @@
                         <StackPanel>
                             <TextBlock Text="Behavior" Style="{StaticResource CardTitleStyle}" Margin="0,0,0,12" />
 
-                            <Grid>
+                            <!-- Mouse interaction — single source of truth for click-passthrough behavior. -->
+                            <Grid Margin="0,0,0,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Disappear on hover" Style="{StaticResource BodyTextStyle}" />
-                                    <TextBlock Text="Fade out when the mouse passes over so you can click through"
-                                               Style="{StaticResource DimTextStyle}" FontSize="10" />
+                                    <TextBlock Text="Mouse interaction" Style="{StaticResource BodyTextStyle}" />
+                                    <TextBlock Text="Normal = clicks land on the gadget. On hover = passes clicks through and fades while hovered. Always = invisible to clicks (use settings to move it back)."
+                                               Style="{StaticResource DimTextStyle}" FontSize="10" TextWrapping="Wrap" />
                                 </StackPanel>
-                                <controls:ToggleSwitch Grid.Column="1" IsChecked="{Binding GadgetHoverFade, Mode=TwoWay}"
-                                                       Width="44" Height="22" VerticalAlignment="Center" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Content="Normal" CommandParameter="normal" Command="{Binding SetGadgetMouseInteractionCommand}" Margin="0,0,4,0">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsMouseInteractionNormal}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Content="On hover" CommandParameter="hover" Command="{Binding SetGadgetMouseInteractionCommand}" Margin="0,0,4,0">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsMouseInteractionHover}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Content="Always" CommandParameter="always" Command="{Binding SetGadgetMouseInteractionCommand}">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsMouseInteractionAlways}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </StackPanel>
                             </Grid>
 
                             <Grid Margin="0,12,0,0">

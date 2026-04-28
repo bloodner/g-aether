@@ -165,15 +165,14 @@ namespace GHelper.WPF.Views
             _baseOpacity = pct / 100.0;
             if (!_hoverFadeEnabled || !IsMouseOver) Opacity = _baseOpacity;
 
-            // Disappear on hover
-            _hoverFadeEnabled = AppConfig.Is("gadget_hover_fade");
+            // Mouse interaction — unified successor of gadget_hover_fade + gadget_click_through.
+            //   "normal" = gadget catches all clicks
+            //   "hover"  = passes clicks through ONLY while hovered (fade is the visual cue)
+            //   "always" = WS_EX_TRANSPARENT permanently — to drag, switch back to normal
+            string interaction = AppConfig.GetString("gadget_mouse_interaction") ?? "normal";
+            _hoverFadeEnabled = interaction == "hover";
             if (!_hoverFadeEnabled) Opacity = _baseOpacity;
-
-            // Click-through: when enabled, mouse events pass through to whatever is
-            // underneath the gadget. The user must disable this to drag/move the
-            // gadget — there's no other way to grab it.
-            bool clickThrough = AppConfig.Is("gadget_click_through");
-            ApplyClickThrough(clickThrough);
+            ApplyClickThrough(interaction == "always");
         }
 
         private void ApplyClickThrough(bool enabled)
