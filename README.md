@@ -10,7 +10,7 @@ A lightweight, open-source control center for ASUS laptops. Built as a modern WP
 - **Power Limits** — Set custom CPU/GPU power limits, boost behavior, and AMD undervolting.
 - **RGB / Aura Lighting** — Control keyboard backlight brightness, animation modes, colors, and speed. Supports Anime Matrix and Slash lighting on compatible models.
 - **Display** — Screen refresh rate switching, overdrive control, and auto-rate based on AC/battery.
-- **G-Scope** — Dedicated Monitor page with sparkline tiles for CPU and dGPU temps, CPU and dGPU usage, dGPU power draw, fan RPM, and battery state. Updates every second; chart history defaults to the last 60 seconds, configurable up to 15 minutes from the in-panel settings (gear icon).
+- **G-Scope** — Dedicated Monitor page with sparkline tiles for CPU and dGPU temps, CPU and dGPU usage, dGPU power draw, fan RPM, and battery state. Updates every 2 seconds; chart history defaults to the last 60 seconds, configurable up to 15 minutes from the in-panel settings (gear icon).
 - **G-Scope Floating** — Compact, always-on-top mini-window that shows live telemetry over games and other apps. Pick which of 8 tiles to show, choose from four size presets, set transparency down to 20%, swap accent colors (including a multi-color "rainbow" mode that keeps each tile's original hue, plus white and a stealth near-black), enable disappear-on-hover, and assign a global hotkey to toggle visibility.
 - **Battery Health** — Set charge limits to extend battery lifespan.
 - **System Tray** — Split-circle icon showing performance and GPU mode at a glance. Right-click to switch modes without opening the app.

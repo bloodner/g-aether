@@ -62,7 +62,7 @@ namespace GHelper.WPF.Services
                 "The single most impactful thing you can do to slow this decline is keep the charge limit below 100% (see above)."),
 
             ["monitor_telemetry"] = new("G-Scope",
-                "Real-time readings straight from the hardware sensors. Values refresh every second; the sparkline charts default to the last 60 seconds and can be extended up to 15 minutes via the gear icon next to this help button — useful for spotting slow trends, not just spikes."),
+                "Real-time readings straight from the hardware sensors. Values refresh every 2 seconds; the sparkline charts default to the last 60 seconds and can be extended up to 15 minutes via the gear icon next to this help button — useful for spotting slow trends, not just spikes."),
 
             ["live_sensors"] = new("Live Sensors",
                 "Current CPU and GPU temperatures, plus live fan RPM. These numbers come directly from the hardware, so they're handy for checking that a mode change or a fan curve is doing what you expected."),

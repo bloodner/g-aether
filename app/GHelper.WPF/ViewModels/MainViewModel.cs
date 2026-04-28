@@ -110,7 +110,7 @@ namespace GHelper.WPF.ViewModels
             // Sensor refresh timer on UI thread
             _sensorTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromSeconds(1)
+                Interval = TimeSpan.FromSeconds(2)
             };
             _sensorTimer.Tick += OnSensorTick;
             _sensorTimer.Start();
@@ -207,7 +207,7 @@ namespace GHelper.WPF.ViewModels
                 Logger.WriteLine("Mode sync error: " + ex.Message);
             }
 
-            // Refresh current screen rate every 5 seconds (lightweight Win32 API call)
+            // Refresh current screen rate every 10 seconds (lightweight Win32 API call)
             if (++_tickCount % 5 == 0)
                 Visual.RefreshCurrentRate();
         }

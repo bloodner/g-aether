@@ -57,7 +57,8 @@ namespace GHelper.WPF.ViewModels
         private readonly StickyReading _stickyGpuUse = new();
         private readonly StickyReading _stickyGpuPower = new();
 
-        // Buffers now hold the longest possible window (15 min @ 1s tick = 900).
+        // Buffers hold the longest possible window. At the 2s sensor tick
+        // 900 samples = 30 minutes, comfortably more than the 15-min UI option.
         // Shorter windows are rendered by slicing the tail.
         private const int BufferSize = 900;
 
@@ -157,7 +158,7 @@ namespace GHelper.WPF.ViewModels
         // Smaller value font for fan tiles (RPM digits) — keep proportional.
         [ObservableProperty] private double _valueFontSizeFan = 22;
 
-        // 60 / 300 / 900 — number of trailing samples to render.
+        // 60 / 300 / 900 seconds — TailOf() halves to samples (2s tick).
         [ObservableProperty] private int _historyWindowSeconds = 60;
 
         // Per-tile stroke colors. On "multi" these match the existing hardcoded
@@ -293,7 +294,9 @@ namespace GHelper.WPF.ViewModels
 
         private double[] TailOf(double[] buffer)
         {
-            int n = Math.Clamp(HistoryWindowSeconds, 1, buffer.Length);
+            // Sensor tick is 2 seconds, so samples = seconds / 2.
+            int sampleCount = Math.Max(1, HistoryWindowSeconds / 2);
+            int n = Math.Clamp(sampleCount, 1, buffer.Length);
             var result = new double[n];
             Array.Copy(buffer, buffer.Length - n, result, 0, n);
             return result;
