@@ -200,12 +200,17 @@ namespace GHelper.WPF.ViewModels
             CpuUseValues = TailOf(_cpuUseHistory);
             CpuUseText = cpuUseRaw is null or < 0 ? "--" : $"{cpuUseRaw}%";
 
-            // GPU Power Draw (watts)
+            // GPU Power Draw (watts).
+            // Laptop dGPUs cap around 175W TGP; anything above 200W is almost
+            // certainly a stale/garbage read from NvAPI when the dGPU is in a
+            // transitional or parked state. Clamp the upper bound and treat
+            // out-of-range values as unavailable, the same way temp/usage do.
             int? gpuPower = HardwareControl.gpuPower;
-            double gpuPowerVal = gpuPower is > 0 ? (double)gpuPower : 0;
+            bool gpuPowerValid = gpuPower is > 0 and < 200;
+            double gpuPowerVal = gpuPowerValid ? (double)gpuPower! : 0;
             ShiftAndPush(_gpuPowerHistory, gpuPowerVal);
             GpuPowerValues = TailOf(_gpuPowerHistory);
-            GpuPowerText = gpuPower is > 0 ? $"{gpuPower}W" : (ecoMode ? "Off" : "--");
+            GpuPowerText = gpuPowerValid ? $"{gpuPower}W" : (ecoMode ? "Off" : "--");
 
             // Battery Rate
             decimal rate = HardwareControl.batteryRate ?? 0;
