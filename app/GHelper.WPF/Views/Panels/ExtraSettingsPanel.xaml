@@ -184,13 +184,13 @@
                     <TextBlock Text="&#xE9D9;" FontFamily="Segoe MDL2 Assets" FontSize="16"
                                Foreground="{DynamicResource AccentBrush}"
                                VerticalAlignment="Center" Margin="0,0,8,0" />
-                    <TextBlock Text="Floating Gadget"
+                    <TextBlock Text="G-Scope Floating"
                                Style="{StaticResource CardTitleStyle}"
                                VerticalAlignment="Center" />
                     <controls:HelpButton HelpKey="floating_gadget" VerticalAlignment="Center" Margin="8,0,0,0" />
                 </StackPanel>
 
-                <TextBlock Text="Compact live telemetry that stays on top of games and other apps."
+                <TextBlock Text="A compact G-Scope window that stays on top of games and other apps."
                            Style="{StaticResource DimTextStyle}"
                            FontSize="11"
                            Margin="0,0,0,12"
@@ -204,7 +204,7 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="Show gadget" Style="{StaticResource BodyTextStyle}" />
-                        <TextBlock Text="Live telemetry, always on top, drag to reposition"
+                        <TextBlock Text="Always on top, drag to reposition"
                                    Style="{StaticResource DimTextStyle}" FontSize="10" />
                     </StackPanel>
                     <controls:ToggleSwitch Grid.Column="1"

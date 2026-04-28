@@ -126,10 +126,10 @@ namespace GHelper.WPF.Services
                 "• Switching from one profiled app to another swaps in the new scene without touching the original snapshot. The baseline stays as whatever you had before the first trigger fired.\n\n" +
                 "Your rules persist across launches. Remove one with the X on its row."),
 
-            ["floating_gadget"] = new("Floating Gadget",
-                "A compact, always-on-top window that shows live CPU and dGPU readings while you're doing other things. Drag it anywhere on screen and it stays put across launches.\n\n" +
+            ["floating_gadget"] = new("G-Scope Floating",
+                "A compact, always-on-top G-Scope window that shows live CPU and dGPU readings while you're doing other things. Drag it anywhere on screen and it stays put across launches.\n\n" +
                 "It draws on top of borderless-windowed games (which is most of them in 2026), so you can keep an eye on temps, usage, and fan RPM during a session. True fullscreen-exclusive games will hide it, just like they hide most overlays.\n\n" +
-                "Click Configure to open the full settings page: pick which tiles show, change the size or accent color, set a keyboard shortcut to toggle visibility from anywhere in Windows, and snap the gadget back to the corner if it ever ends up off-screen."),
+                "Click Configure to open the full settings page: pick which tiles show, change the size or accent color, mirror the main window's mode strip, set a keyboard shortcut to toggle visibility from anywhere in Windows, enable click-through, or snap the gadget back to the corner if it ever ends up off-screen."),
 
             ["battery_triggers"] = new("Battery Saver Automation",
                 "Opt-in, hands-off power saving while you're running on battery.\n\n" +

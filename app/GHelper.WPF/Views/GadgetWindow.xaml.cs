@@ -101,10 +101,6 @@ namespace GHelper.WPF.Views
             TitleText.Visibility = AppConfig.Is("gadget_hide_logo")
                 ? Visibility.Collapsed : Visibility.Visible;
 
-            // Mode strip visibility — defaults to visible (key absent or 1).
-            ModeStripContainer.Visibility = AppConfig.Get("gadget_show_modestrip", 1) == 1
-                ? Visibility.Visible : Visibility.Collapsed;
-
             // Size preset
             string size = AppConfig.GetString("gadget_size") ?? "medium";
             var s = size switch
@@ -114,6 +110,16 @@ namespace GHelper.WPF.Views
                 "large"  => LargeSize,
                 _        => MediumSize,
             };
+
+            // Mode strip — show only when the user enabled it AND the gadget is wide
+            // enough for the four full-width badges. At xsmall (180) and small (220),
+            // 11pt SemiBold "Balanced/Optimized/Healthy" badges overflow the column
+            // and render clipped, so we collapse the row entirely at those sizes.
+            bool stripUserToggle = AppConfig.Get("gadget_show_modestrip", 1) == 1;
+            bool stripFitsAtSize = size != "xsmall" && size != "small";
+            ModeStripContainer.Visibility = (stripUserToggle && stripFitsAtSize)
+                ? Visibility.Visible : Visibility.Collapsed;
+
             Width = s.W;
             ApplyTileFontSizes(s.Value, s.Label, s.Header);
 
@@ -122,9 +128,11 @@ namespace GHelper.WPF.Views
             int visibleCount = ApplyTileVisibility();
             int rows = Math.Max(1, (visibleCount + 1) / 2);
             TileGrid.Rows = rows;
-            // Window height = chrome (header + padding ≈ H4 - 4*PerRow) + rows * PerRow.
+            // Window height = chrome + rows * PerRow + (mode strip row when visible).
+            // The strip row is a fixed ~28px (11pt text + 4+4 padding + 1+1 dividers + bottom margin 8).
             double chrome = s.H4 - 4 * s.PerRow;
-            Height = chrome + rows * s.PerRow;
+            double stripContribution = ModeStripContainer.Visibility == Visibility.Visible ? 28 : 0;
+            Height = chrome + rows * s.PerRow + stripContribution;
 
             // Accent color. "multi" (default) keeps each tile's original color
             // and lets the header use the app-level accent. Anything else

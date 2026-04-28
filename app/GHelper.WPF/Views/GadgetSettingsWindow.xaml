@@ -164,8 +164,8 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Text="Show mode strip" Style="{StaticResource BodyTextStyle}" />
-                                    <TextBlock Text="Mirrors the main window's Perf/GPU/Display/Services badges"
-                                               Style="{StaticResource DimTextStyle}" FontSize="10" />
+                                    <TextBlock Text="Mirrors the main window's Perf/GPU/Display/Services badges. Hidden automatically at X-Small/Small sizes."
+                                               Style="{StaticResource DimTextStyle}" FontSize="10" TextWrapping="Wrap" />
                                 </StackPanel>
                                 <controls:ToggleSwitch Grid.Column="1"
                                                        IsChecked="{Binding ShowGadgetModeStrip, Mode=TwoWay}"

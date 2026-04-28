@@ -281,7 +281,7 @@ namespace GHelper.WPF.Services
             HotkeyAction.SceneNight => "Scene: Night",
             HotkeyAction.SceneGame => "Scene: Game",
             HotkeyAction.ToggleWindow => "Show / Hide G-Aether",
-            HotkeyAction.ToggleGadget => "Show / Hide Floating Gadget",
+            HotkeyAction.ToggleGadget => "Show / Hide G-Scope Floating",
             _ => action.ToString(),
         };
 
