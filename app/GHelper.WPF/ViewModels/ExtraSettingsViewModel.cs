@@ -52,6 +52,20 @@ namespace GHelper.WPF.ViewModels
         private bool _showGadgetModeStrip = true;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsModeStripBadges), nameof(IsModeStripCompact))]
+        private string _gadgetModeStripStyle = "badges";
+
+        public bool IsModeStripBadges => GadgetModeStripStyle == "badges";
+        public bool IsModeStripCompact => GadgetModeStripStyle == "compact";
+
+        partial void OnGadgetModeStripStyleChanged(string value)
+        {
+            if (_ignoreChange) return;
+            AppConfig.Set("gadget_modestrip_style", value);
+            GadgetService.ApplySettings();
+        }
+
+        [ObservableProperty]
         private bool _gadgetHoverFade;
 
         [ObservableProperty]
@@ -385,6 +399,9 @@ namespace GHelper.WPF.ViewModels
         private void SetGadgetAccent(string accent) => GadgetAccent = accent;
 
         [RelayCommand]
+        private void SetGadgetModeStripStyle(string style) => GadgetModeStripStyle = style;
+
+        [RelayCommand]
         private void SetGadgetHotkey()
         {
             var owner = Application.Current?.MainWindow;
@@ -700,6 +717,7 @@ namespace GHelper.WPF.ViewModels
                 ShowCpuFan   = AppConfig.Get("gadget_show_cpu_fan", 1) == 1;
                 ShowGpuFan        = AppConfig.Get("gadget_show_gpu_fan", 1) == 1;
                 ShowGadgetModeStrip = AppConfig.Get("gadget_show_modestrip", 1) == 1;
+                GadgetModeStripStyle = AppConfig.GetString("gadget_modestrip_style") ?? "badges";
                 GadgetClickThrough = AppConfig.Get("gadget_click_through", 0) == 1;
                 RefreshGadgetHotkey();
                 BootSound = AppConfig.Is("boot_sound");

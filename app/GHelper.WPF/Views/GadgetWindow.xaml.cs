@@ -111,14 +111,21 @@ namespace GHelper.WPF.Views
                 _        => MediumSize,
             };
 
-            // Mode strip — show only when the user enabled it AND the gadget is wide
-            // enough for the four full-width badges. At xsmall (180) and small (220),
-            // 11pt SemiBold "Balanced/Optimized/Healthy" badges overflow the column
-            // and render clipped, so we collapse the row entirely at those sizes.
+            // Mode strip — two styles:
+            //   "badges"  = full PERF/GPU/DISPLAY/SERVICES; only fits at Medium+
+            //   "compact" = Scene · PerfMode · health dot; fits at every size
+            // User toggles visibility via gadget_show_modestrip; chooses style via
+            // gadget_modestrip_style. When the toggle is off, both containers hide.
             bool stripUserToggle = AppConfig.Get("gadget_show_modestrip", 1) == 1;
-            bool stripFitsAtSize = size != "xsmall" && size != "small";
-            ModeStripContainer.Visibility = (stripUserToggle && stripFitsAtSize)
-                ? Visibility.Visible : Visibility.Collapsed;
+            string stripStyle = AppConfig.GetString("gadget_modestrip_style") ?? "badges";
+
+            bool showBadges = stripUserToggle
+                              && stripStyle == "badges"
+                              && size != "xsmall" && size != "small";
+            bool showCompact = stripUserToggle && stripStyle == "compact";
+
+            ModeStripContainer.Visibility = showBadges ? Visibility.Visible : Visibility.Collapsed;
+            CompactStripContainer.Visibility = showCompact ? Visibility.Visible : Visibility.Collapsed;
 
             Width = s.W;
             ApplyTileFontSizes(s.Value, s.Label, s.Header);
@@ -131,7 +138,9 @@ namespace GHelper.WPF.Views
             // Window height = chrome + rows * PerRow + (mode strip row when visible).
             // The strip row is a fixed ~28px (11pt text + 4+4 padding + 1+1 dividers + bottom margin 8).
             double chrome = s.H4 - 4 * s.PerRow;
-            double stripContribution = ModeStripContainer.Visibility == Visibility.Visible ? 28 : 0;
+            double stripContribution =
+                (ModeStripContainer.Visibility == Visibility.Visible
+                 || CompactStripContainer.Visibility == Visibility.Visible) ? 28 : 0;
             Height = chrome + rows * s.PerRow + stripContribution;
 
             // Accent color. "multi" (default) keeps each tile's original color

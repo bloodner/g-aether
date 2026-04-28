@@ -1,4 +1,5 @@
 // app/GHelper.WPF/ViewModels/ModeStripViewModel.cs
+using System.Linq;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using GHelper.WPF.Services;
@@ -36,6 +37,23 @@ namespace GHelper.WPF.ViewModels
         [ObservableProperty] private Brush _servicesBadgeBrush =
             new SolidColorBrush(Color.FromRgb(0x4C, 0xC9, 0x5E));
         [ObservableProperty] private bool _servicesBadgeIsWarning;
+
+        // ---- Active Scene (for the compact mode-strip variant) ----
+        // Records the most recently applied scene so the gadget's compact strip
+        // can display "🎮 Game · Turbo ●" style. Survives drift — we don't try
+        // to detect when manual tweaks have invalidated the scene name.
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasActiveScene))]
+        private string _activeSceneName = "";
+
+        [ObservableProperty]
+        private string _activeSceneIcon = "";
+
+        public bool HasActiveScene => !string.IsNullOrEmpty(ActiveSceneName);
+
+        // ---- Health summary brush (for the compact strip's right-side dot) ----
+        [ObservableProperty] private Brush _healthBrush =
+            new SolidColorBrush(Color.FromRgb(0x4C, 0xC9, 0x5E));  // green by default
 
         private static Brush ModeBrush(Color c) => new SolidColorBrush(c);
 
@@ -84,6 +102,15 @@ namespace GHelper.WPF.ViewModels
             UpdateGpuBadge();
             UpdateDisplayBadge();
             UpdateServicesBadge();
+            UpdateHealthBrush();
+
+            // Rehydrate active scene from last session.
+            string? savedSceneName = AppConfig.GetString("active_scene");
+            if (!string.IsNullOrEmpty(savedSceneName))
+            {
+                var saved = SceneService.BuiltInScenes.FirstOrDefault(s => s.Name == savedSceneName);
+                if (saved != null) SetActiveScene(saved);
+            }
         }
 
         private void UpdatePerfBadge()
@@ -101,6 +128,7 @@ namespace GHelper.WPF.ViewModels
                 _ => ModeBrush(ThemeService.ColorBalanced),
             };
             PerfBadgeIsWarning = name == "Turbo";
+            UpdateHealthBrush();
         }
 
         private void UpdateGpuBadge()
@@ -119,6 +147,7 @@ namespace GHelper.WPF.ViewModels
                 _ => ModeBrush(ThemeService.ColorStandard),
             };
             GpuBadgeIsWarning = name == "Ultimate";
+            UpdateHealthBrush();
         }
 
         private void UpdateDisplayBadge()
@@ -155,6 +184,24 @@ namespace GHelper.WPF.ViewModels
                 ServicesBadgeBrush = ModeBrush(ThemeService.ColorTurbo);
                 ServicesBadgeIsWarning = true;
             }
+            UpdateHealthBrush();
+        }
+
+        private void UpdateHealthBrush()
+        {
+            bool anyWarning = PerfBadgeIsWarning || GpuBadgeIsWarning || ServicesBadgeIsWarning;
+            HealthBrush = anyWarning
+                ? ModeBrush(ThemeService.ColorTurbo)   // amber/orange for warnings
+                : ModeBrush(ThemeService.ColorEco);    // green for healthy
+        }
+
+        /// <summary>
+        /// Records the most recently applied scene. Called by MainViewModel.ApplyScene.
+        /// </summary>
+        public void SetActiveScene(Scene scene)
+        {
+            ActiveSceneName = scene.Name;
+            ActiveSceneIcon = scene.Icon;
         }
 
         /// <summary>

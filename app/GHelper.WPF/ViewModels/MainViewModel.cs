@@ -61,6 +61,8 @@ namespace GHelper.WPF.ViewModels
             try
             {
                 scene.Apply(this);
+                AppConfig.Set("active_scene", scene.Name);
+                ModeStrip?.SetActiveScene(scene);
                 ToastService.ShowOsdOnly(scene.Name, scene.Icon, ThemeService.AccentColor);
                 Logger.WriteLine($"Scene applied: {scene.Name}");
             }

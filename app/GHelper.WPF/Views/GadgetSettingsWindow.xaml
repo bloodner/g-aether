@@ -164,12 +164,51 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Text="Show mode strip" Style="{StaticResource BodyTextStyle}" />
-                                    <TextBlock Text="Mirrors the main window's Perf/GPU/Display/Services badges. Hidden automatically at X-Small/Small sizes."
-                                               Style="{StaticResource DimTextStyle}" FontSize="10" TextWrapping="Wrap" />
+                                    <TextBlock Text="Show a status strip in the gadget header"
+                                               Style="{StaticResource DimTextStyle}" FontSize="10" />
                                 </StackPanel>
                                 <controls:ToggleSwitch Grid.Column="1"
                                                        IsChecked="{Binding ShowGadgetModeStrip, Mode=TwoWay}"
                                                        Width="44" Height="22" VerticalAlignment="Center" />
+                            </Grid>
+
+                            <!-- Mode strip style — Badges (full PERF/GPU/DISPLAY/SERVICES) vs Compact (Scene · Mode · health dot) -->
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Strip style" Style="{StaticResource BodyTextStyle}" />
+                                    <TextBlock Text="Badges = full PERF/GPU/DISPLAY/SERVICES (Medium+ only). Compact = Scene · Mode · health dot (every size)."
+                                               Style="{StaticResource DimTextStyle}" FontSize="10" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Content="Badges" CommandParameter="badges" Command="{Binding SetGadgetModeStripStyleCommand}" Margin="0,0,4,0">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsModeStripBadges}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Content="Compact" CommandParameter="compact" Command="{Binding SetGadgetModeStripStyleCommand}">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsModeStripCompact}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </StackPanel>
                             </Grid>
 
                             <!-- Hide close button -->
