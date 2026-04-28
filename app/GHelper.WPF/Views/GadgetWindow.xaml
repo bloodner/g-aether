@@ -34,17 +34,54 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock x:Name="TitleText"
-                           Text="G-Aether"
-                           FontSize="11"
-                           FontWeight="SemiBold"
-                           Foreground="{DynamicResource AccentBrush}"
-                           VerticalAlignment="Center" />
+                <!-- Title or compact strip — only one visible at a time. The compact
+                     variant takes over the title row instead of sitting below it. -->
+                <Grid VerticalAlignment="Center">
+                    <TextBlock x:Name="TitleText"
+                               Text="G-Aether"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center" />
+                    <StackPanel x:Name="CompactStripInline"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                Visibility="Collapsed">
+                        <TextBlock Text="{Binding ModeStrip.ActiveSceneIcon}"
+                                   FontFamily="Segoe MDL2 Assets" FontSize="12"
+                                   Foreground="{DynamicResource AccentBrush}"
+                                   VerticalAlignment="Center" Margin="0,0,5,0"
+                                   Visibility="{Binding ModeStrip.HasActiveScene, Converter={StaticResource BoolToVisibility}}" />
+                        <TextBlock Text="{Binding ModeStrip.ActiveSceneName}"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource AccentBrush}"
+                                   VerticalAlignment="Center"
+                                   Visibility="{Binding ModeStrip.HasActiveScene, Converter={StaticResource BoolToVisibility}}" />
+                        <TextBlock Text="  ·  "
+                                   FontSize="11"
+                                   Foreground="#888"
+                                   VerticalAlignment="Center"
+                                   Visibility="{Binding ModeStrip.HasActiveScene, Converter={StaticResource BoolToVisibility}}" />
+                        <TextBlock Text="{Binding ModeStrip.PerfBadgeName}"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{Binding ModeStrip.PerfBadgeBrush}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- Health dot — visible only when CompactStripInline is showing. -->
+                <Ellipse x:Name="CompactHealthDot"
+                         Grid.Column="1"
+                         Width="8" Height="8"
+                         Fill="{Binding ModeStrip.HealthBrush}"
+                         VerticalAlignment="Center" Margin="0,0,8,0"
+                         Visibility="Collapsed" />
 
                 <Button x:Name="CloseButton"
-                        Grid.Column="1"
+                        Grid.Column="2"
                         Content="&#xE711;"
                         FontFamily="Segoe MDL2 Assets"
                         FontSize="10"
@@ -79,10 +116,6 @@
                     <StackPanel Grid.Column="0" Orientation="Horizontal"
                                 HorizontalAlignment="Center"
                                 ToolTip="{Binding ModeStrip.PerfBadgeName, StringFormat='Performance: {0}'}">
-                        <TextBlock Text="&#xE945;"
-                                   Style="{StaticResource ModeBadgePulseIconStyle}"
-                                   Foreground="{Binding ModeStrip.PerfBadgeBrush}"
-                                   IsEnabled="{Binding ModeStrip.PerfBadgeIsWarning}" />
                         <TextBlock Text="{Binding ModeStrip.PerfBadgeName}"
                                    Style="{StaticResource ModeBadgeValueStyle}"
                                    Foreground="{Binding ModeStrip.PerfBadgeBrush}" />
@@ -92,10 +125,6 @@
                     <StackPanel Grid.Column="1" Orientation="Horizontal"
                                 HorizontalAlignment="Center"
                                 ToolTip="{Binding ModeStrip.GpuBadgeName, StringFormat='GPU: {0}'}">
-                        <TextBlock Text="&#xE950;"
-                                   Style="{StaticResource ModeBadgePulseIconStyle}"
-                                   Foreground="{Binding ModeStrip.GpuBadgeBrush}"
-                                   IsEnabled="{Binding ModeStrip.GpuBadgeIsWarning}" />
                         <TextBlock Text="{Binding ModeStrip.GpuBadgeName}"
                                    Style="{StaticResource ModeBadgeValueStyle}"
                                    Foreground="{Binding ModeStrip.GpuBadgeBrush}" />
@@ -105,9 +134,6 @@
                     <StackPanel Grid.Column="2" Orientation="Horizontal"
                                 HorizontalAlignment="Center"
                                 ToolTip="{Binding ModeStrip.DisplayBadgeName, StringFormat='Display: {0}'}">
-                        <TextBlock Text="&#xE7F4;"
-                                   Style="{StaticResource ModeBadgeIconStyle}"
-                                   Foreground="{Binding ModeStrip.DisplayBadgeBrush}" />
                         <TextBlock Text="{Binding ModeStrip.DisplayBadgeName}"
                                    Style="{StaticResource ModeBadgeValueStyle}"
                                    Foreground="{Binding ModeStrip.DisplayBadgeBrush}" />
@@ -117,63 +143,10 @@
                     <StackPanel Grid.Column="3" Orientation="Horizontal"
                                 HorizontalAlignment="Center"
                                 ToolTip="{Binding ModeStrip.ServicesBadgeName, StringFormat='Services: {0}'}">
-                        <TextBlock Text="&#xE72E;"
-                                   Style="{StaticResource ModeBadgePulseIconStyle}"
-                                   Foreground="{Binding ModeStrip.ServicesBadgeBrush}"
-                                   IsEnabled="{Binding ModeStrip.ServicesBadgeIsWarning}" />
                         <TextBlock Text="{Binding ModeStrip.ServicesBadgeName}"
                                    Style="{StaticResource ModeBadgeValueStyle}"
                                    Foreground="{Binding ModeStrip.ServicesBadgeBrush}" />
                     </StackPanel>
-                </Grid>
-            </Border>
-
-            <!-- Compact strip — Scene · PerfMode · health dot.
-                 Same Grid.Row as ModeStripContainer; only one is ever visible.
-                 Scales to small gadget widths because it's a single line. -->
-            <Border x:Name="CompactStripContainer"
-                    Grid.Row="1"
-                    Margin="0,0,0,8"
-                    Padding="6,5,6,5"
-                    BorderBrush="#18FFFFFF"
-                    BorderThickness="0,1,0,1"
-                    Visibility="Collapsed">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <!-- Scene icon (only shown when an active scene is recorded) -->
-                        <TextBlock Text="{Binding ModeStrip.ActiveSceneIcon}"
-                                   FontFamily="Segoe MDL2 Assets" FontSize="13"
-                                   Foreground="{DynamicResource AccentBrush}"
-                                   VerticalAlignment="Center" Margin="0,0,5,0"
-                                   Visibility="{Binding ModeStrip.HasActiveScene, Converter={StaticResource BoolToVisibility}}" />
-                        <!-- Scene name -->
-                        <TextBlock Text="{Binding ModeStrip.ActiveSceneName}"
-                                   Style="{StaticResource ModeBadgeValueStyle}"
-                                   Foreground="{DynamicResource AccentBrush}"
-                                   Visibility="{Binding ModeStrip.HasActiveScene, Converter={StaticResource BoolToVisibility}}" />
-                        <!-- Separator -->
-                        <TextBlock Text=" · "
-                                   Style="{StaticResource ModeBadgeValueStyle}"
-                                   Foreground="#888"
-                                   Visibility="{Binding ModeStrip.HasActiveScene, Converter={StaticResource BoolToVisibility}}" />
-                        <!-- Performance mode (always shown) -->
-                        <TextBlock Text="{Binding ModeStrip.PerfBadgeName}"
-                                   Style="{StaticResource ModeBadgeValueStyle}"
-                                   Foreground="{Binding ModeStrip.PerfBadgeBrush}" />
-                    </StackPanel>
-                    <!-- Health dot — green when nominal, amber/red when any badge is in warning state. -->
-                    <Ellipse Grid.Column="1" Width="9" Height="9"
-                             Fill="{Binding ModeStrip.HealthBrush}"
-                             VerticalAlignment="Center" Margin="0,0,2,0">
-                        <Ellipse.Effect>
-                            <DropShadowEffect ShadowDepth="0" BlurRadius="6" Opacity="0.6"
-                                              Color="{Binding ModeStrip.HealthBrush.(SolidColorBrush.Color)}" />
-                        </Ellipse.Effect>
-                    </Ellipse>
                 </Grid>
             </Border>
 

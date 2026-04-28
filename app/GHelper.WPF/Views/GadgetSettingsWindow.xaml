@@ -180,7 +180,7 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Text="Strip style" Style="{StaticResource BodyTextStyle}" />
-                                    <TextBlock Text="Badges = full PERF/GPU/DISPLAY/SERVICES (Medium+ only). Compact = Scene · Mode · health dot (every size)."
+                                    <TextBlock Text="Badges = colored PERF/GPU/DISPLAY/SERVICES strip (Small+). Compact = Scene · Mode · health dot, replaces the G-Aether title (every size)."
                                                Style="{StaticResource DimTextStyle}" FontSize="10" TextWrapping="Wrap" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">

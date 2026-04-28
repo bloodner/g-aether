@@ -112,20 +112,34 @@ namespace GHelper.WPF.Views
             };
 
             // Mode strip — two styles:
-            //   "badges"  = full PERF/GPU/DISPLAY/SERVICES; only fits at Medium+
-            //   "compact" = Scene · PerfMode · health dot; fits at every size
+            //   "badges"  = full PERF/GPU/DISPLAY/SERVICES strip in its own row.
+            //   "compact" = Scene · PerfMode + health dot in the title row, replacing "G-Aether".
             // User toggles visibility via gadget_show_modestrip; chooses style via
-            // gadget_modestrip_style. When the toggle is off, both containers hide.
+            // gadget_modestrip_style. When the toggle is off, both styles hide and
+            // the title goes back to "G-Aether".
             bool stripUserToggle = AppConfig.Get("gadget_show_modestrip", 1) == 1;
             string stripStyle = AppConfig.GetString("gadget_modestrip_style") ?? "badges";
 
-            bool showBadges = stripUserToggle
-                              && stripStyle == "badges"
-                              && size != "xsmall" && size != "small";
+            bool showBadges = stripUserToggle && stripStyle == "badges" && size != "xsmall";
             bool showCompact = stripUserToggle && stripStyle == "compact";
 
             ModeStripContainer.Visibility = showBadges ? Visibility.Visible : Visibility.Collapsed;
-            CompactStripContainer.Visibility = showCompact ? Visibility.Visible : Visibility.Collapsed;
+
+            // Compact takes over the header: hide the "G-Aether" title text and show
+            // the inline scene/mode + dot instead. Hide-logo respects this — when the
+            // user has hidden the logo, the compact content still shows.
+            CompactStripInline.Visibility = showCompact ? Visibility.Visible : Visibility.Collapsed;
+            CompactHealthDot.Visibility = showCompact ? Visibility.Visible : Visibility.Collapsed;
+
+            // When compact is active, suppress TitleText regardless of hide_logo
+            // (the compact content IS the title in that mode). When compact is off,
+            // TitleText follows the existing hide_logo rule.
+            if (showCompact)
+            {
+                TitleText.Visibility = Visibility.Collapsed;
+            }
+            // (When showCompact is false, TitleText.Visibility was already set
+            // earlier in this method by the hide_logo block.)
 
             Width = s.W;
             ApplyTileFontSizes(s.Value, s.Label, s.Header);
@@ -138,9 +152,8 @@ namespace GHelper.WPF.Views
             // Window height = chrome + rows * PerRow + (mode strip row when visible).
             // The strip row is a fixed ~28px (11pt text + 4+4 padding + 1+1 dividers + bottom margin 8).
             double chrome = s.H4 - 4 * s.PerRow;
-            double stripContribution =
-                (ModeStripContainer.Visibility == Visibility.Visible
-                 || CompactStripContainer.Visibility == Visibility.Visible) ? 28 : 0;
+            // Only the badges variant adds a row; compact is inline in the header.
+            double stripContribution = ModeStripContainer.Visibility == Visibility.Visible ? 28 : 0;
             Height = chrome + rows * s.PerRow + stripContribution;
 
             // Accent color. "multi" (default) keeps each tile's original color
