@@ -28,6 +28,27 @@ namespace GHelper.WPF.Services
             };
 
             _trayIcon.MouseUp += OnTrayMouseUp;
+
+            // Update-available overlay — pick up cached result if the background check
+            // already completed, and subscribe for late discovery.
+            if (UpdateNotifier.Latest is { Status: UpdateStatus.UpdateAvailable })
+                SetUpdateAvailable(true);
+            UpdateNotifier.UpdateDiscovered += result =>
+            {
+                if (result.Status == UpdateStatus.UpdateAvailable) SetUpdateAvailable(true);
+            };
+        }
+
+        /// <summary>
+        /// Toggles the update-available overlay dot on the tray icon. Triggers a
+        /// re-render only if the state actually changed.
+        /// </summary>
+        public void SetUpdateAvailable(bool available)
+        {
+            if (_updateAvailable == available) return;
+            _updateAvailable = available;
+            // Force a redraw using the last known perf/gpu modes.
+            if (_lastPerfMode >= 0) UpdateIcon(_lastPerfMode, _lastGpuMode);
         }
 
         private void OnTrayMouseUp(object? sender, System.Windows.Forms.MouseEventArgs e)
@@ -145,6 +166,8 @@ namespace GHelper.WPF.Services
         private int _lastGpuMode = -1;
         private bool _lastGpuAuto;
         private bool _lastBw;
+        private bool _lastUpdateAvailable;
+        private bool _updateAvailable;
 
         private static System.Drawing.Color ToGrayscale(System.Drawing.Color c)
         {
@@ -168,11 +191,13 @@ namespace GHelper.WPF.Services
             bool bw = AppConfig.Is("bw_icon");
 
             // Skip if nothing changed
-            if (perfMode == _lastPerfMode && gpuMode == _lastGpuMode && isAuto == _lastGpuAuto && bw == _lastBw) return;
+            bool updateAvailable = _updateAvailable;
+            if (perfMode == _lastPerfMode && gpuMode == _lastGpuMode && isAuto == _lastGpuAuto && bw == _lastBw && updateAvailable == _lastUpdateAvailable) return;
             _lastPerfMode = perfMode;
             _lastGpuMode = gpuMode;
             _lastGpuAuto = isAuto;
             _lastBw = bw;
+            _lastUpdateAvailable = updateAvailable;
 
             var perfColor = PerfColor(perfMode);
 
@@ -188,7 +213,7 @@ namespace GHelper.WPF.Services
                 gpuColor = ToGrayscale(gpuColor);
             }
 
-            var newIcon = CreateIcon(perfColor, gpuColor);
+            var newIcon = CreateIcon(perfColor, gpuColor, updateAvailable);
             var oldIcon = _trayIcon.Icon;
             _trayIcon.Icon = newIcon;
             oldIcon?.Dispose();
@@ -258,7 +283,7 @@ namespace GHelper.WPF.Services
             return dst;
         }
 
-        private static Icon CreateIcon(System.Drawing.Color perfColor, System.Drawing.Color gpuColor)
+        private static Icon CreateIcon(System.Drawing.Color perfColor, System.Drawing.Color gpuColor, bool updateAvailable = false)
         {
             int size = 32;
             using var bmp = new Bitmap(size, size, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -290,6 +315,25 @@ namespace GHelper.WPF.Services
                     g.SetClip(new Rectangle(mid, 0, size - mid, size));
                     using (var r = new SolidBrush(gpuColor)) g.FillEllipse(r, 0, 0, size - 1, size - 1);
                     g.ResetClip();
+                }
+
+                // Update-available overlay — small accent-blue dot in the bottom-right
+                // corner. Discoverable without opening the main window.
+                if (updateAvailable)
+                {
+                    int dotSize = 12;
+                    int margin = 1;
+                    int x = size - dotSize - margin;
+                    int y = size - dotSize - margin;
+                    var rectDot = new RectangleF(x, y, dotSize, dotSize);
+
+                    // White outline so the dot reads against any tint underneath
+                    using (var outline = new SolidBrush(System.Drawing.Color.FromArgb(220, 255, 255, 255)))
+                        g.FillEllipse(outline, x - 1, y - 1, dotSize + 2, dotSize + 2);
+
+                    // Accent-blue fill matches the nav-gear badge in the main window
+                    using (var fill = new SolidBrush(System.Drawing.Color.FromArgb(255, 0x60, 0xCD, 0xFF)))
+                        g.FillEllipse(fill, rectDot);
                 }
             }
             var hIcon = bmp.GetHicon();

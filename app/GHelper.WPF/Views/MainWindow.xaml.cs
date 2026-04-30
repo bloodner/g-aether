@@ -52,6 +52,17 @@ namespace GHelper.WPF.Views
             var mainGrid = (Grid)((System.Windows.Controls.Border)Content).Child;
             ToastService.Initialize(mainGrid);
 
+            // Notify the user when an update is discovered. Fires at most once per
+            // launch (UpdateNotifier publishes once); cached value covers the case
+            // where the background check completed before this constructor ran.
+            if (UpdateNotifier.Latest is { Status: UpdateStatus.UpdateAvailable } cached)
+                ShowUpdateToast(cached);
+            UpdateNotifier.UpdateDiscovered += result =>
+            {
+                if (result.Status == UpdateStatus.UpdateAvailable)
+                    Application.Current?.Dispatcher.BeginInvoke(new Action(() => ShowUpdateToast(result)));
+            };
+
             Loaded += OnLoaded;
             Closed += (s, e) => _trayService.Dispose();
             _trayService.Initialize();
@@ -156,6 +167,21 @@ namespace GHelper.WPF.Views
                 sv.ScrollToVerticalOffset(sv.VerticalOffset - e.Delta / 3.0);
                 e.Handled = true;
             }
+        }
+
+        /// <summary>
+        /// Fires a one-shot OSD-style toast announcing an available update. The
+        /// user discovers the update without having to open the Settings panel.
+        /// </summary>
+        private static void ShowUpdateToast(UpdateCheckResult result)
+        {
+            string version = result.LatestVersion ?? "";
+            string message = string.IsNullOrEmpty(version)
+                ? "Update available"
+                : $"Update available — {version}";
+            //  is the MDL2 Update glyph (upward arrow into a tray)
+            ToastService.ShowOsdOnly(message, "",
+                System.Windows.Media.Color.FromRgb(0x60, 0xCD, 0xFF));
         }
     }
 }
