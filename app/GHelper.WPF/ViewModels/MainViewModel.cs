@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using GHelper.Gpu;
 using GHelper.Mode;
 using GHelper.WPF.Services;
+using Microsoft.Win32;
 
 namespace GHelper.WPF.ViewModels
 {
@@ -115,6 +116,12 @@ namespace GHelper.WPF.ViewModels
             _sensorTimer.Tick += OnSensorTick;
             _sensorTimer.Start();
 
+            // React immediately to AC plug/unplug instead of waiting up to 2s for the
+            // next sensor tick. Also signals to Windows that we're an active power-event
+            // participant — useful on hardware where the EC needs to coordinate with
+            // USB-PD negotiation.
+            SystemEvents.PowerModeChanged += OnSystemPowerModeChanged;
+
             // Initial mode from backend
             Task.Run(() =>
             {
@@ -210,6 +217,26 @@ namespace GHelper.WPF.ViewModels
             // Refresh current screen rate every 10 seconds (lightweight Win32 API call)
             if (++_tickCount % 5 == 0)
                 Visual.RefreshCurrentRate();
+        }
+
+        private void OnSystemPowerModeChanged(object? sender, PowerModeChangedEventArgs e)
+        {
+            if (e.Mode != PowerModes.StatusChange) return;
+
+            // The PowerStatus reading from .NET / Win32 is updated by the time this
+            // event fires. Refresh the sensors and battery state on the UI thread.
+            Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                try
+                {
+                    Battery.UpdateBatteryStatus();
+                    Monitor.UpdateSensors();
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine("PowerModeChanged refresh error: " + ex.Message);
+                }
+            }));
         }
 
     }

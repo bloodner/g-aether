@@ -31,6 +31,11 @@ public static class HardwareControl
     public static string? gpuFan;
     public static string? midFan;
 
+    // Auto-detected on first sensor read. If the machine has no Mid fan,
+    // GetFan(AsusFan.Mid) returns -1; we then skip the ACPI call permanently
+    // to avoid EC contention. Null = not yet determined.
+    private static bool? _hasMidFan;
+
     public static int? gpuUse;
     public static int? gpuPower;  // watts, from NVML (NVIDIA) or ADL (AMD) via IGpuControl.GetPowerDraw()
     public static int? cpuUse;    // % from PerformanceCounter "Processor / % Processor Time / _Total"
@@ -496,7 +501,21 @@ public static class HardwareControl
 
         cpuFan = FanSensorControl.FormatFan(AsusFan.CPU, Program.acpi.GetFan(AsusFan.CPU));
         gpuFan = FanSensorControl.FormatFan(AsusFan.GPU, Program.acpi.GetFan(AsusFan.GPU));
-        midFan = FanSensorControl.FormatFan(AsusFan.Mid, Program.acpi.GetFan(AsusFan.Mid));
+
+        // Skip the ACPI call on machines without a Mid fan. The first read on any
+        // machine determines this; subsequent ticks short-circuit if false.
+        if (_hasMidFan != false)
+        {
+            int midRpm = Program.acpi.GetFan(AsusFan.Mid);
+            if (_hasMidFan == null) _hasMidFan = midRpm >= 0;
+            midFan = _hasMidFan == true
+                ? FanSensorControl.FormatFan(AsusFan.Mid, midRpm)
+                : null;
+        }
+        else
+        {
+            midFan = null;
+        }
 
         cpuTemp = GetCPUTemp();
         gpuTemp = GetGPUTemp();
