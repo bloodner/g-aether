@@ -84,6 +84,9 @@ namespace GHelper.WPF.Services
             _source.AddHook(WndProc);
             RegisterAll();
             Logger.WriteLine($"GlobalHotkeyService: initialized with {_bindings.Count} binding(s)");
+            // VMs constructed before this point read an empty list; tell them
+            // bindings are now available so labels like "Not set" can refresh.
+            BindingsChanged?.Invoke();
         }
 
         public static void Shutdown()
